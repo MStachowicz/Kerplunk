@@ -48,11 +48,10 @@ int main()
 	
 	// Shader
 	// todo: move the shader string to a seperate file
+
+	// Vertex shader
 	const string VertexShaderString = ("#version 330 core\nlayout (location = 0) in vec3 aPos;void main(){gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);}");
 	const GLchar *VertexShaderSource = (const GLchar *)VertexShaderString.c_str();
-
-
-	//const GLchar *VertexShaderSource[] = ("#version 330 corelayout (location = 0) in vec3 aPos;void main(){gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);}");
 
 	unsigned int vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER); // shader object created
@@ -70,6 +69,22 @@ int main()
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
+	//Fragment shader
+	const string FragmentShaderString = ("#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);}");
+	const GLchar *FragmentShaderSource = (const GLchar *)FragmentShaderString.c_str();
+
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &FragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
 
 
 	float triangleVertices[] = {
