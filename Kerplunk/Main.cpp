@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <GLFW\glfw3.h>
-
 #include <iostream>
 
 using namespace std;
@@ -70,7 +69,7 @@ int main()
 	}
 
 	//Fragment shader
-	const string FragmentShaderString = ("#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);}");
+	const string FragmentShaderString = ("#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1.0f, 0.5f, 0.9f, 1.0f);}");
 	const GLchar *FragmentShaderSource = (const GLchar *)FragmentShaderString.c_str();
 
 	unsigned int fragmentShader;
@@ -100,7 +99,7 @@ int main()
 		std::cout << "ERROR::SHADER_PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 
-	glUseProgram(shaderProgram);
+	//glUseProgram(shaderProgram);
 
 	// clearing allocated memory after shaders are linked to the program
 	glDeleteShader(vertexShader);
@@ -115,8 +114,33 @@ int main()
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
+	
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+
+	// 1. bind Vertex Array Object
+	glBindVertexArray(VAO);
+
+	// 2. copy vertices array in a buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+
+	// 3. Linking vertex attributes
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	
+
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+	
+
+
+	// Generating a VAO
+
 
 
 	// render loop
@@ -131,6 +155,12 @@ int main()
 		// ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
