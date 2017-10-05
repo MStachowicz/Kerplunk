@@ -101,9 +101,14 @@ int main()
 
 	//triangle data
 	float triangleVertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
+	};
+	unsigned int triangleIndices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
 	};
 
 	unsigned int VBO;
@@ -112,6 +117,9 @@ int main()
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+
 	// 1. bind Vertex Array Object
 	glBindVertexArray(VAO);
 
@@ -119,12 +127,20 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
-	// 3. Linking vertex attributes
+	// 3. Copy index array in a element buffer for OpenGL to use
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangleIndices), triangleIndices, GL_STATIC_DRAW);
+
+	// 4. Linking vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// Unbind VBO, EBO, VAO
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+
+
 
 	// render loop
 	// -----------
@@ -142,7 +158,8 @@ int main()
 
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
