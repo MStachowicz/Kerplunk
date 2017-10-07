@@ -6,6 +6,8 @@ using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+bool isWireFrameModeActive = false;
+
 
 // settings
 const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600;
@@ -35,12 +37,12 @@ int main()
 	// glew
 	glewExperimental = GL_TRUE;
 
-	if (GLEW_OK != glewInit() )
+	if (GLEW_OK != glewInit())
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+
 	// Shader
 	// todo: move the shader string to a seperate file
 
@@ -113,7 +115,7 @@ int main()
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
-	
+
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 
@@ -174,12 +176,46 @@ int main()
 	return 0;
 }
 
+
+// A flag set to true when the caps lock key is pressed, reset to false when the
+// key is released
+bool capsFlag = false;
+
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+	// Close window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+
+	// Toggle wireframe mode
+	if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS)
+	{
+		if (!capsFlag)
+		{
+			if (isWireFrameModeActive)
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				isWireFrameModeActive = false;
+			}
+			else
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				isWireFrameModeActive = true;
+			}
+		}
+
+		// Set flag to indicate the key is being pressed.
+		capsFlag = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_RELEASE)
+	{
+		capsFlag = false;
+	}
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -190,3 +226,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
 }
+
