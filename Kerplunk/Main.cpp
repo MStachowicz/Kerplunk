@@ -113,35 +113,70 @@ int main()
 		1, 2, 3    // second triangle
 	};
 
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
+	//triangle 2 data
+	float triangle2Vertices[] = {
+		0.5f,  1.0f, 0.0f,   // top right
+		0.5f, 0.0f, 0.0f,   // bottom right
+		-0.5f, 0.0f, 0.0f,  // bottom left
+		-0.5f,  1.0f, 0.0f   // top left 
+	};
+	unsigned int triangle2Indices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
 
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
+	unsigned int VAO1, VAO2;
+	glGenVertexArrays(1, &VAO1);
+	glGenVertexArrays(2, &VAO2);
 
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
+	unsigned int VBO1, VBO2;
+	glGenBuffers(1, &VBO1);
+	glGenBuffers(1, &VBO2);
+
+	unsigned int EBO1, EBO2;
+	glGenBuffers(1, &EBO1);
+	glGenBuffers(1, &EBO2);
 
 	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAO1);
 
 	// 2. copy vertices array in a buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
 	// 3. Copy index array in a element buffer for OpenGL to use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO1);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangleIndices), triangleIndices, GL_STATIC_DRAW);
 
 	// 4. Linking vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Unbind VBO, EBO, VAO
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
+	// Unbind VAO, VBO, EBO 
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	// Triangle 2 VAO setup
+	// 1. bind Vertex Array Object
+	glBindVertexArray(VAO2);
+
+	// 2. copy vertices array in a buffer for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2Vertices), triangle2Vertices, GL_STATIC_DRAW);
+
+	// 3. Copy index array in a element buffer for OpenGL to use`
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle2Indices), triangle2Indices, GL_STATIC_DRAW);
+
+	// 4. Linking vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Unbind VAO, VBO, EBO 
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 	// render loop
@@ -159,10 +194,14 @@ int main()
 
 
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
+		
+		glBindVertexArray(VAO1);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
+		glBindVertexArray(VAO2);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
