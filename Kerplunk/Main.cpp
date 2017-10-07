@@ -7,6 +7,8 @@ using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 bool isWireFrameModeActive = false;
+// Variable to adjust the position of triangle vertices for testing locations.
+float yOffset = -1.0f;
 
 
 // settings
@@ -110,76 +112,47 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	//triangle data
+	// Triangle Data
 	float triangleVertices[] = {
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
+		-0.9f, -0.5f, 0.0f,  // left 
+		-0.0f, -0.5f, 0.0f,  // right
+		-0.45f, 0.5f, 0.0f,  // top 
+	};
+
+	// Triangle Indices
+	float triangle2Vertices[] = {
+		0.0f, -0.5f, 0.0f,  // left
+		0.9f, -0.5f, 0.0f,  // right
+		0.45f, 0.5f, 0.0f   // top 
 	};
 	unsigned int triangleIndices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+		0, 1, 2    
 	};
 
-	//triangle 2 data
-	float triangle2Vertices[] = {
-		0.5f,  1.0f, 0.0f,   // top right
-		0.5f, 0.0f, 0.0f,   // bottom right
-		-0.5f, 0.0f, 0.0f,  // bottom left
-		-0.5f,  1.0f, 0.0f   // top left 
-	};
-	unsigned int triangle2Indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
+	// Setting up VAOs and buffers
+	unsigned int VAO[2], VBO[2], EBO[2];
+	glGenVertexArrays(2, VAO);
+	glGenBuffers(2, VBO);
+	glGenBuffers(2, EBO);
 
-	unsigned int VAO1, VAO2;
-	glGenVertexArrays(1, &VAO1);
-	glGenVertexArrays(2, &VAO2);
-
-	unsigned int VBO1, VBO2;
-	glGenBuffers(1, &VBO1);
-	glGenBuffers(1, &VBO2);
-
-	unsigned int EBO1, EBO2;
-	glGenBuffers(1, &EBO1);
-	glGenBuffers(1, &EBO2);
-
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO1);
-
-	// 2. copy vertices array in a buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+	// Triangle 1
+	glBindVertexArray(VAO[0]); // 1. bind Vertex Array Object
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // 2. copy vertices array in a buffer for OpenGL to use
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
-
-	// 3. Copy index array in a element buffer for OpenGL to use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO1);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]); // 3. Copy index array in a element buffer for OpenGL to use
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangleIndices), triangleIndices, GL_STATIC_DRAW);
-
-	// 4. Linking vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // 4. Linking vertex attribute pointers
 	glEnableVertexAttribArray(0);
 
-	// Unbind VAO, VBO, EBO 
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	// Triangle 2 VAO setup
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO2);
-
-	// 2. copy vertices array in a buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	// No unbinding buffers as next VAO is bound
+	
+	// Triangle 2 
+	glBindVertexArray(VAO[1]); // 1. bind Vertex Array Object
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); // 2. copy vertices array in a buffer for OpenGL to use
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2Vertices), triangle2Vertices, GL_STATIC_DRAW);
-
-	// 3. Copy index array in a element buffer for OpenGL to use`
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle2Indices), triangle2Indices, GL_STATIC_DRAW);
-
-	// 4. Linking vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]); // 3. Copy index array in a element buffer for OpenGL to use
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangleIndices), triangleIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // 4. Linking vertex attribute pointers
 	glEnableVertexAttribArray(0);
 
 	// Unbind VAO, VBO, EBO 
@@ -204,12 +177,11 @@ int main()
 
 		glUseProgram(shaderProgram);
 		
-		glBindVertexArray(VAO1);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		glBindVertexArray(VAO[0]);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
-		glBindVertexArray(VAO2);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(VAO[1]);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -263,7 +235,11 @@ void processInput(GLFWwindow *window)
 	{
 		capsFlag = false;
 	}
-
+	// Toggle wireframe mode
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		yOffset += 0.1f;
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
