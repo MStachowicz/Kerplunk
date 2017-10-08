@@ -65,7 +65,6 @@ int main()
 	unsigned int triangleIndices[] = {  // note that we start from 0!
 		0, 1, 2
 	};
-
 	// Setting up VAOs and buffers
 	unsigned int VAO[2], VBO[2], EBO[2];
 	glGenVertexArrays(2, VAO);
@@ -104,6 +103,23 @@ int main()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
+	// Texture coordinates for both triangles
+	float texCoords[] = {
+		0.0f, 0.0f,  // lower-left corner  
+		1.0f, 0.0f,  // lower-right corner
+		0.5f, 1.0f   // top-center corner
+	};
+
+	// Setting the texture wrapping method
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	// Setting the texture filtering option to linear mipmap for downscaled and linear for upscaled textures
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 
 
 	// render loop
