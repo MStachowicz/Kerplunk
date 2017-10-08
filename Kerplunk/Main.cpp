@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "Shader.h"
 
 using namespace std;
 
@@ -46,6 +47,7 @@ int main()
 	}
 
 	// Shader
+	Shader ourShader("$SolutionDir/Shaddeder Files/VertexShader", "$SolutionDir/Shader Files/FragmentShader");
 
 	// Vertex shader
 	const GLchar *VertexShaderSource =
