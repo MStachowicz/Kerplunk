@@ -133,10 +133,10 @@
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="VertexShader.vs" />
+    <Text Include="VertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.fs" />
+    <None Include="FragmentShader.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
