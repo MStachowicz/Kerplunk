@@ -20,6 +20,26 @@ const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600;
 // Value used for the field of view argument in the glm perspective matrix creation.
 float FOV = 45.0f, cameraSpeed = 0.01f;
 
+// Camera
+// Vector pointing to the position of the camera.
+glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+// Vector pointing to the position the camera is looking.
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+// The inverse of the vector in which direction the camera is looking. Unit vector in direction of camera view.
+glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget);
+
+// Unit vector pointing up.
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+// The cross product of the vector pointing up and the camera's direction giving the unit vector in the direction right of the camera.
+glm::vec3 cameraRight = glm::normalize(glm::cross(up,cameraDirection));
+// Unit vector in direction up from where the camera is viewing.
+glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
+
+//FPS camera
+// Direction vector ensuring the camera keeps looking in target direction.
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+
 //Coordinate systems
 // Model matrix, transforms the vertex coordinates to world coordinates.
 glm::mat4 model;
@@ -27,6 +47,9 @@ glm::mat4 model;
 glm::mat4 view;
 // Projection matrix, enables openGL to create perspective using the homogeneous w component of vertices.
 glm::mat4 proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
+
+
+
 
 int main()
 {
@@ -284,9 +307,6 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ourShader.use();
-		// Model and view matrices are set every render cycle as they are prone to change.
-		ourShader.setMatrix4("model", glm::value_ptr(model));
-		ourShader.setMatrix4("view", glm::value_ptr(view));
 
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
@@ -300,6 +320,10 @@ int main()
 		glBindVertexArray(VAO[1]);
 		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);*/
+
+		// FPS camera 
+		view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, up);
+		ourShader.setMatrix4("view", glm::value_ptr(view));
 
 
 		float timePassed = glfwGetTime();
@@ -370,22 +394,16 @@ void processInput(GLFWwindow *window)
 	{
 		capsFlag = false;
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		view = glm::translate(view, glm::vec3(0.0f, -cameraSpeed,0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		view = glm::translate(view, glm::vec3(0.0f, cameraSpeed, 0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		view = glm::translate(view, glm::vec3(cameraSpeed, 0.0f, 0.0f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		view = glm::translate(view, glm::vec3(-cameraSpeed, 0.0f, 0.0f));
-	}
+
+	// Camera movement
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPosition += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPosition -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed; // normalized as result vector can change based on camera front causing camera movement to affect speed
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 
