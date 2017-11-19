@@ -36,8 +36,11 @@ glm::vec3 cameraRight = glm::normalize(glm::cross(up,cameraDirection));
 glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
 //FPS camera
-// Direction vector ensuring the camera keeps looking in target direction.
+// Direction vector ensuring the camera keeps looking in target direction altered by the mouse input.
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous values of mouse position to calculate offset. Initial value centre of the screen.
+bool firstMouse = true; // Prevents the camera jumping when first position is read to not be the centre of screen.
+float yaw = 0.0f, pitch = 0.0f;
 
 
 //Coordinate systems
@@ -47,7 +50,6 @@ glm::mat4 model;
 glm::mat4 view;
 // Projection matrix, enables openGL to create perspective using the homogeneous w component of vertices.
 glm::mat4 proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
-
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -90,6 +92,14 @@ int main()
 
 	// Shader
 	Shader ourShader("../Kerplunk/VertexShader.vert", "../Kerplunk/FragmentShader.frag");
+
+
+	// Setting up mouse input 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	//float vertices[] = {
 	//	// positions          // colors           // texture coords
@@ -294,6 +304,7 @@ int main()
 	ourShader.setMatrix4("projection", glm::value_ptr(proj));
 
 
+
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -325,6 +336,9 @@ int main()
 		// FPS camera 
 		view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, up);
 		ourShader.setMatrix4("view", glm::value_ptr(view));
+		// Zoom
+		proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
+		ourShader.setMatrix4("projection", glm::value_ptr(proj));
 
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -419,5 +433,49 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+		//glfwSetCursorPos(window, lastX, lastY);
+	}
+
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos;
+		lastX = xpos;
+		lastY = ypos;
+
+		float sensitivity = 0.05;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		yaw += xoffset;
+		pitch += yoffset;
+
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		front.y = sin(glm::radians(pitch));
+		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+		cameraFront = glm::normalize(front);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (FOV >= 1.0f && FOV <= 45.0f)
+		FOV -= yoffset;
+	if (FOV <= 1.0f)
+		FOV = 1.0f;
+	if (FOV >= 45.0f)
+		FOV = 45.0f;
 }
 
