@@ -18,7 +18,7 @@ bool isWireFrameModeActive = false;
 // settings
 const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600;
 // Value used for the field of view argument in the glm perspective matrix creation.
-float FOV = 45.0f, cameraSpeed = 0.01f;
+float FOV = 45.0f, cameraSpeed = 0.0f;
 
 // Camera
 // Vector pointing to the position of the camera.
@@ -49,7 +49,8 @@ glm::mat4 view;
 glm::mat4 proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
 
 
-
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
 
 int main()
 {
@@ -325,14 +326,15 @@ int main()
 		view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, up);
 		ourShader.setMatrix4("view", glm::value_ptr(view));
 
-
-		float timePassed = glfwGetTime();
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i * timePassed;
+			float angle = 20.0f * i * currentFrame;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			ourShader.setMatrix4("model", glm::value_ptr(model));
 
@@ -364,6 +366,9 @@ bool capsFlag = false;
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+	cameraSpeed = 2.5f * deltaTime;
+
+
 	// Close window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
