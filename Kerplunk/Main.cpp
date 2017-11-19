@@ -3,56 +3,39 @@
 #include <GLFW/glfw3.h>
 #include <direct.h>
 #include "Shader.h"
+#include "Camera.h"
 #include "stb_image.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-// Boolean keeping track of whether wireframE mode is enabled.
-bool isWireFrameModeActive = false;
-// settings
-const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600;
-// Value used for the field of view argument in the glm perspective matrix creation.
-float FOV = 45.0f, cameraSpeed = 0.0f;
 
-// Camera
-// Vector pointing to the position of the camera.
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-// Vector pointing to the position the camera is looking.
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-// The inverse of the vector in which direction the camera is looking. Unit vector in direction of camera view.
-glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget);
+bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
+const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600; // Screen dimensions.
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
+float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
+bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
 
-// Unit vector pointing up.
-glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-// The cross product of the vector pointing up and the camera's direction giving the unit vector in the direction right of the camera.
-glm::vec3 cameraRight = glm::normalize(glm::cross(up,cameraDirection));
-// Unit vector in direction up from where the camera is viewing.
-glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
-
-//FPS camera
-// Direction vector ensuring the camera keeps looking in target direction altered by the mouse input.
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous values of mouse position to calculate offset. Initial value centre of the screen.
-bool firstMouse = true; // Prevents the camera jumping when first position is read to not be the centre of screen.
-float yaw = 0.0f, pitch = 0.0f;
-
-
-//Coordinate systems
+// TRANSFORMATION MATRICES FOR COORDINATE SYSTEMS
 // Model matrix, transforms the vertex coordinates to world coordinates.
 glm::mat4 model;
 // View matrix, transforms the entire scene to allow for camera movement.
 glm::mat4 view;
 // Projection matrix, enables openGL to create perspective using the homogeneous w component of vertices.
-glm::mat4 proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
+glm::mat4 proj;
 
+// TIMING
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
+
+// KEY FLAGS set to true when key is pressed, reset to false when the key is released
+bool capsFlag = false;
 
 int main()
 {
@@ -78,6 +61,10 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	// Setting up mouse input 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	glewExperimental = GL_TRUE;
 
@@ -87,36 +74,11 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	// Set openGL flag to enable depth testing.
+	// Configure global OpenGL state
 	glEnable(GL_DEPTH_TEST);
 
-	// Shader
+	// Build and compile shader
 	Shader ourShader("../Kerplunk/VertexShader.vert", "../Kerplunk/FragmentShader.frag");
-
-
-	// Setting up mouse input 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-	glfwSetScrollCallback(window, scroll_callback);
-
-	//float vertices[] = {
-	//	// positions          // colors           // texture coords
-	//	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,		  // top right
-	//	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,		  // bottom right
-	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,		  // bottom left
-	//	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f		  // top left 
-	//};
-
-	//// Indices for triangle 1
-	//unsigned int triangle1Indices[] = {  // note that we start from 0!
-	//	1, 2, 3
-	//};
-	//// Indices for triangle 2
-	//unsigned int triangle2Indices[] = {  // note that we start from 0!
-	//	3, 0, 1
-	//};
 
 	float cubeVertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -182,36 +144,6 @@ int main()
 	glGenBuffers(3, VBO);
 	glGenBuffers(2, EBO);
 
-	//// Triangle 1
-	//glBindVertexArray(VAO[0]); // 1. bind Vertex Array Object
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // 2. copy vertices array in a buffer for OpenGL to use
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]); // 3. Copy index array in a element buffer for OpenGL to use
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle1Indices), triangle1Indices, GL_STATIC_DRAW);
-	//// Position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // 4. Linking vertex attribute pointers
-	//glEnableVertexAttribArray(0);
-	//// Texture attribute
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
-	//// Triangle 2 
-	//glBindVertexArray(VAO[1]); // 1. bind Vertex Array Object
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); // 2. copy vertices array in a buffer for OpenGL to use
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]); // 3. Copy index array in a element buffer for OpenGL to use
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle2Indices), triangle2Indices, GL_STATIC_DRAW);
-	//// Position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); 
-	//glEnableVertexAttribArray(0);
-	//// Texture attribute
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
-	//// Unbind EBO 
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
 	// Cube object
 	glBindVertexArray(VAO[2]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
@@ -228,10 +160,7 @@ int main()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-
-	// Texture
-	//------------------------------------------------
+	// ------------------------------------------------ TEXTURE ------------------------------------------------
 	// Generate texture objects
 	unsigned int texture[2];
 	glGenTextures(2, texture);
@@ -295,26 +224,18 @@ int main()
 	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
 
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-	// Setting the uniform coordinate matrices in the shader.
-	ourShader.setMatrix4("model", glm::value_ptr(model));
-	ourShader.setMatrix4("view", glm::value_ptr(view));
-	ourShader.setMatrix4("projection", glm::value_ptr(proj));
-
-
-
-	// render loop
-	// -----------
+	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
+		// Per frame time logic
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// input
-		// -----
 		processInput(window);
 
 		// render
-		// ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -326,23 +247,13 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture[1]);
 
-		// Previous triangle render code using EBO
-		/*glBindVertexArray(VAO[0]);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(VAO[1]);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);*/
-
-		// FPS camera 
-		view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, up);
-		ourShader.setMatrix4("view", glm::value_ptr(view));
 		// Zoom
-		proj = glm::perspective(glm::radians(FOV), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
+		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
 		ourShader.setMatrix4("projection", glm::value_ptr(proj));
-
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		// FPS camera 
+		view = camera.GetViewMatrix(); 
+		ourShader.setMatrix4("view", glm::value_ptr(view));
+	
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
@@ -370,19 +281,10 @@ int main()
 	return 0;
 }
 
-
-// A flag set to true when the caps lock key is pressed, reset to false when the
-// key is released
-bool capsFlag = false;
-
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
-	cameraSpeed = 2.5f * deltaTime;
-
-
 	// Close window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -414,15 +316,15 @@ void processInput(GLFWwindow *window)
 		capsFlag = false;
 	}
 
-	// Camera movement
+	// CAMERA MOVEMENT
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPosition += cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPosition -= cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed; // normalized as result vector can change based on camera front causing camera movement to affect speed
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 
@@ -442,40 +344,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		lastX = xpos;
 		lastY = ypos;
 		firstMouse = false;
-		//glfwSetCursorPos(window, lastX, lastY);
 	}
 
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos;
-		lastX = xpos;
-		lastY = ypos;
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-		float sensitivity = 0.05;
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
+	lastX = xpos;
+	lastY = ypos;
 
-		yaw += xoffset;
-		pitch += yoffset;
-
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
-
-		glm::vec3 front;
-		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front.y = sin(glm::radians(pitch));
-		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		cameraFront = glm::normalize(front);
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	if (FOV >= 1.0f && FOV <= 45.0f)
-		FOV -= yoffset;
-	if (FOV <= 1.0f)
-		FOV = 1.0f;
-	if (FOV >= 45.0f)
-		FOV = 45.0f;
+	camera.ProcessMouseScroll(yoffset);
 }
 
