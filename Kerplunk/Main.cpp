@@ -273,13 +273,14 @@ int main()
 		lightingShader.setVec3("objectColor", glm::value_ptr(objectColor));
 		lightingShader.setVec3("lightColor", glm::value_ptr(lightColor));
 		lightingShader.setVec3("lightPos", glm::value_ptr(lightPos));
+		lightingShader.setVec3("viewPos", glm::value_ptr(camera.Position));
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i * currentFrame;
-			//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			float angle = 10.0f * i * currentFrame;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			lightingShader.setMatrix4("model", glm::value_ptr(model));
 
 			glBindVertexArray(VAO[2]);
