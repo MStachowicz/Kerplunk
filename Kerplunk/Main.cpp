@@ -267,13 +267,35 @@ int main()
 
 		lightingShader.setMatrix4("projection", glm::value_ptr(proj));
 		lightingShader.setMatrix4("view", glm::value_ptr(view));
-
-		glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
-		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("objectColor", glm::value_ptr(objectColor));
-		lightingShader.setVec3("lightColor", glm::value_ptr(lightColor));
-		lightingShader.setVec3("lightPos", glm::value_ptr(lightPos));
 		lightingShader.setVec3("viewPos", glm::value_ptr(camera.Position));
+
+		// MATERIAL
+		glm::vec3 ambient = glm::vec3(1.0f, 0.5f, 0.31f);
+		glm::vec3 diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+		glm::vec3 specular = glm::vec3(0.5f);
+		lightingShader.setVec3("material.ambient", glm::value_ptr(ambient));
+		lightingShader.setVec3("material.diffuse", glm::value_ptr(diffuse));
+		lightingShader.setVec3("material.specular", glm::value_ptr(specular));
+		lightingShader.setFloat("material.shininess", 32.0f);
+		//LIGHT
+		glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
+		glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		glm::vec3 lightSpecular = glm::vec3(1.0f);
+		lightingShader.setVec3("light.ambient", glm::value_ptr(lightAmbient));
+		lightingShader.setVec3("light.diffuse", glm::value_ptr(lightDiffuse)); // darken the light a bit to fit the scene
+		lightingShader.setVec3("light.specular", glm::value_ptr(lightSpecular));
+		lightingShader.setVec3("light.position", glm::value_ptr(lightPos));
+
+		// Changing colour
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f);
+		lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+		lightingShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
+		lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
@@ -291,6 +313,8 @@ int main()
 		lightBoxShader.use();
 
 		model = glm::mat4(1.0f);
+		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightBoxShader.setMatrix4("model", glm::value_ptr(model));
