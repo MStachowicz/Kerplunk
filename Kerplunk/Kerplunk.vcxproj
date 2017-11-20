@@ -139,7 +139,11 @@
     <Text Include="VertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FragmentShader - lightBox.frag" />
+    <None Include="FragmentShader - lighting.frag" />
     <None Include="FragmentShader.frag" />
+    <None Include="VertexShader - lightBox.vert" />
+    <None Include="VertexShader - lighting.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

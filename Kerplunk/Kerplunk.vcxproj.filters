@@ -43,6 +43,18 @@
     <None Include="FragmentShader.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="VertexShader - lighting.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="FragmentShader - lighting.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="FragmentShader - lightBox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="VertexShader - lightBox.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="VertexShader.vert">

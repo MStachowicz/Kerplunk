@@ -10,6 +10,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+//#include <vector>
 
 class Shader
 {
@@ -27,6 +28,8 @@ public:
 	void setFloat(const std::string &name, float value) const;
 
 	void setMatrix4(const std::string & name, float *value) const;
+	void setVec3(const std::string & name, float *value) const;
+	//void setVec3(const std::string & name, glm::vec3 *value) const;
 
 	~Shader();
 

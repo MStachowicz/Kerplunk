@@ -16,19 +16,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 const GLint SCR_WIDTH = 800, SCR_HEIGHT = 600; // Screen dimensions.
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
+bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
 
 // TRANSFORMATION MATRICES FOR COORDINATE SYSTEMS
-// Model matrix, transforms the vertex coordinates to world coordinates.
-glm::mat4 model;
-// View matrix, transforms the entire scene to allow for camera movement.
-glm::mat4 view;
-// Projection matrix, enables openGL to create perspective using the homogeneous w component of vertices.
-glm::mat4 proj;
+glm::mat4 model; // Model matrix, transforms the vertex coordinates to world coordinates.
+glm::mat4 view;	 // View matrix, transforms the entire scene to allow for camera movement.
+glm::mat4 proj; // Projection matrix, enables openGL to create perspective using the homogeneous w component of vertices.
 
 // TIMING
 float deltaTime = 0.0f;	// Time between current frame and last frame
@@ -36,6 +33,8 @@ float lastFrame = 0.0f; // Time of last frame
 
 // KEY FLAGS set to true when key is pressed, reset to false when the key is released
 bool capsFlag = false;
+
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // Position of the light in world coordinates.
 
 int main()
 {
@@ -78,7 +77,9 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Build and compile shader
-	Shader ourShader("../Kerplunk/VertexShader.vert", "../Kerplunk/FragmentShader.frag");
+	Shader ourShader("../Kerplunk/VertexShader.vert", "../Kerplunk/FragmentShader.frag"); // Shader featuring texture mapping with two textures
+	Shader lightingShader("../Kerplunk/VertexShader - lighting.vert", "../Kerplunk/FragmentShader - lighting.frag"); // Shader to calculate lighting on objects
+	Shader lightBoxShader("../Kerplunk/VertexShader - lightBox.vert", "../Kerplunk/FragmentShader - lightBox.frag"); // Shader to draw an always white object representing light source
 
 	float cubeVertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -155,6 +156,15 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	// Setting up data for light box
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	// we only need to bind to the VBO, the container's VBO's data already contains the correct data.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+	// set the vertex attributes (only position data for lamp)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// unbind VAO and VBO
 	glBindVertexArray(0);
@@ -239,34 +249,53 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ourShader.use();
+		//ourShader.use();
+		//// Binding textures on corresponding texture units after activating them
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, texture[0]);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, texture[1]);
 
-		// Binding textures on corresponding texture units after activating them
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture[0]);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture[1]);
-
-		// Zoom
+		// Projection set
 		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
-		ourShader.setMatrix4("projection", glm::value_ptr(proj));
-		// FPS camera 
-		view = camera.GetViewMatrix(); 
-		ourShader.setMatrix4("view", glm::value_ptr(view));
-	
+		view = camera.GetViewMatrix();
+
+		//ourShader.setMatrix4("view", glm::value_ptr(view));
+		//ourShader.setMatrix4("projection", glm::value_ptr(proj));
+
+		lightingShader.use();
+
+		lightingShader.setMatrix4("projection", glm::value_ptr(proj));
+		lightingShader.setMatrix4("view", glm::value_ptr(view));
+
+		glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("objectColor", glm::value_ptr(objectColor));
+		lightingShader.setVec3("lightColor", glm::value_ptr(lightColor));
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i * currentFrame;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			ourShader.setMatrix4("model", glm::value_ptr(model));
+			lightingShader.setMatrix4("model", glm::value_ptr(model));
 
+			glBindVertexArray(VAO[2]);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		glBindVertexArray(VAO[2]);
+		// LIGHT CUBE + shader
+		lightBoxShader.use();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightBoxShader.setMatrix4("model", glm::value_ptr(model));
+		lightBoxShader.setMatrix4("projection", glm::value_ptr(proj));
+		lightBoxShader.setMatrix4("view", glm::value_ptr(view));
+
+		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
