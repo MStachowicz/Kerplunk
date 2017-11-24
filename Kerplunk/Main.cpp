@@ -213,26 +213,27 @@ int main()
 
 		lightingShader.use();
 
-		lightingShader.setMatrix4("projection", glm::value_ptr(proj));
-		lightingShader.setMatrix4("view", glm::value_ptr(view));
-		lightingShader.setVec3("viewPos", glm::value_ptr(camera.Position));
+		lightingShader.setMat4("projection", proj);
+		lightingShader.setMat4("view", view);
+		lightingShader.setVec3("viewPos", camera.Position);
 
 		// MATERIAL
 		glm::vec3 ambient = glm::vec3(1.0f, 0.5f, 0.31f);
 		glm::vec3 diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
 		glm::vec3 specular = glm::vec3(0.5f);
-		lightingShader.setVec3("material.ambient", glm::value_ptr(ambient));
-		lightingShader.setVec3("material.diffuse", glm::value_ptr(diffuse));
-		lightingShader.setVec3("material.specular", glm::value_ptr(specular));
+		lightingShader.setVec3("material.ambient", ambient);
+		lightingShader.setVec3("material.diffuse", diffuse);
+		lightingShader.setVec3("material.specular", specular);
 		lightingShader.setFloat("material.shininess", 32.0f);
 		//LIGHT
 		glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
 		glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 		glm::vec3 lightSpecular = glm::vec3(1.0f);
-		lightingShader.setVec3("light.ambient", glm::value_ptr(lightAmbient));
-		lightingShader.setVec3("light.diffuse", glm::value_ptr(lightDiffuse)); // darken the light a bit to fit the scene
-		lightingShader.setVec3("light.specular", glm::value_ptr(lightSpecular));
-		lightingShader.setVec3("light.position", glm::value_ptr(lightPos));
+		lightingShader.setVec3("light.ambient", lightAmbient);
+		lightingShader.setVec3("light.diffuse", lightDiffuse); // darken the light a bit to fit the scene
+		lightingShader.setVec3("light.specular", lightSpecular);
+		//lightingShader.setVec3("light.position", lightPos));
+		lightingShader.setVec3("light.direction", lightPos);
 
 		// Changing colour
 		//glm::vec3 lightColor;
@@ -251,7 +252,7 @@ int main()
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 10.0f * i * currentFrame;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			lightingShader.setMatrix4("model", glm::value_ptr(model));
+			lightingShader.setMat4("model", model);
 
 			glBindVertexArray(VAO[2]);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -265,9 +266,9 @@ int main()
 		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
-		lightBoxShader.setMatrix4("model", glm::value_ptr(model));
-		lightBoxShader.setMatrix4("projection", glm::value_ptr(proj));
-		lightBoxShader.setMatrix4("view", glm::value_ptr(view));
+		lightBoxShader.setMat4("model", model);
+		lightBoxShader.setMat4("projection", proj);
+		lightBoxShader.setMat4("view", view);
 
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
