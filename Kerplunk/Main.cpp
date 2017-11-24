@@ -143,6 +143,19 @@ int main()
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
+
+	glm::vec3 pointLightColours[] = {
+		glm::vec3(1.0f),
+		glm::vec3(1.0f),
+		glm::vec3(1.0f),
+		glm::vec3(1.0f)
+	};
 
 	// Setting up VAOs and buffers
 	unsigned int VAO[3], VBO[3], EBO[2];
@@ -217,36 +230,43 @@ int main()
 		lightingShader.setMat4("view", view);
 		lightingShader.setVec3("viewPos", camera.Position);
 
-		// MATERIAL
+		// Set the uniforms for all the point lights
+		for (GLuint i = 0; i < 4; i++)
+		{
+			string number = to_string(i);
+
+			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].position").c_str()), pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
+			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].ambient").c_str()), pointLightColours[i].r * 0.1f, pointLightColours[i].g * 0.1f, pointLightColours[i].b * 0.1f);
+			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].diffuse").c_str()), pointLightColours[i].r, pointLightColours[i].g, pointLightColours[i].b);
+			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].specular").c_str()), 1.0f, 1.0f, 1.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].constant").c_str()), 1.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].linear").c_str()), 0.09f);
+			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.032f);
+		}
+
+		// Set uniforms for the directional light
+		lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+		lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+		// Set uniforms for the spotlight
+		lightingShader.setVec3("spotlight.position", camera.Position);
+		lightingShader.setVec3("spotlight.direction", camera.Front);
+		lightingShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
+		lightingShader.setVec3("spotlight.diffuse", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
+		lightingShader.setFloat("spotlight.constant", 1.0f);
+		lightingShader.setFloat("spotlight.linear", 0.09);
+		lightingShader.setFloat("spotlight.quadratic", 0.032);
+		lightingShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
+		lightingShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
+		// Set uniforms for the material properties
 		lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 		lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
-
-		//LIGHT
-		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken the light a bit to fit the scene
-		lightingShader.setVec3("light.specular", 1.0f,1.0f,1.0f);
-		lightingShader.setVec3("light.position", lightPos);
-		// Attenuation
-		lightingShader.setFloat("light.constant", 1.0f);
-		lightingShader.setFloat("light.linear", 0.09f);
-		lightingShader.setFloat("light.quadratic", 0.032f);
-		//lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
-
-		// SPOTLIGHT
-		lightingShader.setVec3("spotlight.position", camera.Position);
-		lightingShader.setVec3("spotlight.direction", camera.Front);
-		lightingShader.setFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
-		lightingShader.setFloat("spotlight.outerCutoff", glm::cos(glm::radians(17.5f)));
-		// attenuation
-		lightingShader.setFloat("spotlight.constant", 1.0f);
-		lightingShader.setFloat("spotlight.linear", 0.09f);
-		lightingShader.setFloat("spotlight.quadratic", 0.032f);
-		//
-		lightingShader.setVec3("spotlight.ambient", 0.1f, 0.1f, 0.1f);
-		lightingShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f); // darken the light a bit to fit the scene
-		lightingShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
 
 
 		// Changing colour
@@ -254,12 +274,13 @@ int main()
 		//lightColor.x = sin(glfwGetTime() * 2.0f);
 		//lightColor.y = sin(glfwGetTime() * 0.7f);
 		//lightColor.z = sin(glfwGetTime() * 1.3f);
-
 		//glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
 		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
 		//lightingShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
 		//lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
 
+
+		// Draw cubes
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			model = glm::mat4(1.0f);
@@ -272,20 +293,25 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		// LIGHT CUBE + shader
+
+
+		// Draw light cubes
 		lightBoxShader.use();
 
-		model = glm::mat4(1.0f);
-		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightBoxShader.setMat4("model", model);
-		lightBoxShader.setMat4("projection", proj);
-		lightBoxShader.setMat4("view", view);
+		for (unsigned int i = 0; i < 4; i++)
+		{
+			model = glm::mat4(1.0f);
+			lightPos = pointLightPositions[i];
+			model = glm::translate(model, lightPos);
+			model = glm::scale(model, glm::vec3(0.2f));
+			lightBoxShader.setMat4("model", model);
 
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+			lightBoxShader.setMat4("projection", proj);
+			lightBoxShader.setMat4("view", view);
+
+			glBindVertexArray(lightVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
