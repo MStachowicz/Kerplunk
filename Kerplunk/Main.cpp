@@ -197,7 +197,7 @@ int main()
 		processInput(window);
 
 		// render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightingShader.use();
@@ -232,8 +232,12 @@ int main()
 		lightingShader.setVec3("light.ambient", lightAmbient);
 		lightingShader.setVec3("light.diffuse", lightDiffuse); // darken the light a bit to fit the scene
 		lightingShader.setVec3("light.specular", lightSpecular);
-		//lightingShader.setVec3("light.position", lightPos));
-		lightingShader.setVec3("light.direction", lightPos);
+		lightingShader.setVec3("light.position", lightPos);
+		// Attenuation
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.09f);
+		lightingShader.setFloat("light.quadratic", 0.032f);
+		//lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
 
 		// Changing colour
 		//glm::vec3 lightColor;
