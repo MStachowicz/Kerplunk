@@ -26,6 +26,7 @@ struct Spotlight {
     vec3 position;
     vec3 direction;
     float cutoff; 
+	float outerCutoff;
 
 	// Attenuation
 	float constant;
@@ -84,38 +85,37 @@ void main()
 
 
     // SPOTLIGHT
-	float strength = 0.5;
-    lightDir = normalize(spotlight.position - FragPos);
-    float theta = dot(lightDir, normalize(-spotlight.direction));
+	//float strength = 0.5;
+    //float theta = dot(lightDir, normalize(-spotlight.direction));
 
-    if(theta > spotlight.cutoff) 
-	{
-        // AMBIENT
-		vec3 ambient = spotlight.ambient * vec3(texture(material.diffuseMap, TexCoord));
+		// AMBIENT
+		ambient = spotlight.ambient * vec3(texture(material.diffuseMap, TexCoord));
         // DIFFUSE
-		vec3 norm = normalize(Normal);
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = spotlight.diffuse * diff * vec3(texture(material.diffuseMap, TexCoord));
+		norm = normalize(Normal);
+		lightDir = normalize(spotlight.position - FragPos);
+        diff = max(dot(norm, lightDir), 0.0);
+        diffuse = spotlight.diffuse * diff * vec3(texture(material.diffuseMap, TexCoord));
         //SPECULAR 
-		vec3 viewDir = normalize(viewPos - FragPos);
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-        vec3 specular = spotlight.specular * spec * vec3(texture(material.specularMap, TexCoord));
+		viewDir = normalize(viewPos - FragPos);
+        reflectDir = reflect(-lightDir, norm);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+        specular = spotlight.specular * spec * vec3(texture(material.specularMap, TexCoord));
         
+		// Spotlight soft edges
+		float theta     = dot(lightDir, normalize(-spotlight.direction));
+		float epsilon   = spotlight.cutoff - spotlight.outerCutoff;
+		float intensity = clamp((theta - spotlight.outerCutoff) / epsilon, 0.0, 1.0);   
+		diffuse  *= intensity;
+		specular *= intensity;
+
 		// Attenuation
 		float SpotDistance = length(spotlight.position - FragPos);
 		float SpotAttenuation = 1.0 / (spotlight.constant + spotlight.linear * SpotDistance + spotlight.quadratic * (SpotDistance * SpotDistance));
-
+		ambient  *= SpotAttenuation; 
 		diffuse  *= SpotAttenuation;
         specular *= SpotAttenuation; 
 
-
 		// RESULT SPOTLIGHT
-		result += ((ambient + diffuse + specular) * strength);
+		result += ambient + diffuse + specular;
         FragColor = vec4(result, 1.0);
-    }
-	else
-	{
-	FragColor = vec4(result, 1.0);
-	}
 }

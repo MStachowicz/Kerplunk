@@ -237,7 +237,8 @@ int main()
 		// SPOTLIGHT
 		lightingShader.setVec3("spotlight.position", camera.Position);
 		lightingShader.setVec3("spotlight.direction", camera.Front);
-		lightingShader.setFloat("spotlight.cutoff", glm::cos(glm::radians(10.5f)));
+		lightingShader.setFloat("spotlight.cutoff", glm::cos(glm::radians(12.5f)));
+		lightingShader.setFloat("spotlight.outerCutoff", glm::cos(glm::radians(17.5f)));
 		// attenuation
 		lightingShader.setFloat("spotlight.constant", 1.0f);
 		lightingShader.setFloat("spotlight.linear", 0.09f);
