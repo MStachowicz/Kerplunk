@@ -218,26 +218,35 @@ int main()
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		// MATERIAL
-		glm::vec3 ambient = glm::vec3(1.0f, 0.5f, 0.31f);
-		glm::vec3 diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
-		glm::vec3 specular = glm::vec3(0.5f);
-		lightingShader.setVec3("material.ambient", ambient);
-		lightingShader.setVec3("material.diffuse", diffuse);
-		lightingShader.setVec3("material.specular", specular);
+		lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
+
 		//LIGHT
-		glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
-		glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		glm::vec3 lightSpecular = glm::vec3(1.0f);
-		lightingShader.setVec3("light.ambient", lightAmbient);
-		lightingShader.setVec3("light.diffuse", lightDiffuse); // darken the light a bit to fit the scene
-		lightingShader.setVec3("light.specular", lightSpecular);
+		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken the light a bit to fit the scene
+		lightingShader.setVec3("light.specular", 1.0f,1.0f,1.0f);
 		lightingShader.setVec3("light.position", lightPos);
 		// Attenuation
 		lightingShader.setFloat("light.constant", 1.0f);
 		lightingShader.setFloat("light.linear", 0.09f);
 		lightingShader.setFloat("light.quadratic", 0.032f);
 		//lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+
+		// SPOTLIGHT
+		lightingShader.setVec3("spotlight.position", camera.Position);
+		lightingShader.setVec3("spotlight.direction", camera.Front);
+		lightingShader.setFloat("spotlight.cutoff", glm::cos(glm::radians(10.5f)));
+		// attenuation
+		lightingShader.setFloat("spotlight.constant", 1.0f);
+		lightingShader.setFloat("spotlight.linear", 0.09f);
+		lightingShader.setFloat("spotlight.quadratic", 0.032f);
+		//
+		lightingShader.setVec3("spotlight.ambient", 0.1f, 0.1f, 0.1f);
+		lightingShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f); // darken the light a bit to fit the scene
+		lightingShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
+
 
 		// Changing colour
 		//glm::vec3 lightColor;
