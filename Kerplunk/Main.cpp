@@ -201,7 +201,7 @@ int main()
 
 
 	// load models
-	Model nanosuit("resources/objects/nanosuit/nanosuit.obj");
+	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
 
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
@@ -217,13 +217,6 @@ int main()
 		// render
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		lightingShader.use();
-		// Binding textures on corresponding texture units after activating them
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		// Projection set
 		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
@@ -273,19 +266,21 @@ int main()
 		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
 
-		// Draw models
+
+		// Draw Nanosuit
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f));
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightingShader.setMat4("model", model);
 		nanosuit.Draw(lightingShader);
 
-		// Changing colour
-		//glm::vec3 lightColor;
-		//lightColor.x = sin(glfwGetTime() * 2.0f);
-		//lightColor.y = sin(glfwGetTime() * 0.7f);
-		//lightColor.z = sin(glfwGetTime() * 1.3f);
-		//glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
-		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-		//lightingShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
-		//lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
 
+
+		// Binding textures on corresponding texture units after activating them
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		// Draw cubes
 		for (unsigned int i = 0; i < 10; i++)
@@ -300,7 +295,15 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-
+		// Changing colour
+		//glm::vec3 lightColor;
+		//lightColor.x = sin(glfwGetTime() * 2.0f);
+		//lightColor.y = sin(glfwGetTime() * 0.7f);
+		//lightColor.z = sin(glfwGetTime() * 1.3f);
+		//glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
+		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+		//lightingShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
+		//lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
 
 		// Draw light cubes
 		lightBoxShader.use();
