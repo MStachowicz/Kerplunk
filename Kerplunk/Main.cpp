@@ -8,6 +8,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "Model.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -198,6 +199,10 @@ int main()
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
 
+
+	// load models
+	Model nanosuit("resources/objects/nanosuit/nanosuit.obj");
+
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
@@ -268,6 +273,8 @@ int main()
 		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
 
+		// Draw models
+		nanosuit.Draw(lightingShader);
 
 		// Changing colour
 		//glm::vec3 lightColor;
