@@ -37,8 +37,8 @@ struct SpotLight {
 };
 
 struct Material {
-    sampler2D diffuseMap;
     sampler2D specularMap;
+    sampler2D diffuseMap;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;

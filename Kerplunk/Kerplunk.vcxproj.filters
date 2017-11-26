@@ -46,25 +46,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.frag">
+    <None Include="lightBox.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="VertexShader - lighting.vert">
+    <None Include="lighting.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="FragmentShader - lighting.frag">
+    <None Include="lightBox.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="FragmentShader - lightBox.frag">
+    <None Include="lighting.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="VertexShader - lightBox.vert">
+    <None Include="lightingMaterial.frag">
       <Filter>Shader Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="VertexShader.vert">
+    <None Include="lightingMaterial.vert">
       <Filter>Shader Files</Filter>
-    </Text>
+    </None>
   </ItemGroup>
 </Project>
