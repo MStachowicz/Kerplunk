@@ -146,6 +146,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="frameBuffer.frag" />
+    <None Include="frameBuffer.vert" />
     <None Include="lightBox.frag" />
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />

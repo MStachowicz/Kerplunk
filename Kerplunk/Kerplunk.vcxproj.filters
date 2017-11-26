@@ -64,5 +64,11 @@
     <None Include="texture.vert">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="frameBuffer.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="frameBuffer.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
