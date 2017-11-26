@@ -20,7 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-unsigned int loadTexture(char const * path);
+unsigned int loadTexture(char const * path, bool isAlpha);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
@@ -84,6 +84,7 @@ int main()
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag"); // Shader to draw an always white object representing light source
+	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag"); // Shader to draw textured objects with no lighting applied
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -129,19 +130,6 @@ int main()
 	   -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
 	   -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
-	float texRepeat = 8.0f;
-	float planeVertices[] = {
-		// positions        // normals         // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-		 5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, 0.0f,
-		-5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
-		-5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  0.0f, texRepeat,
-
-		 5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, 0.0f,
-		-5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  0.0f, texRepeat,
-		 5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, texRepeat
-	};
-
-
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
@@ -154,6 +142,7 @@ int main()
 		glm::vec3(1.5f,  0.2f, -2.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+
 
 	glm::vec3 pointLightPositions[] = {
 		glm::vec3(0.7f,  0.2f,  2.0f),
@@ -169,6 +158,37 @@ int main()
 		glm::vec3(1.0f)
 	};
 
+	float texRepeat = 8.0f;
+	float planeVertices[] = {
+		// positions        // normals         // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+		5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, 0.0f,
+		-5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
+		-5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  0.0f, texRepeat,
+
+		5.0f,-0.5f, 5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, 0.0f,
+		-5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  0.0f, texRepeat,
+		5.0f,-0.5f,-5.0f,  0.0f, 1.0f, 0.0f,  texRepeat, texRepeat
+	};
+
+	float transparentVertices[] = {
+		// positions          // texture Coords (swapped y coordinates because texture is flipped upside down)
+		0.0f,  0.5f,  0.0f,   0.0f,  0.0f,
+		0.0f, -0.5f,  0.0f,   0.0f,  1.0f,
+		1.0f, -0.5f,  0.0f,   1.0f,  1.0f,
+
+		0.0f,  0.5f,  0.0f,   0.0f,  0.0f,
+		1.0f, -0.5f,  0.0f,   1.0f,  1.0f,
+		1.0f,  0.5f,  0.0f,   1.0f,  0.0f
+	};
+	// Vegetation locations
+	vector<glm::vec3> vegetation
+	{
+		glm::vec3(-1.5f, 0.0f, -0.48f),
+		glm::vec3(1.5f, 0.0f, 0.51f),
+		glm::vec3(0.0f, 0.0f, 0.7f),
+		glm::vec3(-0.3f, 0.0f, -2.3f),
+		glm::vec3(0.5f, 0.0f, -0.6f)
+	};
 
 
 	// Cube VAO
@@ -217,21 +237,38 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
+
+	// transparent VAO
+	unsigned int transparentVAO, transparentVBO;
+	glGenVertexArrays(1, &transparentVAO);
+	glGenBuffers(1, &transparentVBO);
+
+	glBindVertexArray(transparentVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), transparentVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
 	// unbind VAO and VBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Load texture
-	unsigned int diffuseMap = loadTexture("container2.png");
-	unsigned int specularMap = loadTexture("container2_specular.png");
-	unsigned int floorTexture = loadTexture("woodFloor.png");
+	unsigned int diffuseMap = loadTexture("container2.png", false);
+	unsigned int specularMap = loadTexture("container2_specular.png", false);
+	unsigned int floorTexture = loadTexture("woodFloor.png", false);
+	unsigned int transparentTexture = loadTexture("grass.png", true);
 
+	// Shader texture configurations
 	lightingShader.use();
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
 
-	//lightingShader.use();
-	//lightingShader.setInt("texture1", 0);
+	textureShader.use();
+	textureShader.setInt("texture1", 0);
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
@@ -261,6 +298,13 @@ int main()
 		lightingShader.setMat4("view", view);
 		lightingShader.setVec3("viewPos", camera.Position);
 
+		// Point light motion
+		for (GLuint i = 0; i < 4; i++)
+		{
+			pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+			pointLightPositions[i].y += (0.015 * sin(glfwGetTime() * 2)); // light motion
+		}
+
 		// Set the uniforms for all the point lights
 		for (GLuint i = 0; i < 4; i++)
 		{
@@ -275,16 +319,6 @@ int main()
 			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.032f);
 		}
 
-		// Point light motion
-		for (GLuint i = 0; i < 4; i++)
-		{ 
-			pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-			pointLightPositions[i].y += (0.015 * sin(glfwGetTime() * 2)); // light motion
-
-			// Set the new positions in the lighting shader
-			string number = to_string(i);
-			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].position").c_str()), pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
-		}
 
 
 		// Set uniforms for the directional light
@@ -320,7 +354,6 @@ int main()
 		nanosuit.Draw(lightingShader);
 
 
-
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -353,6 +386,25 @@ int main()
 		glBindVertexArray(planeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		// vegetation
+		textureShader.use();
+		textureShader.setMat4("view", view);
+		textureShader.setMat4("projection", proj);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, transparentTexture);
+
+		glBindVertexArray(transparentVAO);
+		for (GLuint i = 0; i < vegetation.size(); i++)
+		{
+			model = glm::mat4();
+			model = glm::translate(model, vegetation[i]);
+			textureShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+
+
 		// Changing colour
 		//glm::vec3 lightColor;
 		//lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -364,7 +416,6 @@ int main()
 		//lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
 
 		// Draw light cubes
-
 		lightBoxShader.use();
 
 		for (unsigned int i = 0; i < 4; i++)
@@ -475,7 +526,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
-unsigned int loadTexture(char const * path)
+unsigned int loadTexture(char const * path, bool isAlpha)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -497,8 +548,19 @@ unsigned int loadTexture(char const * path)
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		if (isAlpha)
+		{
+			// use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

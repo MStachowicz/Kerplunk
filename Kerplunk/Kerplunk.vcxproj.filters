@@ -58,10 +58,10 @@
     <None Include="lighting.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="lightingMaterial.frag">
+    <None Include="texture.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="lightingMaterial.vert">
+    <None Include="texture.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

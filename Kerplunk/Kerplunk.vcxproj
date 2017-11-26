@@ -150,8 +150,8 @@
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />
     <None Include="lighting.vert" />
-    <None Include="lightingMaterial.frag" />
-    <None Include="lightingMaterial.vert" />
+    <None Include="texture.frag" />
+    <None Include="texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
