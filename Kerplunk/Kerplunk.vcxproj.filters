@@ -19,6 +19,9 @@
     <Filter Include="Shader Files\Post-processing">
       <UniqueIdentifier>{eb2cdcf1-6e0d-48db-b74e-1b7c15733e86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Cubemap">
+      <UniqueIdentifier>{4ae3515f-37e8-42ca-8cd8-aaa845ad8a2b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -81,6 +84,12 @@
     </None>
     <None Include="kernel.frag">
       <Filter>Shader Files\Post-processing</Filter>
+    </None>
+    <None Include="cubemap.vert">
+      <Filter>Shader Files\Cubemap</Filter>
+    </None>
+    <None Include="cubemap.frag">
+      <Filter>Shader Files\Cubemap</Filter>
     </None>
   </ItemGroup>
 </Project>
