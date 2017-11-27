@@ -148,6 +148,8 @@
   <ItemGroup>
     <None Include="frameBuffer.frag" />
     <None Include="frameBuffer.vert" />
+    <None Include="greyscale.frag" />
+    <None Include="inversion.frag" />
     <None Include="lightBox.frag" />
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />

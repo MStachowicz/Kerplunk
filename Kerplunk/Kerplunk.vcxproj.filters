@@ -16,6 +16,9 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{3dece70a-8c87-464e-bfd6-d33b269ed086}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Post-processing">
+      <UniqueIdentifier>{eb2cdcf1-6e0d-48db-b74e-1b7c15733e86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -69,6 +72,12 @@
     </None>
     <None Include="frameBuffer.frag">
       <Filter>Shader Files</Filter>
+    </None>
+    <None Include="inversion.frag">
+      <Filter>Shader Files\Post-processing</Filter>
+    </None>
+    <None Include="greyscale.frag">
+      <Filter>Shader Files\Post-processing</Filter>
     </None>
   </ItemGroup>
 </Project>

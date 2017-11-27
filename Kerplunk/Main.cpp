@@ -88,8 +88,10 @@ int main()
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag"); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag"); // Shader to draw textured objects with no lighting applied
+	
 	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag"); // Shader to draw a quad overlaying the screen used by the frame buffer object
-
+	Shader inverseShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/inversion.frag"); // Shader to inverse the colours as a post processing technique applied to the frame buffer texture
+	Shader greyscaleShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/greyscale.frag"); // Shader to render the scene to greyscale using the frame buffer
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -344,8 +346,16 @@ int main()
 	textureShader.use();
 	textureShader.setInt("texture1", 0);
 
+
+	// Post processing
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
+
+	inverseShader.use();
+	inverseShader.setInt("screenTexture", 0);
+
+	greyscaleShader.use();
+	greyscaleShader.setInt("screenTexture", 0);
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
@@ -542,7 +552,7 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		screenShader.use();
+		greyscaleShader.use();
 		glBindVertexArray(quadVAO);
 		glBindTexture(GL_TEXTURE_2D, texColourBuffer);	// use the color attachment texture as the texture of the quad plane
 		glDrawArrays(GL_TRIANGLES, 0, 6);
