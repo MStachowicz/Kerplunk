@@ -21,11 +21,17 @@ void main()
         vec2( offset, -offset)  // bottom-right    
     );
 
-    float kernel[9] = float[](
+    float sharpenKernel[9] = float[](
         -1, -1, -1,
         -1,  9, -1,
         -1, -1, -1
     );
+
+	float blurKernel[9] = float[](
+    1.0 / 16, 2.0 / 16, 1.0 / 16,
+    2.0 / 16, 4.0 / 16, 2.0 / 16,
+    1.0 / 16, 2.0 / 16, 1.0 / 16  
+);
     
     vec3 sampleTex[9];
     for(int i = 0; i < 9; i++)
@@ -34,7 +40,7 @@ void main()
     }
     vec3 col = vec3(0.0);
     for(int i = 0; i < 9; i++)
-        col += sampleTex[i] * kernel[i];
+        col += sampleTex[i] * blurKernel[i];
     
     FragColor = vec4(col, 1.0);
 }  
