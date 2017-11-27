@@ -95,6 +95,8 @@ int main()
 	Shader greyscaleShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/greyscale.frag"); // Shader to render the scene to greyscale using the frame buffer
 	Shader kernelShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/kernel.frag"); // Shader to render the scene using a kernel matrix to apply post processing
 
+	Shader skyboxShader("../Kerplunk/cubemap.vert", "../Kerplunk/cubemap.frag"); // Shader to render a cubemap reusing the position as the texture coordinates
+
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
 		// Back face
@@ -333,6 +335,20 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
+
+	// Cube VAO
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+
 	// unbind VAO and VBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -394,7 +410,16 @@ int main()
 		"cubemaps/hw_spires/spires_bk.tga",
 		"cubemaps/hw_spires/spires_ft.tga",
 	};
-	unsigned int cubemapTexture = loadCubemap(faces);
+	vector<std::string> faces2 =
+	{
+		"cubemaps/skybox/right.jpg",
+		"cubemaps/skybox/left.jpg",
+		"cubemaps/skybox/top.jpg",
+		"cubemaps/skybox/bottom.jpg",
+		"cubemaps/skybox/back.jpg",
+		"cubemaps/skybox/front.jpg",
+	};
+	unsigned int cubemapTexture = loadCubemap(faces2);
 
 	// Shader texture configurations
 	lightingShader.use();
@@ -446,6 +471,7 @@ int main()
 		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 
+		// Set up all the lighting in the scene
 		lightingShader.use();
 
 		lightingShader.setMat4("projection", proj);
@@ -570,6 +596,23 @@ int main()
 		}
 
 
+		// Draw cube map
+		glDepthFunc(GL_LEQUAL); // set depth function so depth test passes when value is equal to 1 as is set in the cubemap shader
+
+		skyboxShader.use();
+		glm::mat4 cubeView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translations from the view matrix
+		skyboxShader.setMat4("projection", proj);
+		skyboxShader.setMat4("view", cubeView);
+
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+
+		glDepthFunc(GL_LESS);
+
+
 		//for (GLuint i = 0; i < vegetation.size(); i++)
 		//{
 		//	model = glm::mat4();
@@ -604,6 +647,8 @@ int main()
 			textureShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
+
+
 
 		// SECOND PASS
 		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
@@ -750,6 +795,8 @@ unsigned int loadTexture(char const * path)
 	return textureID;
 }
 
+// Loads a cube map from 6 different textures held in a vector of faces. Faces must be in order 
+// right, left, top, bottom, back, front.
 unsigned int loadCubemap(vector<std::string> faces)
 {
 	unsigned int textureID;
