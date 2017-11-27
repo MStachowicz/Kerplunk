@@ -26,12 +26,16 @@ void main()
         -1,  9, -1,
         -1, -1, -1
     );
-
 	float blurKernel[9] = float[](
-    1.0 / 16, 2.0 / 16, 1.0 / 16,
-    2.0 / 16, 4.0 / 16, 2.0 / 16,
-    1.0 / 16, 2.0 / 16, 1.0 / 16  
-);
+         1.0 / 16, 2.0 / 16, 1.0 / 16,
+         2.0 / 16, 4.0 / 16, 2.0 / 16,
+         1.0 / 16, 2.0 / 16, 1.0 / 16  
+    );
+	float edgeHighlightKernel[9] = float[](
+         1,  1,  1,
+         1,  -8, 1,
+         1,  1,  1 
+    );
     
     vec3 sampleTex[9];
     for(int i = 0; i < 9; i++)
@@ -40,7 +44,7 @@ void main()
     }
     vec3 col = vec3(0.0);
     for(int i = 0; i < 9; i++)
-        col += sampleTex[i] * blurKernel[i];
+        col += sampleTex[i] * edgeHighlightKernel[i];
     
     FragColor = vec4(col, 1.0);
 }  
