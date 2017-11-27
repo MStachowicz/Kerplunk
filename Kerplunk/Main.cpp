@@ -97,6 +97,7 @@ int main()
 
 	Shader skyboxShader("../Kerplunk/cubemap.vert", "../Kerplunk/cubemap.frag"); // Shader to render a cubemap reusing the position as the texture coordinates
 	Shader reflectionShader("../Kerplunk/reflection.vert", "../Kerplunk/reflection.frag"); // Shader to render an object with environment reflection using cubemap texture
+	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag"); // Shader to render an object with environment refraction using cubemap texture
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -461,6 +462,9 @@ int main()
 
 	reflectionShader.use();
 	reflectionShader.setInt("skybox", 0);
+	
+	refractionShader.use();
+	refractionShader.setInt("skybox", 0);
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
@@ -623,12 +627,28 @@ int main()
 		reflectionShader.setMat4("view", view);
 		reflectionShader.setVec3("cameraPos", camera.Position);
 
+		glBindVertexArray(mirrorCubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+
+		// draw refraction cube
+		
+		refractionShader.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-4.0f, 0.0f, 0.0f));
+		refractionShader.setMat4("model", model);
+		refractionShader.setMat4("projection", proj);
+		refractionShader.setMat4("view", view);
+		refractionShader.setVec3("cameraPos", camera.Position);
 
 		glBindVertexArray(mirrorCubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
+
 
 		// Draw cube map
 		glDepthFunc(GL_LEQUAL); // set depth function so depth test passes when value is equal to 1 as is set in the cubemap shader

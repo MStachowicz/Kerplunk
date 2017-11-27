@@ -100,5 +100,8 @@
     <None Include="reflection.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="refraction.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

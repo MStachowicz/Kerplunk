@@ -159,6 +159,7 @@
     <None Include="lighting.vert" />
     <None Include="reflection.frag" />
     <None Include="reflection.vert" />
+    <None Include="refraction.frag" />
     <None Include="texture.frag" />
     <None Include="texture.vert" />
   </ItemGroup>
