@@ -96,6 +96,7 @@ int main()
 	Shader kernelShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/kernel.frag"); // Shader to render the scene using a kernel matrix to apply post processing
 
 	Shader skyboxShader("../Kerplunk/cubemap.vert", "../Kerplunk/cubemap.frag"); // Shader to render a cubemap reusing the position as the texture coordinates
+	Shader reflectionShader("../Kerplunk/reflection.vert", "../Kerplunk/reflection.frag"); // Shader to render an object with environment reflection using cubemap texture
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -336,7 +337,7 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-	// Cube VAO
+	// Skybox VAO
 	unsigned int skyboxVAO, skyboxVBO;
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
@@ -347,6 +348,21 @@ int main()
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	// Reflective cube VAO
+	unsigned int mirrorCubeVAO, mirrorCubeVBO;
+	glGenVertexArrays(1, &mirrorCubeVAO);
+	glGenBuffers(1, &mirrorCubeVBO);
+
+	glBindVertexArray(mirrorCubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, mirrorCubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// normal attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 
 	// unbind VAO and VBO
@@ -442,6 +458,9 @@ int main()
 	
 	kernelShader.use();
 	kernelShader.setInt("screenTexture", 0);
+
+	reflectionShader.use();
+	reflectionShader.setInt("skybox", 0);
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
@@ -595,6 +614,21 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
+		// Draw reflective cube
+		reflectionShader.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(4.0f, 0.0f, 0.0f));
+		reflectionShader.setMat4("model", model);
+		reflectionShader.setMat4("projection", proj);
+		reflectionShader.setMat4("view", view);
+		reflectionShader.setVec3("cameraPos", camera.Position);
+
+
+		glBindVertexArray(mirrorCubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
 
 		// Draw cube map
 		glDepthFunc(GL_LEQUAL); // set depth function so depth test passes when value is equal to 1 as is set in the cubemap shader

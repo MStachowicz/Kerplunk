@@ -22,6 +22,9 @@
     <Filter Include="Shader Files\Cubemap">
       <UniqueIdentifier>{4ae3515f-37e8-42ca-8cd8-aaa845ad8a2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Lighting">
+      <UniqueIdentifier>{6b31d2a9-90a3-4f1e-bf19-a592947701e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -52,18 +55,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="lightBox.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="lighting.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="lightBox.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="lighting.vert">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="texture.frag">
       <Filter>Shader Files</Filter>
     </None>
@@ -90,6 +81,24 @@
     </None>
     <None Include="cubemap.frag">
       <Filter>Shader Files\Cubemap</Filter>
+    </None>
+    <None Include="lightBox.frag">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="lightBox.vert">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="lighting.frag">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="lighting.vert">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="reflection.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="reflection.frag">
+      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
 </Project>
