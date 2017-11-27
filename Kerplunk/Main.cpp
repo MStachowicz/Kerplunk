@@ -341,7 +341,16 @@ int main()
 	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png");
 
 	// Loading cube map texture
-
+	vector<std::string> faces =
+	{
+		"cubemaps/hw_spires/spires_rt.tga",
+		"cubemaps/hw_spires/spires_lf.tga",
+		"cubemaps/hw_spires/spires_up.tga",
+		"cubemaps/hw_spires/spires_dn.tga",
+		"cubemaps/hw_spires/spires_bk.tga",
+		"cubemaps/hw_spires/spires_ft.tga",
+	};
+	unsigned int cubemapTexture = loadCubemap(faces);
 
 	// Shader texture configurations
 	lightingShader.use();
