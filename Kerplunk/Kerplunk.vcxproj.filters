@@ -79,5 +79,8 @@
     <None Include="greyscale.frag">
       <Filter>Shader Files\Post-processing</Filter>
     </None>
+    <None Include="kernel.frag">
+      <Filter>Shader Files\Post-processing</Filter>
+    </None>
   </ItemGroup>
 </Project>

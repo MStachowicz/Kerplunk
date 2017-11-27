@@ -150,6 +150,7 @@
     <None Include="frameBuffer.vert" />
     <None Include="greyscale.frag" />
     <None Include="inversion.frag" />
+    <None Include="kernel.frag" />
     <None Include="lightBox.frag" />
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />
