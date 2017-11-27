@@ -88,6 +88,8 @@ int main()
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag"); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag"); // Shader to draw textured objects with no lighting applied
+	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag"); // Shader to draw a quad overlaying the screen used by the frame buffer object
+
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -195,7 +197,21 @@ int main()
 		glm::vec3(-0.3f, -1.5f, -2.3f),
 		glm::vec3(0.5f, -1.5f, -0.6f)
 	};
+	// vertex attributes for a quad that fills the entire screen in NDC.
+	float quadVertices[] = { 
+		// positions     // texCoords
+		-1.0f,  1.0f,    0.0f, 1.0f, // top left
+		-1.0f, -1.0f,    0.0f, 0.0f, // bottom left
+		 1.0f, -1.0f,    1.0f, 0.0f, // bottom right
 
+		-1.0f,  1.0f,    0.0f, 1.0f, // top left
+		 1.0f, -1.0f,    1.0f, 0.0f, // bottom right
+		 1.0f,  1.0f,    1.0f, 1.0f  // top right 
+	};
+	//for (unsigned int i = 0; i < sizeof(quadVertices) / sizeof(quadVertices[0]); i++)
+	//{
+	//	quadVertices[i] *= 0.5;
+	//}
 
 	// Cube VAO
 	unsigned int cubeVAO, cubeVBO;
@@ -257,6 +273,17 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
+	unsigned int quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 	// unbind VAO and VBO
 	glBindVertexArray(0);
@@ -317,6 +344,9 @@ int main()
 	textureShader.use();
 	textureShader.setInt("texture1", 0);
 
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
 
@@ -332,6 +362,12 @@ int main()
 		processInput(window);
 
 		// render
+		// FIRST PASS
+		// bind to framebuffer and draw scene as we normally would to color texture 
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -435,41 +471,6 @@ int main()
 
 		
 
-		for (GLuint i = 0; i < vegetation.size(); i++)
-		{
-			model = glm::mat4();
-			model = glm::translate(model, vegetation[i]);
-			textureShader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
-
-		// sort the transparent windows before rendering
-		std::map<float, glm::vec3> sorted;
-		for (unsigned int i = 0; i < vegetation.size(); i++)
-		{
-			float distance = glm::length(camera.Position - vegetation[i]);
-			sorted[distance] = vegetation[i];
-		}
-
-		// vegetation
-		textureShader.use();
-		textureShader.setMat4("view", view);
-		textureShader.setMat4("projection", proj);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, transparentWindowTexture);
-
-		glBindVertexArray(transparentVAO);
-		textureShader.setBool("blend", true);
-
-		for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
-		{
-			model = glm::mat4();
-			model = glm::translate(model, it->second);
-			textureShader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
-
 		// Changing colour
 		//glm::vec3 lightColor;
 		//lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -497,6 +498,54 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
+
+		//for (GLuint i = 0; i < vegetation.size(); i++)
+		//{
+		//	model = glm::mat4();
+		//	model = glm::translate(model, vegetation[i]);
+		//	textureShader.setMat4("model", model);
+		//	glDrawArrays(GL_TRIANGLES, 0, 6);
+		//}
+
+
+		// transparent windows
+		textureShader.use();
+		textureShader.setMat4("view", view);
+		textureShader.setMat4("projection", proj);
+		textureShader.setBool("blend", true);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, transparentWindowTexture);
+
+		glBindVertexArray(transparentVAO);
+
+		// sort the transparent windows before rendering
+		std::map<float, glm::vec3> sorted;
+		for (unsigned int i = 0; i < vegetation.size(); i++)
+		{
+			float distance = glm::length(camera.Position - vegetation[i]);
+			sorted[distance] = vegetation[i];
+		}
+		for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+		{
+			model = glm::mat4();
+			model = glm::translate(model, it->second);
+			textureShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		// SECOND PASS
+		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+		// clear all relevant buffers
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		screenShader.use();
+		glBindVertexArray(quadVAO);
+		glBindTexture(GL_TEXTURE_2D, texColourBuffer);	// use the color attachment texture as the texture of the quad plane
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -629,5 +678,3 @@ unsigned int loadTexture(char const * path)
 
 	return textureID;
 }
-
-
