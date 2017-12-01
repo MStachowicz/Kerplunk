@@ -106,5 +106,8 @@
     <None Include="reflection.vert">
       <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
     </None>
+    <None Include="refraction.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
