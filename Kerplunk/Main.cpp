@@ -466,6 +466,34 @@ int main()
 	refractionShader.use();
 	refractionShader.setInt("skybox", 0);
 
+	// Uniform block index
+	// Set the binding point for the uniform block in the shaders
+	unsigned int uniformBlockIndexLighting = glGetUniformBlockIndex(lightingShader.ID, "Matrices");
+	unsigned int uniformBlockIndexLightBox = glGetUniformBlockIndex(lightBoxShader.ID, "Matrices");
+	unsigned int uniformBlockIndexReflection = glGetUniformBlockIndex(reflectionShader.ID, "Matrices");
+	unsigned int uniformBlockIndexRefraction = glGetUniformBlockIndex(refractionShader.ID, "Matrices");
+	unsigned int uniformBlockIndexSkyBox = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
+	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
+
+
+	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
+	glUniformBlockBinding(lightBoxShader.ID, uniformBlockIndexLightBox, 0);
+	glUniformBlockBinding(reflectionShader.ID, uniformBlockIndexReflection, 0);
+	glUniformBlockBinding(refractionShader.ID, uniformBlockIndexRefraction, 0);
+	glUniformBlockBinding(skyboxShader.ID, uniformBlockIndexSkyBox, 0);
+	glUniformBlockBinding(textureShader.ID, uniformBlockIndexTextureShader, 0);
+
+	// Creating the actual uniform buffer object and binding it to the binding point
+	unsigned int UBOmatrices;
+	glGenBuffers(1, &UBOmatrices);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	// Binding the UBO to the binding point 0 for all shaders
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
+	
+
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
 
@@ -490,15 +518,22 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Projection set
+		// Projection + view set
 		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 
+		// Set matrices in the uniform buffer object
+		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(proj));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
 		// Set up all the lighting in the scene
 		lightingShader.use();
-
-		lightingShader.setMat4("projection", proj);
-		lightingShader.setMat4("view", view);
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		// Point light motion
@@ -521,8 +556,6 @@ int main()
 			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].linear").c_str()), 0.09f);
 			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.032f);
 		}
-
-
 
 		// Set uniforms for the directional light
 		lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
@@ -611,8 +644,6 @@ int main()
 			model = glm::translate(model, lightPos);
 			model = glm::scale(model, glm::vec3(0.2f));
 			lightBoxShader.setMat4("model", model);
-			lightBoxShader.setMat4("view", view);
-			lightBoxShader.setMat4("projection", proj);
 
 			glBindVertexArray(lightVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -623,10 +654,8 @@ int main()
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(4.0f, 0.0f, 0.0f));
 		reflectionShader.setMat4("model", model);
-		reflectionShader.setMat4("projection", proj);
-		reflectionShader.setMat4("view", view);
 		reflectionShader.setVec3("cameraPos", camera.Position);
-
+		
 		glBindVertexArray(mirrorCubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -639,10 +668,8 @@ int main()
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(-4.0f, 0.0f, 0.0f));
 		refractionShader.setMat4("model", model);
-		refractionShader.setMat4("projection", proj);
-		refractionShader.setMat4("view", view);
 		refractionShader.setVec3("cameraPos", camera.Position);
-
+	
 		glBindVertexArray(mirrorCubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -654,9 +681,11 @@ int main()
 		glDepthFunc(GL_LEQUAL); // set depth function so depth test passes when value is equal to 1 as is set in the cubemap shader
 
 		skyboxShader.use();
+		
 		glm::mat4 cubeView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translations from the view matrix
-		skyboxShader.setMat4("projection", proj);
-		skyboxShader.setMat4("view", cubeView);
+		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(cubeView));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);
@@ -678,8 +707,10 @@ int main()
 
 		// transparent windows
 		textureShader.use();
-		textureShader.setMat4("view", view);
-		textureShader.setMat4("projection", proj);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		textureShader.setBool("blend", true);
 
 		glActiveTexture(GL_TEXTURE0);

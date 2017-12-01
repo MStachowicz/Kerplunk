@@ -25,6 +25,9 @@
     <Filter Include="Shader Files\Lighting">
       <UniqueIdentifier>{6b31d2a9-90a3-4f1e-bf19-a592947701e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Cubemap\Cubemap reflections">
+      <UniqueIdentifier>{9f1053d0-2ed0-4480-bbae-d862d0893b92}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -94,14 +97,14 @@
     <None Include="lighting.vert">
       <Filter>Shader Files\Lighting</Filter>
     </None>
-    <None Include="reflection.vert">
-      <Filter>Shader Files</Filter>
+    <None Include="refraction.frag">
+      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
     </None>
     <None Include="reflection.frag">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
     </None>
-    <None Include="refraction.frag">
-      <Filter>Shader Files</Filter>
+    <None Include="reflection.vert">
+      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
     </None>
   </ItemGroup>
 </Project>
