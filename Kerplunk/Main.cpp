@@ -86,10 +86,10 @@ int main()
 	glEnable(GL_CULL_FACE);
 
 	// Build and compile shader
-	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", nullptr); // Shader to calculate lighting on objects
+	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag", nullptr); // Shader to draw textured objects with no lighting applied
-	
+
 	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag", nullptr); // Shader to draw a quad overlaying the screen used by the frame buffer object
 	Shader inverseShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/inversion.frag", nullptr); // Shader to inverse the colours as a post processing technique applied to the frame buffer texture
 	Shader greyscaleShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/greyscale.frag", nullptr); // Shader to render the scene to greyscale using the frame buffer
@@ -111,7 +111,7 @@ int main()
 		 // Front face
 		-0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 0.0f, // bottom-left
 		 0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 0.0f, // bottom-right
-	 	 0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 1.0f, // top-right
+		 0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 1.0f, // top-right
 		 0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 1.0f, // top-right
 		-0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 1.0f, // top-left
 		-0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 0.0f, // bottom-left
@@ -250,7 +250,7 @@ int main()
 		glm::vec3(0.5f, -1.5f, -0.6f)
 	};
 	// vertex attributes for a quad that fills the entire screen in NDC.
-	float quadVertices[] = { 
+	float quadVertices[] = {
 		// positions     // texCoords
 		-1.0f,  1.0f,    0.0f, 1.0f, // top left
 		-1.0f, -1.0f,    0.0f, 0.0f, // bottom left
@@ -387,7 +387,7 @@ int main()
 
 	// attaching the texture to the frame buffer
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer, 0);
-	
+
 
 	// attaching stencil + depth buffer as a single texture attachment
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
@@ -456,13 +456,13 @@ int main()
 
 	greyscaleShader.use();
 	greyscaleShader.setInt("screenTexture", 0);
-	
+
 	kernelShader.use();
 	kernelShader.setInt("screenTexture", 0);
 
 	reflectionShader.use();
 	reflectionShader.setInt("skybox", 0);
-	
+
 	refractionShader.use();
 	refractionShader.setInt("skybox", 0);
 
@@ -492,7 +492,7 @@ int main()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	// Binding the UBO to the binding point 0 for all shaders
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
-	
+
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
@@ -511,7 +511,7 @@ int main()
 		// render
 		// FIRST PASS
 		// bind to framebuffer and draw scene as we normally would to color texture 
-		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+		//glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
@@ -535,6 +535,10 @@ int main()
 		// Set up all the lighting in the scene
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", camera.Position);
+		// add time component to geometry shader in the form of a uniform
+
+			lightingShader.setFloat("time", glfwGetTime());
+		
 
 		// Point light motion
 		for (GLuint i = 0; i < 4; i++)
@@ -622,7 +626,7 @@ int main()
 		glBindVertexArray(planeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		
+
 
 		// Changing colour
 		//glm::vec3 lightColor;
@@ -655,7 +659,7 @@ int main()
 		model = glm::translate(model, glm::vec3(4.0f, 0.0f, 0.0f));
 		reflectionShader.setMat4("model", model);
 		reflectionShader.setVec3("cameraPos", camera.Position);
-		
+
 		glBindVertexArray(mirrorCubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -668,7 +672,7 @@ int main()
 		model = glm::translate(model, glm::vec3(-4.0f, 0.0f, 0.0f));
 		refractionShader.setMat4("model", model);
 		refractionShader.setVec3("cameraPos", camera.Position);
-	
+
 		glBindVertexArray(mirrorCubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -680,7 +684,7 @@ int main()
 		glDepthFunc(GL_LEQUAL); // set depth function so depth test passes when value is equal to 1 as is set in the cubemap shader
 
 		skyboxShader.use();
-		
+
 		glm::mat4 cubeView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translations from the view matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(cubeView));
@@ -734,18 +738,18 @@ int main()
 
 
 
-		// SECOND PASS
-		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-		// clear all relevant buffers
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
-		glClear(GL_COLOR_BUFFER_BIT);
+		//// SECOND PASS
+		//// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+		//// clear all relevant buffers
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+		//glClear(GL_COLOR_BUFFER_BIT);
 
-		screenShader.use();
-		glBindVertexArray(quadVAO);
-		glBindTexture(GL_TEXTURE_2D, texColourBuffer);	// use the color attachment texture as the texture of the quad plane
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//screenShader.use();
+		//glBindVertexArray(quadVAO);
+		//glBindTexture(GL_TEXTURE_2D, texColourBuffer);	// use the color attachment texture as the texture of the quad plane
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
