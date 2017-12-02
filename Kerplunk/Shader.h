@@ -18,7 +18,12 @@ class Shader
 {
 public:
 	// Reads and builds the shader
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	//Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader(const char * vertexPath, const char * fragmentPath, const char* geometryPath);
+	
+	// Checks shader for comppilation or linking errors.
+	void checkCompileErrors(GLuint shader, std::string type);
+
 
 	// Activates the shader
 	void use();
@@ -44,8 +49,6 @@ public:
 
 	// The program ID
 	unsigned int ID;
-
-
 };
 
 #endif

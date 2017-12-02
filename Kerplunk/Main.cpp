@@ -86,18 +86,18 @@ int main()
 	glEnable(GL_CULL_FACE);
 
 	// Build and compile shader
-	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag"); // Shader to calculate lighting on objects
-	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag"); // Shader to draw an always white object representing light source
-	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag"); // Shader to draw textured objects with no lighting applied
+	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", nullptr); // Shader to calculate lighting on objects
+	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
+	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag", nullptr); // Shader to draw textured objects with no lighting applied
 	
-	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag"); // Shader to draw a quad overlaying the screen used by the frame buffer object
-	Shader inverseShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/inversion.frag"); // Shader to inverse the colours as a post processing technique applied to the frame buffer texture
-	Shader greyscaleShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/greyscale.frag"); // Shader to render the scene to greyscale using the frame buffer
-	Shader kernelShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/kernel.frag"); // Shader to render the scene using a kernel matrix to apply post processing
+	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag", nullptr); // Shader to draw a quad overlaying the screen used by the frame buffer object
+	Shader inverseShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/inversion.frag", nullptr); // Shader to inverse the colours as a post processing technique applied to the frame buffer texture
+	Shader greyscaleShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/greyscale.frag", nullptr); // Shader to render the scene to greyscale using the frame buffer
+	Shader kernelShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/kernel.frag", nullptr); // Shader to render the scene using a kernel matrix to apply post processing
 
-	Shader skyboxShader("../Kerplunk/cubemap.vert", "../Kerplunk/cubemap.frag"); // Shader to render a cubemap reusing the position as the texture coordinates
-	Shader reflectionShader("../Kerplunk/reflection.vert", "../Kerplunk/reflection.frag"); // Shader to render an object with environment reflection using cubemap texture
-	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag"); // Shader to render an object with environment refraction using cubemap texture
+	Shader skyboxShader("../Kerplunk/cubemap.vert", "../Kerplunk/cubemap.frag", nullptr); // Shader to render a cubemap reusing the position as the texture coordinates
+	Shader reflectionShader("../Kerplunk/reflection.vert", "../Kerplunk/reflection.frag", nullptr); // Shader to render an object with environment reflection using cubemap texture
+	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag", nullptr); // Shader to render an object with environment refraction using cubemap texture
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
