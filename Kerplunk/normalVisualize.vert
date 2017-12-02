@@ -6,8 +6,12 @@ out VS_OUT {
     vec3 normal;
 } vs_out;
 
-uniform mat4 projection;
-uniform mat4 view;
+layout (std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+
 uniform mat4 model;
 
 void main()

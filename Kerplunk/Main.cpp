@@ -99,6 +99,8 @@ int main()
 	Shader reflectionShader("../Kerplunk/reflection.vert", "../Kerplunk/reflection.frag", nullptr); // Shader to render an object with environment reflection using cubemap texture
 	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag", nullptr); // Shader to render an object with environment refraction using cubemap texture
 
+	Shader normalVisualizeShader("../Kerplunk/normalVisualize.vert", "../Kerplunk/normalVisualize.frag", "../Kerplunk/normalVisualize.geom"); // Shader to generate lines eminating fromt the vertices in the direction of their normals
+
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
 		// Back face
@@ -474,6 +476,7 @@ int main()
 	unsigned int uniformBlockIndexRefraction = glGetUniformBlockIndex(refractionShader.ID, "Matrices");
 	unsigned int uniformBlockIndexSkyBox = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
 	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
+	unsigned int uniformBlockIndexNormalShader = glGetUniformBlockIndex(normalVisualizeShader.ID, "Matrices");
 
 
 	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
@@ -482,6 +485,7 @@ int main()
 	glUniformBlockBinding(refractionShader.ID, uniformBlockIndexRefraction, 0);
 	glUniformBlockBinding(skyboxShader.ID, uniformBlockIndexSkyBox, 0);
 	glUniformBlockBinding(textureShader.ID, uniformBlockIndexTextureShader, 0);
+	glUniformBlockBinding(normalVisualizeShader.ID, uniformBlockIndexNormalShader, 0);
 
 	// Creating the actual uniform buffer object and binding it to the binding point
 	unsigned int UBOmatrices;
@@ -593,7 +597,16 @@ int main()
 		lightingShader.setMat4("model", model);
 		nanosuit.Draw(lightingShader);
 
+		// Redraw nanosuit drawing the normals away from its vertices
+		normalVisualizeShader.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
+		model = glm::scale(model, glm::vec3(0.2f));
+		normalVisualizeShader.setMat4("model", model);
+		nanosuit.Draw(normalVisualizeShader);
 
+
+		lightingShader.use();
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
