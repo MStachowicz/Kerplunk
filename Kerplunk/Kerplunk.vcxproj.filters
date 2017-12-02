@@ -28,6 +28,9 @@
     <Filter Include="Shader Files\Cubemap\Cubemap reflections">
       <UniqueIdentifier>{9f1053d0-2ed0-4480-bbae-d862d0893b92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Debug">
+      <UniqueIdentifier>{0de86dda-8576-442e-87ab-cf1c0f2fb5e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -112,6 +115,15 @@
     <None Include="ClassDiagram.cd" />
     <None Include="explode.geom">
       <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="normalVisualize.vert">
+      <Filter>Shader Files\Debug</Filter>
+    </None>
+    <None Include="normalVisualize.frag">
+      <Filter>Shader Files\Debug</Filter>
+    </None>
+    <None Include="normalVisualize.geom">
+      <Filter>Shader Files\Debug</Filter>
     </None>
   </ItemGroup>
 </Project>

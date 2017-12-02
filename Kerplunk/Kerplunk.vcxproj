@@ -159,6 +159,9 @@
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />
     <None Include="lighting.vert" />
+    <None Include="normalVisualize.frag" />
+    <None Include="normalVisualize.geom" />
+    <None Include="normalVisualize.vert" />
     <None Include="reflection.frag" />
     <None Include="reflection.vert" />
     <None Include="refraction.frag" />
