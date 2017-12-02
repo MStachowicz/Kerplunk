@@ -662,8 +662,7 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
-		// draw refraction cube
-		
+		// draw refraction cube	
 		refractionShader.use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(-4.0f, 0.0f, 0.0f));
