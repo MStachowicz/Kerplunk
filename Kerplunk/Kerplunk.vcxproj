@@ -146,8 +146,10 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="cubemap.frag" />
     <None Include="cubemap.vert" />
+    <None Include="explode.geom" />
     <None Include="frameBuffer.frag" />
     <None Include="frameBuffer.vert" />
     <None Include="greyscale.frag" />

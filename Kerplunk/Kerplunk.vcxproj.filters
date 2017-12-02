@@ -109,5 +109,9 @@
     <None Include="refraction.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="explode.geom">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>
