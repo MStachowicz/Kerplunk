@@ -54,6 +54,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4); // increase the number of samples in buffers
 
 	// glfw window creation
 	// --------------------
@@ -84,6 +85,7 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_MULTISAMPLE);
 
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
@@ -207,7 +209,7 @@ int main()
 	};
 
 	glm::vec3 pointLightPositions[] = {
-		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(12.7f,  0.2f,  12.0f),
 		glm::vec3(2.3f, 3.3f, -4.0f),
 		glm::vec3(-4.0f,  2.0f, -12.0f),
 		glm::vec3(0.0f,  0.0f, -3.0f)
@@ -215,9 +217,9 @@ int main()
 
 	glm::vec3 pointLightColours[] = {
 		glm::vec3(1.0f),
-		glm::vec3(1.0f),
-		glm::vec3(1.0f),
-		glm::vec3(1.0f)
+		glm::vec3(1.0f,0.0f,0.0f),
+		glm::vec3(1.0f,0.0f,0.0f),
+		glm::vec3(1.0f,0.0f,0.0f)
 	};
 
 	float texRepeat = 8.0f;
@@ -586,10 +588,10 @@ int main()
 		processInput(window);
 
 		// render
-		// FIRST PASS
-		// bind to framebuffer and draw scene as we normally would to color texture 
+		//// FIRST PASS
+		//// bind to framebuffer and draw scene as we normally would to color texture 
 		//glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
+		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -617,12 +619,12 @@ int main()
 			lightingShader.setFloat("time", glfwGetTime());
 		
 
-		// Point light motion
-		for (GLuint i = 0; i < 4; i++)
-		{
-			pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-			pointLightPositions[i].y += (0.015 * sin(glfwGetTime() * 2)); // light motion
-		}
+		//// Point light motion
+		//for (GLuint i = 0; i < 4; i++)
+		//{
+		//	pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		//	pointLightPositions[i].y += (0.015 * sin(glfwGetTime() * 2)); // light motion
+		//}
 
 		// Set the uniforms for all the point lights
 		for (GLuint i = 0; i < 4; i++)
@@ -643,11 +645,11 @@ int main()
 		lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
 		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
 		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
 		// Set uniforms for the spotlight
-		lightingShader.setVec3("spotlight.position", camera.Position);
-		lightingShader.setVec3("spotlight.direction", camera.Front);
-		lightingShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
+		lightingShader.setVec3("spotlight.position", -15.793399f, -0.271867f, 15.654298f);
+		lightingShader.setVec3("spotlight.direction", 0.905481f, -0.424199f, -0.012639f);
+		//std::cout << "Position: x:" << to_string(camera.Position.x) << "y:" << to_string(camera.Position.y) << "z:" << to_string(camera.Position.z) << endl;
+		//std::cout << "Front: x:" << to_string(camera.Front.x) << "y:" << to_string(camera.Front.y) << "z:" << to_string(camera.Front.z) << endl;		lightingShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
 		lightingShader.setVec3("spotlight.diffuse", 1.0f, 1.0f, 1.0f);
 		lightingShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
 		lightingShader.setFloat("spotlight.constant", 1.0f);

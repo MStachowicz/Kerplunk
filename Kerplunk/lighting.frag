@@ -94,13 +94,19 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     
 	// specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); 
+
 	// combine results
     vec3 ambient  = light.ambient  * vec3(texture(material.diffuseMap, fs_in.TexCoord));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuseMap, fs_in.TexCoord));
     vec3 specular = light.specular * spec * vec3(texture(material.specularMap, fs_in.TexCoord));
     
+	float magnitude = 0.1;
+
+	ambient *= magnitude;
+	diffuse *= magnitude;
+	specular *= magnitude;
+
 	return (ambient + diffuse + specular);
 }
 
