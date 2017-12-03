@@ -589,7 +589,6 @@ int main()
 		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
 
-
 		// Draw Nanosuit
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
@@ -597,14 +596,13 @@ int main()
 		lightingShader.setMat4("model", model);
 		nanosuit.Draw(lightingShader);
 
-		// Redraw nanosuit drawing the normals away from its vertices
-		normalVisualizeShader.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
-		model = glm::scale(model, glm::vec3(0.2f));
-		normalVisualizeShader.setMat4("model", model);
-		nanosuit.Draw(normalVisualizeShader);
-
+		//// Redraw nanosuit drawing the normals away from its vertices
+		//normalVisualizeShader.use();
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
+		//model = glm::scale(model, glm::vec3(0.2f));
+		//normalVisualizeShader.setMat4("model", model);
+		//nanosuit.Draw(normalVisualizeShader);
 
 		lightingShader.use();
 		// Binding textures on corresponding texture units after activating them
