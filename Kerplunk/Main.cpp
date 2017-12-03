@@ -40,6 +40,8 @@ float lastFrame = 0.0f; // Time of last frame
 
 // KEY FLAGS set to true when key is pressed, reset to false when the key is released
 bool capsFlag = false;
+bool testFlag = false;
+bool isBlinnShadingActive = false; // Switches the lighting to use the blinn-phong lighting model.
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // Position of the light in world coordinates.
 
 int main()
@@ -481,7 +483,7 @@ int main()
 	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
 	unsigned int uniformBlockIndexNormalShader = glGetUniformBlockIndex(normalVisualizeShader.ID, "Matrices");
 	unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
-	
+
 
 
 	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
@@ -528,10 +530,10 @@ int main()
 
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float y = 40 + displacement * 0.4f; // keep height of field smaller compared to width of x and z
-		
+
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float z = cos(angle) * radius + displacement;
-		
+
 		model = glm::translate(model, glm::vec3(x, y, z));
 
 		// 2. scale: Scale between 0.05 and 0.25f
@@ -575,7 +577,7 @@ int main()
 		glBindVertexArray(0);
 	}
 
-	
+
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
@@ -616,8 +618,9 @@ int main()
 		lightingShader.setVec3("viewPos", camera.Position);
 		// add time component to geometry shader in the form of a uniform
 
-			lightingShader.setFloat("time", glfwGetTime());
-		
+		lightingShader.setFloat("time", glfwGetTime());
+		lightingShader.setBool("blinn", isBlinnShadingActive);
+		cout << isBlinnShadingActive << endl;
 
 		//// Point light motion
 		//for (GLuint i = 0; i < 4; i++)
@@ -899,6 +902,26 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_RELEASE)
 	{
 		capsFlag = false;
+	}
+
+	// Toggle blinn shading
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+	{
+		if (!testFlag)
+		{
+			if (isBlinnShadingActive)
+				isBlinnShadingActive = false;
+			else
+				isBlinnShadingActive = true;
+		}
+
+		// Set flag to indicate the key is being pressed.
+		testFlag = true;
+	}
+	// Toggle blinn shading
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)
+	{
+		testFlag = false;
 	}
 
 	// CAMERA MOVEMENT

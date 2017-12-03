@@ -52,6 +52,7 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotlight;
 uniform Material material;
+uniform bool blinn;
 
 in GS_OUT {
 	vec3 Normal;
@@ -119,8 +120,19 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     
 	// specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    
+	
+	float spec;
+
+	if(blinn)
+	{
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+	}
+	else
+	{
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	}
+
 	// attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
@@ -149,7 +161,17 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	// specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    
+    	
+	if(blinn)
+	{
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+	}
+	else
+	{
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	}
+
 	// attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
