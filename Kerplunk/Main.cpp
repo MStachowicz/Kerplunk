@@ -100,6 +100,7 @@ int main()
 	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag", nullptr); // Shader to render an object with environment refraction using cubemap texture
 
 	Shader normalVisualizeShader("../Kerplunk/normalVisualize.vert", "../Kerplunk/normalVisualize.frag", "../Kerplunk/normalVisualize.geom"); // Shader to generate lines eminating fromt the vertices in the direction of their normals
+	Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -477,6 +478,8 @@ int main()
 	unsigned int uniformBlockIndexSkyBox = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
 	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
 	unsigned int uniformBlockIndexNormalShader = glGetUniformBlockIndex(normalVisualizeShader.ID, "Matrices");
+	unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
+	
 
 
 	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
@@ -486,6 +489,7 @@ int main()
 	glUniformBlockBinding(skyboxShader.ID, uniformBlockIndexSkyBox, 0);
 	glUniformBlockBinding(textureShader.ID, uniformBlockIndexTextureShader, 0);
 	glUniformBlockBinding(normalVisualizeShader.ID, uniformBlockIndexNormalShader, 0);
+	glUniformBlockBinding(instancedLightingShader.ID, uniformBlockIndexInstanceShader, 0);
 
 	// Creating the actual uniform buffer object and binding it to the binding point
 	unsigned int UBOmatrices;
@@ -497,10 +501,15 @@ int main()
 	// Binding the UBO to the binding point 0 for all shaders
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
 
+	// load models
+	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
+	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj");
+	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj");
+
 	// Generating an asteroid field
-	unsigned int amount = 3000;
-	float radius = 50.0;
-	float offset = 2.5f;
+	unsigned int amount = 100000;
+	float radius = 50;
+	float offset = 5.5f;
 
 	glm::mat4 *modelMatrices;
 	modelMatrices = new glm::mat4[amount];
@@ -535,11 +544,36 @@ int main()
 		modelMatrices[i] = model;
 	}
 
-	// load models
-	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
-	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj");
-	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj");
+	// vertex Buffer Object
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
+	for (unsigned int i = 0; i < rock.meshes.size(); i++)
+	{
+		unsigned int VAO = rock.meshes[i].VAO;
+		glBindVertexArray(VAO);
+		// vertex Attributes
+		GLsizei vec4Size = sizeof(glm::vec4);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(vec4Size));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+	}
+
+	
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
@@ -635,20 +669,6 @@ int main()
 		lightingShader.setMat4("model", model);
 		nanosuit.Draw(lightingShader);
 
-		// draw Planet
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 20.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		lightingShader.setMat4("model", model);
-		planet.Draw(lightingShader);
-
-		// draw meteorites
-		for (unsigned int i = 0; i < amount; i++)
-		{
-			lightingShader.setMat4("model", modelMatrices[i]);
-			rock.Draw(lightingShader);
-		}
-
 		//// Redraw nanosuit drawing the normals away from its vertices
 		//normalVisualizeShader.use();
 		//model = glm::mat4(1.0f);
@@ -657,8 +677,24 @@ int main()
 		//normalVisualizeShader.setMat4("model", model);
 		//nanosuit.Draw(normalVisualizeShader);
 
-		//lightingShader.use();
 
+		// draw Planet
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 20.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		lightingShader.setMat4("model", model);
+		planet.Draw(lightingShader);
+
+		// draw meteorites
+		instancedLightingShader.use();
+		for (unsigned int i = 0; i < rock.meshes.size(); i++)
+		{
+			glBindVertexArray(rock.meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, rock.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, amount);
+		}
+
+
+		lightingShader.use();
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);

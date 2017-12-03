@@ -125,5 +125,8 @@
     <None Include="normalVisualize.geom">
       <Filter>Shader Files\Debug</Filter>
     </None>
+    <None Include="lightingInstanced.vert">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -159,6 +159,7 @@
     <None Include="lighting.frag" />
     <None Include="lightBox.vert" />
     <None Include="lighting.vert" />
+    <None Include="lightingInstanced.vert" />
     <None Include="normalVisualize.frag" />
     <None Include="normalVisualize.geom" />
     <None Include="normalVisualize.vert" />
