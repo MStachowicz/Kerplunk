@@ -497,9 +497,48 @@ int main()
 	// Binding the UBO to the binding point 0 for all shaders
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
 
+	// Generating an asteroid field
+	unsigned int amount = 3000;
+	float radius = 50.0;
+	float offset = 2.5f;
+
+	glm::mat4 *modelMatrices;
+	modelMatrices = new glm::mat4[amount];
+
+	srand(glfwGetTime()); // initialize random seed	
+
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		glm::mat4 model;
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)amount * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float y = 40 + displacement * 0.4f; // keep height of field smaller compared to width of x and z
+		
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		
+		model = glm::translate(model, glm::vec3(x, y, z));
+
+		// 2. scale: Scale between 0.05 and 0.25f
+		float scale = (rand() % 20) / 100.0f + 0.05;
+		model = glm::scale(model, glm::vec3(scale));
+
+		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+		float rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		// 4. now add to list of matrices
+		modelMatrices[i] = model;
+	}
 
 	// load models
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
+	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj");
+	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj");
 
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
@@ -596,6 +635,20 @@ int main()
 		lightingShader.setMat4("model", model);
 		nanosuit.Draw(lightingShader);
 
+		// draw Planet
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 20.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		lightingShader.setMat4("model", model);
+		planet.Draw(lightingShader);
+
+		// draw meteorites
+		for (unsigned int i = 0; i < amount; i++)
+		{
+			lightingShader.setMat4("model", modelMatrices[i]);
+			rock.Draw(lightingShader);
+		}
+
 		//// Redraw nanosuit drawing the normals away from its vertices
 		//normalVisualizeShader.use();
 		//model = glm::mat4(1.0f);
@@ -604,7 +657,8 @@ int main()
 		//normalVisualizeShader.setMat4("model", model);
 		//nanosuit.Draw(normalVisualizeShader);
 
-		lightingShader.use();
+		//lightingShader.use();
+
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
