@@ -20,7 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-unsigned int loadTexture(char const * path);
+unsigned int loadTexture(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
@@ -88,6 +88,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
@@ -219,9 +220,9 @@ int main()
 
 	glm::vec3 pointLightColours[] = {
 		glm::vec3(1.0f),
-		glm::vec3(1.0f,0.0f,0.0f),
-		glm::vec3(1.0f,0.0f,0.0f),
-		glm::vec3(1.0f,0.0f,0.0f)
+		glm::vec3(1.0f),
+		glm::vec3(1.0f),
+		glm::vec3(1.0f)
 	};
 
 	float texRepeat = 8.0f;
@@ -418,11 +419,11 @@ int main()
 
 
 	// Load texture
-	unsigned int diffuseMap = loadTexture("container2.png");
-	unsigned int specularMap = loadTexture("container2_specular.png");
-	unsigned int floorTexture = loadTexture("woodFloor.png");
-	unsigned int transparentTexture = loadTexture("grass.png");
-	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png");
+	unsigned int diffuseMap = loadTexture("container2.png", true);
+	unsigned int specularMap = loadTexture("container2_specular.png", false);
+	unsigned int floorTexture = loadTexture("woodFloor.png", true);
+	unsigned int transparentTexture = loadTexture("grass.png", true);
+	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png", true);
 
 	// Loading cube map texture
 	vector<std::string> faces =
@@ -969,32 +970,38 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int loadTexture(char const * path)
+unsigned int loadTexture(char const * path, bool gammaCorrection)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
-	int width1, height1, nrChannels1;
 	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
 	if (data)
 	{
-		GLenum format;
+		GLenum internalFormat;
+		GLenum dataFormat;
 		if (nrComponents == 1)
-			format = GL_RED;
+		{
+			internalFormat = dataFormat = GL_RED;
+		}
 		else if (nrComponents == 3)
-			format = GL_RGB;
+		{
+			internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+			dataFormat = GL_RGB;
+		}
 		else if (nrComponents == 4)
-			format = GL_RGBA;
+		{
+			internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+			dataFormat = GL_RGBA;
+		}
 
 		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		// use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
