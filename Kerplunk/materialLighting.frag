@@ -51,7 +51,6 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotlight;
 uniform Material material;
-uniform bool blinn;
 
 in VS_OUT {
 	vec3 Normal;
@@ -65,6 +64,9 @@ out vec4 FragColor;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+
+// Settings
+bool blinn = true; // Toggle between Phong and Blinn-Phong lighting
 
 void main()
 {
@@ -97,19 +99,23 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
     
 	// specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); 
+    float spec;
+    	
+	if(blinn)
+	{
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+	}
+	else
+	{
+		vec3 reflectDir = reflect(-lightDir, normal);
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	}
 
 	// combine results
     vec3 ambient  = light.ambient  * material.ambient;
     vec3 diffuse  = light.diffuse  * diff * material.diffuse;
     vec3 specular = light.specular * spec * material.specular;
-    
-	float magnitude = 0.1;
-
-	ambient *= magnitude;
-	diffuse *= magnitude;
-	specular *= magnitude;
 
 	return (ambient + diffuse + specular);
 }
@@ -122,10 +128,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
     
 	// specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-	
-	float spec;
-
+    float spec;
+    	
 	if(blinn)
 	{
 		vec3 halfwayDir = normalize(lightDir + viewDir);
@@ -133,6 +137,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	}
 	else
 	{
+		vec3 reflectDir = reflect(-lightDir, normal);
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	}
 
@@ -162,8 +167,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
     
 	// specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec;
     	
 	if(blinn)
 	{
@@ -172,6 +176,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	}
 	else
 	{
+		vec3 reflectDir = reflect(-lightDir, normal);
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	}
 

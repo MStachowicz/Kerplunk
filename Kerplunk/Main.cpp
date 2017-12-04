@@ -22,6 +22,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
+void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
@@ -106,6 +107,9 @@ int main()
 
 	Shader normalVisualizeShader("../Kerplunk/normalVisualize.vert", "../Kerplunk/normalVisualize.frag", "../Kerplunk/normalVisualize.geom"); // Shader to generate lines eminating fromt the vertices in the direction of their normals
 	Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
+
+	Shader materialShader("../Kerplunk/materialLighting.vert", "../Kerplunk/materialLighting.frag", nullptr); // Shader to draw objects with material properties and texture applied.
+
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -212,17 +216,24 @@ int main()
 	};
 
 	glm::vec3 pointLightPositions[] = {
-		glm::vec3(12.7f,  0.2f,  12.0f),
-		glm::vec3(2.3f, 3.3f, -4.0f),
-		glm::vec3(-4.0f,  2.0f, -12.0f),
-		glm::vec3(0.0f,  0.0f, -3.0f)
+		glm::vec3(-10.0f,  -1.0f,  -6.0f),
+		glm::vec3(-6.0f,   -1.0f,  -6.0f),
+		glm::vec3(-2.0f,   -1.0f,  -6.0f),
+		glm::vec3( 2.0f,   -1.0f,  -6.0f)
 	};
 
 	glm::vec3 pointLightColours[] = {
-		glm::vec3(1.0f),
-		glm::vec3(1.0f),
-		glm::vec3(1.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f),
 		glm::vec3(1.0f)
+	};
+
+	glm::vec3 pointLightSpecular[] = {
+		glm::vec3(0.9f),
+		glm::vec3(0.7f),
+		glm::vec3(0.5f),
+		glm::vec3(0.3f)
 	};
 
 	float texRepeat = 8.0f;
@@ -451,6 +462,9 @@ int main()
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
 
+	materialShader.use();
+	materialShader.setInt("material.diffuseMap", 0);
+
 	textureShader.use();
 	textureShader.setInt("texture1", 0);
 
@@ -484,8 +498,7 @@ int main()
 	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
 	unsigned int uniformBlockIndexNormalShader = glGetUniformBlockIndex(normalVisualizeShader.ID, "Matrices");
 	unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
-
-
+	unsigned int uniformBlockIndexMaterialShader = glGetUniformBlockIndex(materialShader.ID, "Matrices");
 
 	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
 	glUniformBlockBinding(lightBoxShader.ID, uniformBlockIndexLightBox, 0);
@@ -495,6 +508,7 @@ int main()
 	glUniformBlockBinding(textureShader.ID, uniformBlockIndexTextureShader, 0);
 	glUniformBlockBinding(normalVisualizeShader.ID, uniformBlockIndexNormalShader, 0);
 	glUniformBlockBinding(instancedLightingShader.ID, uniformBlockIndexInstanceShader, 0);
+	glUniformBlockBinding(materialShader.ID, uniformBlockIndexMaterialShader, 0);
 
 	// Creating the actual uniform buffer object and binding it to the binding point
 	unsigned int UBOmatrices;
@@ -613,61 +627,11 @@ int main()
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-
 		// Set up all the lighting in the scene
-		lightingShader.use();
-		lightingShader.setVec3("viewPos", camera.Position);
-
+		setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
 		// add time component to geometry shader in the form of a uniform
 		lightingShader.setFloat("time", glfwGetTime());
-		lightingShader.setBool("blinn", isBlinnShadingActive);
-		//cout << isBlinnShadingActive << endl;
-
-		//// Point light motion
-		//for (GLuint i = 0; i < 4; i++)
-		//{
-		//	pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-		//	pointLightPositions[i].y += (0.015 * sin(glfwGetTime() * 2)); // light motion
-		//}
-
-		// Set the uniforms for all the point lights
-		for (GLuint i = 0; i < 4; i++)
-		{
-			string number = to_string(i);
-
-			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].position").c_str()), pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
-			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].ambient").c_str()), pointLightColours[i].r * 0.1f, pointLightColours[i].g * 0.1f, pointLightColours[i].b * 0.1f);
-			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].diffuse").c_str()), pointLightColours[i].r, pointLightColours[i].g, pointLightColours[i].b);
-			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].specular").c_str()), 1.0f, 1.0f, 1.0f);
-			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].constant").c_str()), 1.0f);
-			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].linear").c_str()), 0.9f);
-			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.32f);
-		}
-
-		// Set uniforms for the directional light
-		lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-		// Set uniforms for the spotlight
-		lightingShader.setVec3("spotlight.position", -15.793399f, -0.271867f, 15.654298f);
-		lightingShader.setVec3("spotlight.direction", 0.905481f, -0.424199f, -0.012639f);
-		//std::cout << "Position: x:" << to_string(camera.Position.x) << "y:" << to_string(camera.Position.y) << "z:" << to_string(camera.Position.z) << endl;
-		//std::cout << "Front: x:" << to_string(camera.Front.x) << "y:" << to_string(camera.Front.y) << "z:" << to_string(camera.Front.z) << endl;		lightingShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
-		lightingShader.setVec3("spotlight.diffuse", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
-		lightingShader.setFloat("spotlight.constant", 1.0f);
-		lightingShader.setFloat("spotlight.linear", 0.09);
-		lightingShader.setFloat("spotlight.quadratic", 0.032);
-		lightingShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
-		lightingShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(15.0f)));
-
-		// Set uniforms for the material properties
-		lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		lightingShader.setFloat("material.shininess", 32.0f);
-
+		lightingShader.use();
 		// Draw Nanosuit
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
@@ -721,22 +685,23 @@ int main()
 		}
 
 		// floor
+		setupLighting(materialShader, pointLightPositions, pointLightColours, pointLightSpecular);
+
+		// Set uniforms for the material properties
+		materialShader.use();
+		materialShader.setVec3("material.ambient", 0.01f,0.01f,0.01f);
+		materialShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
+		materialShader.setVec3("material.specular", 0.9f, 0.9f, 0.9f);
+		materialShader.setFloat("material.shininess", 64);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, floorTexture); // binding floor texture to diffuse
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, 0); // unbind the specular map for the floor
-		lightingShader.setBool("specularMap", false); // set the shader to not use specular mapping
-		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // set specular factor
-		lightingShader.setFloat("material.shininess", 32.0f);
 		model = glm::mat4(1.0f);
 		model = glm::scale(model, glm::vec3(4.0f));
-		lightingShader.setMat4("model", model);
+		materialShader.setMat4("model", model);
 
 		glBindVertexArray(planeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		lightingShader.setBool("specularMap", true);
 
 
 		// Changing colour
@@ -872,6 +837,58 @@ int main()
 	// ------------------------------------------------------------------
 	glfwTerminate();
 	return 0;
+}
+
+void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[])
+{
+	// Set up all the lighting in the scene
+	shader.use();
+	shader.setVec3("viewPos", camera.Position);
+
+	// Point light motion
+	for (GLuint i = 0; i < 4; i++)
+	{
+		pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
+		//pointLightPositions[i].y += 1;
+	}
+
+	// Set the uniforms for all the point lights
+	for (GLuint i = 0; i < 4; i++)
+	{
+		string number = to_string(i);
+
+		glUniform3f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].position").c_str()), pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
+		glUniform3f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].ambient").c_str()), pointLightColours[i].r, pointLightColours[i].g, pointLightColours[i].b);
+		glUniform3f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].diffuse").c_str()), pointLightColours[i].r, pointLightColours[i].g, pointLightColours[i].b);
+		glUniform3f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].specular").c_str()), pointLightSpecular[i].r, pointLightSpecular[i].g, pointLightSpecular[i].b);
+		glUniform1f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].constant").c_str()), 1.0f);
+		glUniform1f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].linear").c_str()), 0.9f);
+		glUniform1f(glGetUniformLocation(shader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.32f);
+	}
+
+	// Set uniforms for the directional light
+	shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+	shader.setVec3("dirLight.ambient", 0.01f, 0.01f, 0.01f);
+	shader.setVec3("dirLight.diffuse", 0.04f, 0.04f, 0.04f);
+	shader.setVec3("dirLight.specular", 0.0f, 0.0f, 0.0f);
+	
+	// Set uniforms for the spotlight
+	shader.setVec3("spotlight.position", -15.793399f, -0.271867f, 15.654298f);
+	shader.setVec3("spotlight.direction", 0.905481f, -0.424199f, -0.012639f);
+	shader.setVec3("spotlight.diffuse", 1.0f, 1.0f, 1.0f);
+	shader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
+	shader.setFloat("spotlight.constant", 1.0f);
+	shader.setFloat("spotlight.linear", 0.09);
+	shader.setFloat("spotlight.quadratic", 0.032);
+	shader.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
+	shader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
+	// Set uniforms for the material properties
+	shader.setVec3("material.ambient", 0.0f, 0.0f, 0.0f);
+	shader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
+	shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+	shader.setFloat("material.shininess", 32.0f);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
