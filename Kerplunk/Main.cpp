@@ -521,9 +521,9 @@ int main()
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
 
 	// load models
-	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj");
-	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj");
-	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj");
+	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
+	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
+	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
 
 	// Generating an asteroid field
 	unsigned int amount = 100000;
