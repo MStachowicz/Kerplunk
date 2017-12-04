@@ -630,13 +630,30 @@ int main()
 		// input
 		processInput(window);
 
-		// render
 		//// FIRST PASS
 		//// bind to framebuffer and draw scene as we normally would to color texture 
 		//glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
-		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
+
+		// First render to the shadow map
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		// Directional light, orthographic projection as there is no perspective deform
+		float near_plane = 1.0f, far_plane = 7.5f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
