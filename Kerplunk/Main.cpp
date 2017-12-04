@@ -413,7 +413,7 @@ int main()
 	// attaching stencil and depth buffer to the frame buffer
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, textureFBO, 0);
 
-	// creating a render buffer object to attach to the frame buffer, write only, best suited to stencil and depth testing.
+	// creating a render buffer object to attach to the framebuffer, write only, best suited to stencil and depth testing.
 	unsigned int RBO;
 	glGenRenderbuffers(1, &RBO);
 
@@ -425,7 +425,33 @@ int main()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 
-	// unbinding the frame buffer object
+	// unbinding the framebuffer object
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	// Generating a framebuffer to store the shadow depth map
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+	// Creating a 2D texture to be used as the frame buffers depth buffer
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Attaching the depth texture to the framebuffers depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	// No need to attach a colour buffer so setting draw and read buffer to GL_NONE to signify this.
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
