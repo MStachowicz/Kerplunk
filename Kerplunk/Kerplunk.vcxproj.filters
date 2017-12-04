@@ -31,6 +31,9 @@
     <Filter Include="Shader Files\Debug">
       <UniqueIdentifier>{0de86dda-8576-442e-87ab-cf1c0f2fb5e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Shadow map">
+      <UniqueIdentifier>{1753e955-31e0-4518-9358-52b8bc34ccb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -133,6 +136,12 @@
     </None>
     <None Include="materialLighting.frag">
       <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="depthShader.vert">
+      <Filter>Shader Files\Shadow map</Filter>
+    </None>
+    <None Include="depthShader.frag">
+      <Filter>Shader Files\Shadow map</Filter>
     </None>
   </ItemGroup>
 </Project>
