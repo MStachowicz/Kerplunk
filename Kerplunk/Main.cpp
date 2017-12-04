@@ -41,7 +41,7 @@ float lastFrame = 0.0f; // Time of last frame
 // KEY FLAGS set to true when key is pressed, reset to false when the key is released
 bool capsFlag = false;
 bool testFlag = false;
-bool isBlinnShadingActive = false; // Switches the lighting to use the blinn-phong lighting model.
+bool isBlinnShadingActive = true; // Switches the lighting to use the blinn-phong lighting model.
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // Position of the light in world coordinates.
 
 int main()
@@ -88,7 +88,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_FRAMEBUFFER_SRGB);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
@@ -617,11 +617,11 @@ int main()
 		// Set up all the lighting in the scene
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", camera.Position);
-		// add time component to geometry shader in the form of a uniform
 
+		// add time component to geometry shader in the form of a uniform
 		lightingShader.setFloat("time", glfwGetTime());
 		lightingShader.setBool("blinn", isBlinnShadingActive);
-		cout << isBlinnShadingActive << endl;
+		//cout << isBlinnShadingActive << endl;
 
 		//// Point light motion
 		//for (GLuint i = 0; i < 4; i++)
@@ -640,8 +640,8 @@ int main()
 			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].diffuse").c_str()), pointLightColours[i].r, pointLightColours[i].g, pointLightColours[i].b);
 			glUniform3f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].specular").c_str()), 1.0f, 1.0f, 1.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].constant").c_str()), 1.0f);
-			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].linear").c_str()), 0.09f);
-			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.032f);
+			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].linear").c_str()), 0.9f);
+			glUniform1f(glGetUniformLocation(lightingShader.ID, ("pointLights[" + number + "].quadratic").c_str()), 0.32f);
 		}
 
 		// Set uniforms for the directional light
@@ -721,11 +721,14 @@ int main()
 		}
 
 		// floor
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, floorTexture); // binding floor texture to diffuse
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0); // unbind the specular map for the floor
-
+		lightingShader.setBool("specularMap", false); // set the shader to not use specular mapping
+		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // set specular factor
+		lightingShader.setFloat("material.shininess", 32.0f);
 		model = glm::mat4(1.0f);
 		model = glm::scale(model, glm::vec3(4.0f));
 		lightingShader.setMat4("model", model);
@@ -733,6 +736,7 @@ int main()
 		glBindVertexArray(planeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		lightingShader.setBool("specularMap", true);
 
 
 		// Changing colour
