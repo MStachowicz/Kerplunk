@@ -128,5 +128,11 @@
     <None Include="lightingInstanced.vert">
       <Filter>Shader Files\Lighting</Filter>
     </None>
+    <None Include="materialLighting.vert">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
+    <None Include="materialLighting.frag">
+      <Filter>Shader Files\Lighting</Filter>
+    </None>
   </ItemGroup>
 </Project>
