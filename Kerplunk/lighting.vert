@@ -10,20 +10,24 @@ layout (std140) uniform Matrices
 };
 
 uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 
 out VS_OUT {
 	vec3 Normal;
 	vec3 FragPos;
 	vec2 TexCoord;
+	vec4 FragPosLightSpace;
 } vs_out;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-	vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
-
-	// Adjusting the normal for non uniform transformations.
-	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
-
 	vs_out.TexCoord = aTexCoords;
+	// Passing a world-space vertex postion
+	vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+	// Adjusting the normal for non uniform transformations
+	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
+	// Transforming the world-space vertex position to light space
+	vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
+
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 } 

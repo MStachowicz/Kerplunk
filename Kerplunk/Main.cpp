@@ -109,7 +109,7 @@ int main()
 	Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
 
 	Shader materialShader("../Kerplunk/materialLighting.vert", "../Kerplunk/materialLighting.frag", nullptr); // Shader to draw objects with material properties and texture applied.
-
+	Shader simpleDepthShader("../Kerplunk/depthShader.vert", "../Kerplunk/depthShader.frag", nullptr); // Shader used for shadow mapping, used to write to the depth buffer performing no lighting. 
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -487,6 +487,7 @@ int main()
 	lightingShader.use();
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
+	lightingShader.setInt("shadowMap", 2);
 
 	materialShader.use();
 	materialShader.setInt("material.diffuseMap", 0);
@@ -648,6 +649,12 @@ int main()
 			glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+
+		simpleDepthShader.use();
+		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
