@@ -23,6 +23,7 @@ void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
 void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
+void renderObjects(Shader shader, glm::vec3 cubePositions[], unsigned int cubeVAO, Model nanosuit);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
@@ -43,7 +44,6 @@ float lastFrame = 0.0f; // Time of last frame
 bool capsFlag = false;
 bool testFlag = false;
 bool isBlinnShadingActive = true; // Switches the lighting to use the blinn-phong lighting model.
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // Position of the light in world coordinates.
 
 int main()
 {
@@ -279,10 +279,6 @@ int main()
 		 1.0f, -1.0f,    1.0f, 0.0f, // bottom right
 		 1.0f,  1.0f,    1.0f, 1.0f  // top right 
 	};
-	//for (unsigned int i = 0; i < sizeof(quadVertices) / sizeof(quadVertices[0]); i++)
-	//{
-	//	quadVertices[i] *= 0.5;
-	//}
 
 	// Cube VAO
 	unsigned int cubeVAO, cubeVBO;
@@ -547,7 +543,7 @@ int main()
 	// Binding the UBO to the binding point 0 for all shaders
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
 
-	// load models
+	// load models	
 	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
 	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
 	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
@@ -630,6 +626,7 @@ int main()
 
 		// input
 		processInput(window);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		//// FIRST PASS
 		//// bind to framebuffer and draw scene as we normally would to color texture 
@@ -637,38 +634,41 @@ int main()
 		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
 
 
-		// First render to the shadow map
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-
-		// Directional light, orthographic projection as there is no perspective deform
+		// 1. render depth of scene to texture (from light's perspective)
+		// --------------------------------------------------------------
+		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
 		float near_plane = 1.0f, far_plane = 7.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(
+			glm::vec3(-2.0f, 10.0f, -1.0f), // light position
+			glm::vec3(0.0f), 
+			glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
 
+		// render scene from light's point of view
 		simpleDepthShader.use();
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-
-
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, woodTexture);
+		renderObjects(simpleDepthShader, cubePositions, cubeVAO, nanosuit);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-
-		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// 2. render scene as normal using the generated depth/shadow map  
+		// --------------------------------------------------------------
+		// reset viewport
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Projection + view set
 		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 
-		// Set matrices in the uniform buffer object
+		// Set matrices in the uniform buffer object (sets the projection and view matrices)
 		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(proj));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -679,15 +679,20 @@ int main()
 
 		// Set up all the lighting in the scene
 		setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
+		
+		lightingShader.use();
 		// add time component to geometry shader in the form of a uniform
 		lightingShader.setFloat("time", glfwGetTime());
-		lightingShader.use();
-		// Draw Nanosuit
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightingShader.setMat4("model", model);
-		nanosuit.Draw(lightingShader);
+		lightingShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		// Binding textures on corresponding texture units after activating them
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		renderObjects(simpleDepthShader, cubePositions, cubeVAO, nanosuit);
 
 		//// Redraw nanosuit drawing the normals away from its vertices
 		//normalVisualizeShader.use();
@@ -698,47 +703,28 @@ int main()
 		//nanosuit.Draw(normalVisualizeShader);
 
 
-		// draw Planet
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 20.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		lightingShader.setMat4("model", model);
-		planet.Draw(lightingShader);
+		//// draw Planet
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(0.0f, 20.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		//lightingShader.setMat4("model", model);
+		//planet.Draw(lightingShader);
 
-		// draw meteorites
-		instancedLightingShader.use();
-		for (unsigned int i = 0; i < rock.meshes.size(); i++)
-		{
-			glBindVertexArray(rock.meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, rock.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, amount);
-		}
+		//// draw meteorites
+		//instancedLightingShader.use();
+		//for (unsigned int i = 0; i < rock.meshes.size(); i++)
+		//{
+		//	glBindVertexArray(rock.meshes[i].VAO);
+		//	glDrawElementsInstanced(GL_TRIANGLES, rock.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, amount);
+		//}
 
-
-		lightingShader.use();
-		// Binding textures on corresponding texture units after activating them
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
-
-		// Draw cubes
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 10.0f * i * currentFrame;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			lightingShader.setMat4("model", model);
-
-			glBindVertexArray(cubeVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
 
 		// floor
-		setupLighting(materialShader, pointLightPositions, pointLightColours, pointLightSpecular);
-
-		// Set uniforms for the material properties
 		materialShader.use();
+		
+		setupLighting(materialShader, pointLightPositions, pointLightColours, pointLightSpecular);
+		
+		// Set uniforms for the material properties
 		materialShader.setVec3("material.ambient", 0.01f,0.01f,0.01f);
 		materialShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
 		materialShader.setVec3("material.specular", 0.9f, 0.9f, 0.9f);
@@ -754,24 +740,13 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
-		// Changing colour
-		//glm::vec3 lightColor;
-		//lightColor.x = sin(glfwGetTime() * 2.0f);
-		//lightColor.y = sin(glfwGetTime() * 0.7f);
-		//lightColor.z = sin(glfwGetTime() * 1.3f);
-		//glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
-		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-		//lightingShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
-		//lightingShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
-
 		// Draw light cubes
 		lightBoxShader.use();
 
 		for (unsigned int i = 0; i < 4; i++)
 		{
 			model = glm::mat4(1.0f);
-			lightPos = pointLightPositions[i];
-			model = glm::translate(model, lightPos);
+			model = glm::translate(model, pointLightPositions[i]);
 			model = glm::scale(model, glm::vec3(0.2f));
 			lightBoxShader.setMat4("model", model);
 
@@ -887,6 +862,31 @@ int main()
 	// ------------------------------------------------------------------
 	glfwTerminate();
 	return 0;
+}
+
+void renderObjects(Shader shader, glm::vec3 cubePositions[], unsigned int cubeVAO, Model nanosuit)
+{
+	shader.use();
+
+	// Draw Nanosuit
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader.setMat4("model", model);
+	nanosuit.Draw(shader);
+
+	// Draw cubes
+	for (unsigned int i = 0; i < 10; i++)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 10.0f * i * glfwGetTime();
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		shader.setMat4("model", model);
+
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
 }
 
 void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[])
