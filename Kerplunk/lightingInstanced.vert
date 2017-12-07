@@ -14,7 +14,10 @@ out VS_OUT {
 	vec3 Normal;
 	vec3 FragPos;
 	vec2 TexCoord;
+	vec4 FragPosLightSpace;
 } vs_out;
+
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
@@ -24,5 +27,6 @@ void main()
 	// Adjusting the normal for non uniform transformations.
 	vs_out.Normal = mat3(transpose(inverse(instanceMatrix))) * aNormal;
 
+	vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
 	vs_out.TexCoord = aTexCoords;
 } 

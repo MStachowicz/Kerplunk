@@ -9,15 +9,15 @@ layout (std140) uniform Matrices
     mat4 view;
 };
 
-uniform mat4 model;
-uniform mat4 lightSpaceMatrix;
-
 out VS_OUT {
 	vec3 Normal;
 	vec3 FragPos;
 	vec2 TexCoord;
 	vec4 FragPosLightSpace;
 } vs_out;
+
+uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {

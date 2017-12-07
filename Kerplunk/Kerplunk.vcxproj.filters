@@ -143,5 +143,11 @@
     <None Include="depthShader.frag">
       <Filter>Shader Files\Shadow map</Filter>
     </None>
+    <None Include="debugQuad.vert">
+      <Filter>Shader Files\Shadow map</Filter>
+    </None>
+    <None Include="debugQuad.frag">
+      <Filter>Shader Files\Shadow map</Filter>
+    </None>
   </ItemGroup>
 </Project>

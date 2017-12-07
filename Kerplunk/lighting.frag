@@ -67,6 +67,7 @@ out vec4 FragColor;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+float ShadowCalculation(vec4 fragPosLightSpace);
 
 // Settings
 bool blinn = true; // Toggle between Phong and Blinn-Phong lighting
@@ -123,6 +124,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 
 	// multiplying the diffuse and specular components by the inverse of the shadow factor (how much of the fragment is not in shadow)
 	return  ambient + (1.0 - shadow) * (diffuse + specular);
+	//return  ambient + diffuse + specular;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
