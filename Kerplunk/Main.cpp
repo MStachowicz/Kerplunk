@@ -641,12 +641,12 @@ int main()
 		// 1. render depth of scene to texture (from light's perspective)
 		// --------------------------------------------------------------
 		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 30.0f;
+		float near_plane = 1.0f, far_plane = 110.0f, projSize = 28.0f;
 
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightProjection = glm::ortho(-projSize, projSize, -projSize, projSize, near_plane, far_plane);
 		lightView = glm::lookAt(
-			glm::vec3(-2.0f, 10.0f, -1.0f), // light position
-			glm::vec3(0.0f),
+			glm::vec3(-2.0f, 100.0f, -1.0f), // light position
+			glm::vec3(0.0f, 0.0f,0.0f),
 			glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 
@@ -657,8 +657,6 @@ int main()
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, woodTexture);
 		renderObjects(simpleDepthShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, false);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -708,7 +706,7 @@ int main()
 		debugDepthQuad.setFloat("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-		renderQuad();
+		//renderQuad();
 
 		//// floor
 		//materialShader.use();
@@ -870,13 +868,6 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 
-	// Draw Nanosuit
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
-	model = glm::scale(model, glm::vec3(0.2f));
-	shader.setMat4("model", model);
-	nanosuit.Draw(shader);
-
 	if (bindTextures)
 	{
 		glActiveTexture(GL_TEXTURE0);
@@ -891,6 +882,14 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 
 	glBindVertexArray(planeVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	// Draw Nanosuit
+	/*model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader.setMat4("model", model);
+	nanosuit.Draw(shader);*/
+
 
 	//// Redraw nanosuit drawing the normals away from its vertices
 	//normalVisualizeShader.use();
