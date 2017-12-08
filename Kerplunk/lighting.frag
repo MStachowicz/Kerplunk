@@ -67,7 +67,7 @@ out vec4 FragColor;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-float ShadowCalculation(vec4 fragPosLightSpace);
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir);
 
 // Settings
 bool blinn = true; // Toggle between Phong and Blinn-Phong lighting
@@ -120,7 +120,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 specular = light.specular * spec * vec3(texture(material.specularMap, fs_in.TexCoord));
 
 	// calculate shadow
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);       
+    float shadow = ShadowCalculation(fs_in.FragPosLightSpace, normal, lightDir);       
 
 	// multiplying the diffuse and specular components by the inverse of the shadow factor (how much of the fragment is not in shadow)
 	return  ambient + (1.0 - shadow) * (diffuse + specular);
@@ -209,7 +209,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 }
 
 // Calculates the factor of how much of a fragment is in shadow 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
 	// transforming the light space position in clip space to NDC as fragPosLightSpace is not passed to the fragment shader via gl_Position
 	// performing the manual perspective division
@@ -220,8 +220,11 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float closestDepth = texture(shadowMap, projCoords.xy).r; 
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
+
+	// Bias applied to surface shadows to prevent shadow acne
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    float shadow = currentDepth- bias > closestDepth  ? 1.0 : 0.0;
 
     return shadow;
 }
