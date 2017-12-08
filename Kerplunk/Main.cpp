@@ -431,7 +431,7 @@ int main()
 	unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	const unsigned int SHADOW_WIDTH = 1024 * 2, SHADOW_HEIGHT = 1024 * 2;
 
 	// Creating a 2D texture to be used as the frame buffers depth buffer
 	unsigned int depthMap;
