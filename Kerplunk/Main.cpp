@@ -657,7 +657,9 @@ int main()
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
+		glCullFace(GL_FRONT); // reverse cull order to reduce peter panning on shadows
 		renderObjects(simpleDepthShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, false);
+		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
