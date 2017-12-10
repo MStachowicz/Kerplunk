@@ -52,7 +52,11 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotlight;
 uniform Material material;
+// Directional shadow mapping
 uniform sampler2D shadowMap;
+// Omnidirectional shadow mapping
+uniform samplerCube omniShadowMap;
+uniform float omniFarPlane;
 
 in GS_OUT {
 	vec3 Normal;
@@ -68,6 +72,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir);
+float OmniShadowCalculation(vec3 fragPos, vec3 lightPos);
 
 // Settings
 bool blinn = true; // Toggle between Phong and Blinn-Phong lighting
@@ -79,13 +84,16 @@ void main()
     vec3 norm = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
-    // phase 1: Directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
+    
+	// phase 1: Directional lighting
+     vec3 result = CalcDirLight(dirLight, norm, viewDir);
 
     // phase 2: Point lights
-    for(int i = 0; i < NR_POINT_LIGHTS; i++)
-        result += CalcPointLight(pointLights[i], norm,  fs_in.FragPos, viewDir); 
+    //for(int i = 0; i < NR_POINT_LIGHTS; i++)
+      //  result += CalcPointLight(pointLights[i], norm,  fs_in.FragPos, viewDir); 
 		
+	result += CalcPointLight(pointLights[0], norm,  fs_in.FragPos, viewDir);
+
     // phase 3: Spot light
     result += CalcSpotLight(spotlight, norm,  fs_in.FragPos, viewDir);          
 
@@ -159,11 +167,16 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuseMap, fs_in.TexCoord));
     vec3 specular = light.specular * spec * vec3(texture(material.specularMap, fs_in.TexCoord));
     
-	ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
+	//ambient  *= attenuation;
+    //diffuse  *= attenuation;
+    //specular *= attenuation;
 
-    return (ambient + diffuse + specular);
+	// calculate shadow
+    float shadow = OmniShadowCalculation(fs_in.FragPos, light.position);  
+
+	// multiplying the diffuse and specular components by the inverse of the shadow factor (how much of the fragment is not in shadow)
+	return  ambient + (1.0 - shadow) * (diffuse + specular);
+    //return (ambient + diffuse + specular);
 } 
 
 // calculates the color when using a spot light.
@@ -246,5 +259,26 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
     if(projCoords.z > 1.0)
         shadow = 0.0;
         
+    return shadow;
+}
+
+// Calculates the factor of how much of a fragment is in shadow for point lights using a cubemap depth map
+float OmniShadowCalculation(vec3 fragPos, vec3 lightPos)
+{
+	// find direction vector from the light position to fragment
+	vec3 fragToLight = fragPos - lightPos; 
+	// retrieve the closest depth value by sampling the cubemap using the direction
+    float closestDepth = texture(omniShadowMap, fragToLight).r;
+	// transform the depth from [0,1] range back to original value
+    closestDepth *= omniFarPlane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // now test for shadows
+    float bias = 0.05; 
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+	
+	// display closestDepth as debug (to visualize depth cubemap)
+	//FragColor = vec4(vec3(closestDepth / omniFarPlane), 1.0);  
+
     return shadow;
 }

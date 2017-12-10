@@ -112,6 +112,7 @@ int main()
 	Shader materialShader("../Kerplunk/materialLighting.vert", "../Kerplunk/materialLighting.frag", nullptr); // Shader to draw objects with material properties and texture applied.
 	Shader simpleDepthShader("../Kerplunk/depthShader.vert", "../Kerplunk/depthShader.frag", nullptr); // Shader used for shadow mapping, used to write to the depth buffer performing no lighting. 
 	Shader debugDepthQuad("../Kerplunk/debugQuad.vert", "../Kerplunk/debugQuad.frag", nullptr);
+	Shader omniDepthShader("../Kerplunk/omniDepthShader.vert", "../Kerplunk/omniDepthShader.frag", "../Kerplunk/omniDepthShader.geom"); // shader used to fill the depth component of the framebuffer cubemap for omnidirectional shadow mapping
 
 	float cubeVertices[] = {
 		// positions          // normals            // texture coords
@@ -218,14 +219,14 @@ int main()
 	};
 
 	glm::vec3 pointLightPositions[] = {
-		glm::vec3(-10.0f,  -1.0f,  -6.0f),
+		glm::vec3(0.0f,  3.0f,  1.5f),
 		glm::vec3(-6.0f,   -1.0f,  -6.0f),
 		glm::vec3(-2.0f,   -1.0f,  -6.0f),
 		glm::vec3(2.0f,   -1.0f,  -6.0f)
 	};
 
 	glm::vec3 pointLightColours[] = {
-		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 1.0f),
 		glm::vec3(1.0f)
@@ -458,18 +459,20 @@ int main()
 
 
 	// OMNIDIRECTIONAL SHADOW MAPPING
+	const unsigned int OMNI_SHADOW_WIDTH = 1024, OMNI_SHADOW_HEIGHT = 1024;
+	
 	unsigned int depthMapOmniFBO;
 	glGenFramebuffers(1, &depthMapOmniFBO);
 
 	// Creating a cubemap
 	unsigned int depthCubemap;
 	glGenTextures(1, &depthCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 
 	// generating each of the cubemap faces as 2D depth value texture images
-	const unsigned int OMNI_SHADOW_WIDTH = 1024, OMNI_SHADOW_HEIGHT = 1024;
-	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, OMNI_SHADOW_WIDTH, OMNI_SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, OMNI_SHADOW_WIDTH, OMNI_SHADOW_HEIGHT, 
+			0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	// texture parameters
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -519,6 +522,7 @@ int main()
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
 	lightingShader.setInt("shadowMap", 2);
+	lightingShader.setInt("omniShadowMap", 3);
 
 	materialShader.use();
 	materialShader.setInt("material.diffuseMap", 0);
@@ -527,7 +531,7 @@ int main()
 	textureShader.setInt("texture1", 0);
 
 	debugDepthQuad.use();
-	debugDepthQuad.setInt("depthMap", 0);
+	debugDepthQuad.setInt("depthMap", 0); 
 
 	// Post processing
 	screenShader.use();
@@ -668,10 +672,10 @@ int main()
 		//// FIRST PASS
 		//// bind to framebuffer and draw scene as we normally would to color texture 
 		//glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)
+		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)		
 
 
-		// 1. render depth of scene to texture (from light's perspective)
+		// 1. render depth of scene to depth map for directional shadow mapping
 		// --------------------------------------------------------------
 		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
 		float near_plane = 1.0f, far_plane = 50.0f, projSize = 15.0f;
@@ -683,7 +687,8 @@ int main()
 			glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 
-		// render scene from light's point of view
+		// 1.1 render scene to depth map
+		// --------------------------------------------------------------
 		simpleDepthShader.use();
 		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
@@ -716,6 +721,23 @@ int main()
 		shadowTransforms.push_back(shadowProj *
 			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
+		// 2.1 render scene to cubemap
+		// --------------------------------------------------------------
+		glViewport(0, 0, OMNI_SHADOW_WIDTH, OMNI_SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapOmniFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		omniDepthShader.use();
+		for (unsigned int i = 0; i < 6; ++i)
+			omniDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+
+		omniDepthShader.setFloat("far_plane", far);
+		omniDepthShader.setVec3("lightPos", pointLightPositions[0]);
+
+		renderObjects(omniDepthShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, false);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
 
 		// 3. render scene as normal using the generated depth/shadow map  
 		// --------------------------------------------------------------
@@ -743,6 +765,7 @@ int main()
 		// add time component to geometry shader in the form of a uniform
 		lightingShader.setFloat("time", glfwGetTime());
 		lightingShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		lightingShader.setFloat("omniFarPlane", far);
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -750,19 +773,22 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 
 		renderObjects(lightingShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, true);
 
 
-
 		// render Depth map to quad for visual debugging
 		// ---------------------------------------------
-		debugDepthQuad.use();
-		debugDepthQuad.setFloat("near_plane", near_plane);
-		debugDepthQuad.setFloat("far_plane", far_plane);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
+		//debugDepthQuad.use();
+
+		//debugDepthQuad.setFloat("near_plane", near_plane);
+		//debugDepthQuad.setFloat("far_plane", far_plane);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, depthMap); // directional
 		//renderQuad();
+
 
 		//// floor
 		//materialShader.use();
@@ -1009,13 +1035,13 @@ void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 po
 	shader.use();
 	shader.setVec3("viewPos", camera.Position);
 
-	// Point light motion
-	for (GLuint i = 0; i < 4; i++)
-	{
-		pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-		pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
-		//pointLightPositions[i].y += 1;
-	}
+	//// Point light motion
+	//for (GLuint i = 0; i < 4; i++)
+	//{
+	//	pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+	//	pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
+	//	//pointLightPositions[i].y += 1;
+	//}
 
 	// Set the uniforms for all the point lights
 	for (GLuint i = 0; i < 4; i++)
