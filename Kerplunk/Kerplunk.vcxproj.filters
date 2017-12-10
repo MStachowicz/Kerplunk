@@ -34,6 +34,9 @@
     <Filter Include="Shader Files\Shadow map">
       <UniqueIdentifier>{1753e955-31e0-4518-9358-52b8bc34ccb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Shadow map\Omnidirectional">
+      <UniqueIdentifier>{f7187c2a-56fb-4a7a-8d5d-b76ee7022c1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -148,6 +151,15 @@
     </None>
     <None Include="debugQuad.frag">
       <Filter>Shader Files\Shadow map</Filter>
+    </None>
+    <None Include="omniDepthShader.vert">
+      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
+    </None>
+    <None Include="omniDepthShader.geom">
+      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
+    </None>
+    <None Include="omniDepthShader.frag">
+      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
     </None>
   </ItemGroup>
 </Project>
