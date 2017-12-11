@@ -460,7 +460,9 @@ int main()
 
 	// OMNIDIRECTIONAL SHADOW MAPPING
 	const unsigned int OMNI_SHADOW_WIDTH = 1024, OMNI_SHADOW_HEIGHT = 1024;
-	
+
+
+
 	unsigned int depthMapOmniFBO;
 	glGenFramebuffers(1, &depthMapOmniFBO);
 
@@ -471,7 +473,7 @@ int main()
 
 	// generating each of the cubemap faces as 2D depth value texture images
 	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, OMNI_SHADOW_WIDTH, OMNI_SHADOW_HEIGHT, 
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, OMNI_SHADOW_WIDTH, OMNI_SHADOW_HEIGHT,
 			0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	// texture parameters
@@ -531,7 +533,7 @@ int main()
 	textureShader.setInt("texture1", 0);
 
 	debugDepthQuad.use();
-	debugDepthQuad.setInt("depthMap", 0); 
+	debugDepthQuad.setInt("depthMap", 0);
 
 	// Post processing
 	screenShader.use();
@@ -683,7 +685,7 @@ int main()
 		lightProjection = glm::ortho(-projSize, projSize, -projSize, projSize, near_plane, far_plane);
 		lightView = glm::lookAt(
 			glm::vec3(-2.0f, 30.0f, -1.0f), // light position
-			glm::vec3(0.0f, 0.0f,0.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 
@@ -706,20 +708,21 @@ int main()
 		float near = 1.0f, far = 25.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
 
+		int i = 0;
 		// creating the light space transformation matrices for the 6 faces of cubemap
 		std::vector<glm::mat4> shadowTransforms;
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
 		shadowTransforms.push_back(shadowProj *
-			glm::lookAt(pointLightPositions[0], pointLightPositions[0] + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+			glm::lookAt(pointLightPositions[i], pointLightPositions[i] + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
 		// 2.1 render scene to cubemap
 		// --------------------------------------------------------------
@@ -737,7 +740,8 @@ int main()
 		renderObjects(omniDepthShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, false);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+		//}
+
 
 		// 3. render scene as normal using the generated depth/shadow map  
 		// --------------------------------------------------------------
@@ -881,32 +885,32 @@ int main()
 
 
 		// transparent windows
-		textureShader.use();
+		//textureShader.use();
 
-		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		textureShader.setBool("blend", true);
+		//glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
+		//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		//textureShader.setBool("blend", true);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, transparentWindowTexture);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, transparentWindowTexture);
 
-		glBindVertexArray(transparentVAO);
+		//glBindVertexArray(transparentVAO);
 
-		// sort the transparent windows before rendering
-		std::map<float, glm::vec3> sorted;
-		for (unsigned int i = 0; i < vegetation.size(); i++)
-		{
-			float distance = glm::length(camera.Position - vegetation[i]);
-			sorted[distance] = vegetation[i];
-		}
-		for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
-		{
-			model = glm::mat4();
-			model = glm::translate(model, it->second);
-			textureShader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
+		//// sort the transparent windows before rendering
+		//std::map<float, glm::vec3> sorted;
+		//for (unsigned int i = 0; i < vegetation.size(); i++)
+		//{
+		//	float distance = glm::length(camera.Position - vegetation[i]);
+		//	sorted[distance] = vegetation[i];
+		//}
+		//for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+		//{
+		//	model = glm::mat4();
+		//	model = glm::translate(model, it->second);
+		//	textureShader.setMat4("model", model);
+		//	glDrawArrays(GL_TRIANGLES, 0, 6);
+		//}
 
 
 
@@ -1035,13 +1039,12 @@ void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 po
 	shader.use();
 	shader.setVec3("viewPos", camera.Position);
 
-	//// Point light motion
-	//for (GLuint i = 0; i < 4; i++)
-	//{
-	//	pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-	//	pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
-	//	//pointLightPositions[i].y += 1;
-	//}
+	// Point light motion
+	for (GLuint i = 0; i < 4; i++)
+	{
+		pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
+	}
 
 	// Set the uniforms for all the point lights
 	for (GLuint i = 0; i < 4; i++)
@@ -1059,8 +1062,8 @@ void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 po
 
 	// Set uniforms for the directional light
 	shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-	shader.setVec3("dirLight.ambient", 0.3f, 0.3f, 0.3f);
-	shader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+	shader.setVec3("dirLight.ambient", 0.01f, 0.01f, 0.01f);
+	shader.setVec3("dirLight.diffuse", 0.01f, 0.01f, 0.01f);
 	shader.setVec3("dirLight.specular", 0.1f, 0.1f, 0.1f);
 
 	// Set uniforms for the spotlight

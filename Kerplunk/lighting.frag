@@ -55,8 +55,8 @@ uniform Material material;
 // Directional shadow mapping
 uniform sampler2D shadowMap;
 // Omnidirectional shadow mapping
-uniform samplerCube omniShadowMap;
 uniform float omniFarPlane;
+uniform	samplerCube omniShadowMap;
 
 in GS_OUT {
 	vec3 Normal;
@@ -89,8 +89,8 @@ void main()
      vec3 result = CalcDirLight(dirLight, norm, viewDir);
 
     // phase 2: Point lights
-    //for(int i = 0; i < NR_POINT_LIGHTS; i++)
-      //  result += CalcPointLight(pointLights[i], norm,  fs_in.FragPos, viewDir); 
+   // for(int i = 0; i < NR_POINT_LIGHTS; i++)
+       // result += CalcPointLight(pointLights[i], norm,  fs_in.FragPos, viewDir); 
 		
 	result += CalcPointLight(pointLights[0], norm,  fs_in.FragPos, viewDir);
 
@@ -167,9 +167,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuseMap, fs_in.TexCoord));
     vec3 specular = light.specular * spec * vec3(texture(material.specularMap, fs_in.TexCoord));
     
-	//ambient  *= attenuation;
-    //diffuse  *= attenuation;
-    //specular *= attenuation;
+	ambient  *= attenuation;
+    diffuse  *= attenuation;
+    specular *= attenuation;
 
 	// calculate shadow
     float shadow = OmniShadowCalculation(fs_in.FragPos, light.position);  
@@ -262,22 +262,46 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
     return shadow;
 }
 
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);  
+
 // Calculates the factor of how much of a fragment is in shadow for point lights using a cubemap depth map
 float OmniShadowCalculation(vec3 fragPos, vec3 lightPos)
 {
 	// find direction vector from the light position to fragment
 	vec3 fragToLight = fragPos - lightPos; 
-	// retrieve the closest depth value by sampling the cubemap using the direction
-    float closestDepth = texture(omniShadowMap, fragToLight).r;
-	// transform the depth from [0,1] range back to original value
-    closestDepth *= omniFarPlane;
     // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight);
-    // now test for shadows
-    float bias = 0.05; 
-    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
-	
+    
+	// now test for shadows
+	// Percentage-closer filtering
+	float shadow = 0.0;
+	float bias   = 0.15;
+	int samples  = 20;
+	float viewDistance = length(viewPos - fragPos);
+	float diskRadius = (1.0 + (viewDistance / omniFarPlane)) / 25.0; // vary radius by distance of viewer for softer shadows when closer to shadow
+
+	for(int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(omniShadowMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= omniFarPlane;   // Undo mapping [0;1]
+		if(currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+
+	shadow /= float(samples);  
+
 	// display closestDepth as debug (to visualize depth cubemap)
+	// retrieve the closest depth value by sampling the cubemap using the direction
+    //float closestDepth = texture(omniShadowMap, fragToLight).r;
+	// transform the depth from [0,1] range back to original value
+    //closestDepth *= omniFarPlane;
 	//FragColor = vec4(vec3(closestDepth / omniFarPlane), 1.0);  
 
     return shadow;
