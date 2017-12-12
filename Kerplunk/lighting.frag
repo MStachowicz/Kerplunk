@@ -52,11 +52,15 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotlight;
 uniform Material material;
+
 // Directional shadow mapping
 uniform sampler2D shadowMap;
 // Omnidirectional shadow mapping
 uniform float omniFarPlane;
 uniform	samplerCube omniShadowMap;
+// normal map
+uniform sampler2D normalMap;  
+uniform bool isNormalMap;
 
 in GS_OUT {
 	vec3 Normal;
@@ -81,7 +85,18 @@ int shadowSamplingFactor = 2;
 void main()
 {
     // properties
-    vec3 norm = normalize(fs_in.Normal);
+	vec3 norm;
+	
+	if (isNormalMap)
+	{
+		// obtain normal from normal map in range [0,1]
+		vec3 normal = texture(normalMap, fs_in.TexCoord).rgb;
+		// transform normal vector to range [-1,1]
+		norm = normalize(normal * 2.0 - 1.0); 
+	}
+	else
+		norm = normalize(fs_in.Normal);
+
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
     
