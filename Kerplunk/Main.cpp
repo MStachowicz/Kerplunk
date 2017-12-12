@@ -46,6 +46,9 @@ bool capsFlag = false;
 bool testFlag = false;
 bool isBlinnShadingActive = true; // Switches the lighting to use the blinn-phong lighting model.
 
+unsigned int brickwallTexture;
+unsigned int brickwallNormalMap;
+
 int main()
 {
 	char buf[100];
@@ -239,7 +242,7 @@ int main()
 		glm::vec3(0.3f)
 	};
 
-	float texRepeat = 8.0f;
+	float texRepeat = 1.0f;
 	float planeVertices[] = {
 		// positions            // normals           // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
 		// Bottom triangle
@@ -497,6 +500,8 @@ int main()
 	unsigned int floorTexture = loadTexture("woodFloor.png", true);
 	unsigned int transparentTexture = loadTexture("grass.png", true);
 	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png", true);
+	brickwallTexture = loadTexture("brickWall.jpg", true);
+	brickwallNormalMap = loadTexture("brickwall_normal.jpg", true);
 
 	// Loading cube map texture
 	vector<std::string> faces =
@@ -525,6 +530,7 @@ int main()
 	lightingShader.setInt("material.specularMap", 1);
 	lightingShader.setInt("shadowMap", 2);
 	lightingShader.setInt("omniShadowMap", 3);
+	lightingShader.setInt("normalMap", 4);
 
 	materialShader.use();
 	materialShader.setInt("material.diffuseMap", 0);
@@ -779,6 +785,8 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, brickwallNormalMap);
 
 		renderObjects(lightingShader, cubePositions, cubeVAO, nanosuit, planeVAO, floorTexture, true);
 
@@ -941,6 +949,9 @@ int main()
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, Model nanosuit, unsigned int planeVAO, unsigned int floorTexture, bool bindTextures)
 {
+	if (bindTextures)
+		shader.setBool("isNormalMap", false);
+
 	// Draw cubes
 	for (unsigned int i = 0; i < 10; i++)
 	{
@@ -954,12 +965,13 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 
+	// draw floor
 	if (bindTextures)
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, floorTexture); // binding floor texture to diffuse
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, NULL); // binding floor texture to diffuse
+		glBindTexture(GL_TEXTURE_2D, NULL); // binding blank specular texture map
 	}
 
 	model = glm::mat4(1.0f);
@@ -968,6 +980,31 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 
 	glBindVertexArray(planeVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	// Brick wall
+	if (bindTextures)
+	{
+		shader.setBool("isNormalMap", true); // uses a normal map texture
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, brickwallTexture); // binding floor texture to diffuse
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, NULL); // binding blank specular texture map
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, brickwallNormalMap); // binding normal map texture
+	}
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.0f));
+	shader.setMat4("model", model);
+
+	glBindVertexArray(planeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	if (bindTextures)
+		shader.setBool("isNormalMap", false);
 
 	// Draw Nanosuit
 	/*model = glm::mat4(1.0f);
