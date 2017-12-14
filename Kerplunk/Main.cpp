@@ -501,7 +501,7 @@ int main()
 	unsigned int transparentTexture = loadTexture("grass.png", true);
 	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png", true);
 	brickwallTexture = loadTexture("brickWall.jpg", true);
-	brickwallNormalMap = loadTexture("brickwall_normal.jpg", true);
+	brickwallNormalMap = loadTexture("brickwall_normal.jpg", false);
 
 	// Loading cube map texture
 	vector<std::string> faces =
