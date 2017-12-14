@@ -8,6 +8,7 @@ in VS_OUT {
 	vec3 FragPos;
 	vec2 TexCoord;
 	vec4 FragPosLightSpace;
+	mat3 TBN;
 } gs_in[];
 
 out GS_OUT {
@@ -15,6 +16,7 @@ out GS_OUT {
 	vec3 FragPos;
 	vec2 TexCoord;
 	vec4 FragPosLightSpace;
+	mat3 TBN;
 } gs_out;
 
 uniform float time;
@@ -42,6 +44,7 @@ void main() {
 	gs_out.FragPos = gs_in[0].FragPos;
     gs_out.TexCoord = gs_in[0].TexCoord;
     gs_out.FragPosLightSpace = gs_in[0].FragPosLightSpace;
+    gs_out.TBN = gs_in[0].TBN;
     EmitVertex();
 
     gl_Position = explode(gl_in[1].gl_Position, normal);
@@ -49,6 +52,7 @@ void main() {
 	gs_out.FragPos = gs_in[1].FragPos;
     gs_out.TexCoord = gs_in[1].TexCoord;
     gs_out.FragPosLightSpace = gs_in[1].FragPosLightSpace;
+    gs_out.TBN = gs_in[1].TBN;
     EmitVertex();
 
     gl_Position = explode(gl_in[2].gl_Position, normal);
@@ -56,6 +60,7 @@ void main() {
 	gs_out.FragPos = gs_in[2].FragPos;
     gs_out.TexCoord = gs_in[2].TexCoord;
     gs_out.FragPosLightSpace = gs_in[2].FragPosLightSpace;
+    gs_out.TBN = gs_in[2].TBN;
     EmitVertex();
 
     EndPrimitive();

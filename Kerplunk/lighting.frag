@@ -67,6 +67,7 @@ in GS_OUT {
 	vec3 FragPos;
 	vec2 TexCoord;
 	vec4 FragPosLightSpace;
+	mat3 TBN;
 } fs_in;
 
 out vec4 FragColor;
@@ -93,6 +94,8 @@ void main()
 		vec3 normal = texture(normalMap, fs_in.TexCoord).rgb;
 		// transform normal vector to range [-1,1]
 		norm = normalize(normal * 2.0 - 1.0); 
+		// transform the normal vector into tangent space to correct normal mapping 
+		norm = normalize(fs_in.TBN * normal); 
 	}
 	else
 		norm = normalize(fs_in.Normal);
