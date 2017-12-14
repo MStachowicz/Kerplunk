@@ -23,7 +23,7 @@ void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
 void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
-void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, Model nanosuit, unsigned int floorTexture, bool bindTextures);
+void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures);
 void renderQuad(const Shader &shader, glm::mat4 &model);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
@@ -48,6 +48,16 @@ bool isNormalMapActive = true; // Switches the lighting to use the blinn-phong l
 
 unsigned int brickwallTexture;
 unsigned int brickwallNormalMap;
+
+Model planet;
+Model nanosuit;
+Model rock;
+
+Model ironMan;
+Model cyborg;
+Model grass;
+
+
 
 int main()
 {
@@ -252,7 +262,7 @@ int main()
 		1.0f, -0.5f,  0.0f,   1.0f,  1.0f,
 		1.0f,  0.5f,  0.0f,   1.0f,  0.0f
 	};
-	
+
 	// Vegetation locations
 	vector<glm::vec3> vegetation
 	{
@@ -262,7 +272,7 @@ int main()
 		glm::vec3(-0.3f, -1.5f, -2.3f),
 		glm::vec3(0.5f, -1.5f, -0.6f)
 	};
-	
+
 	// vertex attributes for a quad that fills the entire screen in NDC.
 	float quadVertices[] = {
 		// positions     // texCoords
@@ -453,6 +463,15 @@ int main()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// Load models
+	planet = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
+	nanosuit = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
+	rock = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
+
+	ironMan = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/IronMan/IronMan.obj", true);
+	cyborg = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Cyborg/Cyborg.obj", true);
+	grass = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Grass pack/Grass_01.obj", true);
+
 
 	// Load texture
 	unsigned int containerDiffuseMap = loadTexture("container2.png", true);
@@ -552,10 +571,6 @@ int main()
 	// Binding the UBO to the binding point 0 for all shaders
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOmatrices, 0, 2 * sizeof(glm::mat4));
 
-	// load models	
-	Model nanosuit("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
-	Model planet("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
-	Model rock("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
 
 	// Generating an asteroid field
 	unsigned int amount = 100000;
@@ -664,7 +679,7 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glCullFace(GL_FRONT); // reverse cull order to reduce peter panning on shadows
-		renderObjects(simpleDepthShader, cubePositions, cubeVAO, nanosuit, floorTexture, false);
+		renderObjects(simpleDepthShader, cubePositions, cubeVAO, floorTexture, false);
 		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -703,7 +718,7 @@ int main()
 		omniDepthShader.setFloat("far_plane", far);
 		omniDepthShader.setVec3("lightPos", pointLightPositions[0]);
 
-		renderObjects(omniDepthShader, cubePositions, cubeVAO, nanosuit, floorTexture, false);
+		renderObjects(omniDepthShader, cubePositions, cubeVAO, floorTexture, false);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//}
@@ -746,7 +761,7 @@ int main()
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, omniDirectionalDepthCubemap);
 
-		renderObjects(lightingShader, cubePositions, cubeVAO, nanosuit, floorTexture, true);
+		renderObjects(lightingShader, cubePositions, cubeVAO, floorTexture, true);
 
 
 		// render Depth map of directional shadow to quad for visual debugging
@@ -882,7 +897,7 @@ int main()
 	return 0;
 }
 
-void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, Model nanosuit, unsigned int floorTexture, bool bindTextures)
+void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
 {
 	if (bindTextures)
 		shader.setBool("isNormalMap", false);
@@ -944,6 +959,27 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 	model = glm::scale(model, glm::vec3(0.2f));
 	shader.setMat4("model", model);
 	nanosuit.Draw(shader);
+
+	// Draw iron man
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -18.0f));
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader.setMat4("model", model);
+	ironMan.Draw(shader);
+
+	// Draw cyborg
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(4.0f, 0.0f, -18.0f));
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader.setMat4("model", model);
+	cyborg.Draw(shader);
+
+	// Draw grass
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(6.0f, 0.0f, -18.0f));
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader.setMat4("model", model);
+	grass.Draw(shader);
 
 
 	//// Redraw nanosuit drawing the normals away from its vertices
