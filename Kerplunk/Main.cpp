@@ -27,7 +27,7 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 void renderQuad();
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // FPS camera object.
+Camera camera(glm::vec3(0.0f, 1.0f, 3.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
 bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
@@ -44,7 +44,7 @@ float lastFrame = 0.0f; // Time of last frame
 // KEY FLAGS set to true when key is pressed, reset to false when the key is released
 bool capsFlag = false;
 bool testFlag = false;
-bool isBlinnShadingActive = true; // Switches the lighting to use the blinn-phong lighting model.
+bool isNormalMapActive = true; // Switches the lighting to use the blinn-phong lighting model.
 
 unsigned int brickwallTexture;
 unsigned int brickwallNormalMap;
@@ -164,7 +164,7 @@ int main()
 	};
 
 	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(0.0f,  2.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
 		glm::vec3(-1.5f, 4.2f, -2.5f),
 		glm::vec3(-4.8f, 10.0f, -12.3f),
@@ -172,7 +172,7 @@ int main()
 		glm::vec3(-1.7f,  3.0f, -7.5f),
 		glm::vec3(1.3f, 3.0f, -2.5f),
 		glm::vec3(3.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -2.5f),
+		glm::vec3(1.5f,  2.2f, -4.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
@@ -222,7 +222,7 @@ int main()
 	};
 
 	glm::vec3 pointLightPositions[] = {
-		glm::vec3(0.0f,  3.0f,  1.5f),
+		glm::vec3(0.0f,  3.0f,  -19.0f),
 		glm::vec3(-6.0f,   -1.0f,  -6.0f),
 		glm::vec3(-2.0f,   -1.0f,  -6.0f),
 		glm::vec3(2.0f,   -1.0f,  -6.0f)
@@ -242,17 +242,17 @@ int main()
 		glm::vec3(0.3f)
 	};
 
-	float texRepeat = 1.0f;
+	float texRepeat = 8.0f;
 	float planeVertices[] = {
 		// positions            // normals           // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
 		// Bottom triangle
-		-5.0f, -0.5f, -5.0f,    0.0f, 1.0f, 0.0f,    0.0f, texRepeat,	     // top left
-		-5.0f, -0.5f,  5.0f,    0.0f, 1.0f, 0.0f,    0.0f, 0.0f,			 // bottom left
-		 5.0f, -0.5f,  5.0f,    0.0f, 1.0f, 0.0f,    texRepeat, 0.0f,		 // bottom right
+		-1.0f, 0.0f, -1.0f,    0.0f, 1.0f, 0.0f,    0.0f, texRepeat,	     // top left
+		-1.0f, 0.0f,  1.0f,    0.0f, 1.0f, 0.0f,    0.0f, 0.0f,			 // bottom left
+		 1.0f, 0.0f,  1.0f,    0.0f, 1.0f, 0.0f,    texRepeat, 0.0f,		 // bottom right
 		 // Top triangle
-		-5.0f, -0.5f, -5.0f,    0.0f, 1.0f, 0.0f,    0.0f, texRepeat,		 // top left
-		 5.0f, -0.5f,  5.0f,    0.0f, 1.0f, 0.0f,    texRepeat, 0.0f,		 // bottom right
-		 5.0f, -0.5f, -5.0f,    0.0f, 1.0f, 0.0f,    texRepeat, texRepeat    // top right
+		-1.0f, 0.0f, -1.0f,    0.0f, 1.0f, 0.0f,    0.0f, texRepeat,		 // top left
+		 1.0f, 0.0f,  1.0f,    0.0f, 1.0f, 0.0f,    texRepeat, 0.0f,		 // bottom right
+		 1.0f, 0.0f, -1.0f,    0.0f, 1.0f, 0.0f,    texRepeat, texRepeat    // top right
 	};
 
 	float transparentVertices[] = {
@@ -840,7 +840,7 @@ int main()
 		// Draw reflective cube
 		reflectionShader.use();
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(4.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(8.0f, 0.5f, 0.0f));
 		reflectionShader.setMat4("model", model);
 		reflectionShader.setVec3("cameraPos", camera.Position);
 
@@ -853,7 +853,7 @@ int main()
 		// draw refraction cube	
 		refractionShader.use();
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-4.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(-8.0f, 0.5f, 0.0f));
 		refractionShader.setMat4("model", model);
 		refractionShader.setVec3("cameraPos", camera.Position);
 
@@ -975,7 +975,7 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 	}
 
 	model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(4.0f));
+	model = glm::scale(model, glm::vec3(20.0f));
 	shader.setMat4("model", model);
 
 	glBindVertexArray(planeVAO);
@@ -984,7 +984,7 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 	// Brick wall
 	if (bindTextures)
 	{
-		shader.setBool("isNormalMap", true); // uses a normal map texture
+		shader.setBool("isNormalMap", isNormalMapActive); // uses a normal map texture
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, brickwallTexture); // binding floor texture to diffuse
@@ -995,9 +995,9 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 	}
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 3.0f, -20.0f));
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(1.0f));
+	model = glm::scale(model, glm::vec3(20.0f));
 	shader.setMat4("model", model);
 
 	glBindVertexArray(planeVAO);
@@ -1077,9 +1077,10 @@ void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 po
 	shader.setVec3("viewPos", camera.Position);
 
 	// Point light motion
-	for (GLuint i = 0; i < 4; i++)
+	for (GLuint i = 0; i < 1; i++)
 	{
-		pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		pointLightPositions[i].x += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		//pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
 		pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
 	}
 
@@ -1105,7 +1106,9 @@ void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 po
 
 	// Set uniforms for the spotlight
 	shader.setVec3("spotlight.position", -15.793399f, -0.271867f, 15.654298f);
+	//shader.setVec3("spotlight.position", camera.Position);
 	shader.setVec3("spotlight.direction", 0.905481f, -0.424199f, -0.012639f);
+	//shader.setVec3("spotlight.direction", camera.Front);
 	shader.setVec3("spotlight.diffuse", 1.0f, 1.0f, 1.0f);
 	shader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
 	shader.setFloat("spotlight.constant", 1.0f);
@@ -1161,10 +1164,10 @@ void processInput(GLFWwindow *window)
 	{
 		if (!testFlag)
 		{
-			if (isBlinnShadingActive)
-				isBlinnShadingActive = false;
+			if (isNormalMapActive)
+				isNormalMapActive = false;
 			else
-				isBlinnShadingActive = true;
+				isNormalMapActive = true;
 		}
 
 		// Set flag to indicate the key is being pressed.
