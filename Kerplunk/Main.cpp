@@ -110,7 +110,7 @@ int main()
 	Shader refractionShader("../Kerplunk/reflection.vert", "../Kerplunk/refraction.frag", nullptr); // Shader to render an object with environment refraction using cubemap texture
 
 	Shader normalVisualizeShader("../Kerplunk/normalVisualize.vert", "../Kerplunk/normalVisualize.frag", "../Kerplunk/normalVisualize.geom"); // Shader to generate lines eminating fromt the vertices in the direction of their normals
-	Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
+	//Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
 
 	Shader materialShader("../Kerplunk/materialLighting.vert", "../Kerplunk/materialLighting.frag", nullptr); // Shader to draw objects with material properties and texture applied.
 	Shader simpleDepthShader("../Kerplunk/depthShader.vert", "../Kerplunk/depthShader.frag", nullptr); // Shader used for shadow mapping, used to write to the depth buffer performing no lighting. 
@@ -529,7 +529,7 @@ int main()
 	unsigned int uniformBlockIndexSkyBox = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
 	unsigned int uniformBlockIndexTextureShader = glGetUniformBlockIndex(textureShader.ID, "Matrices");
 	unsigned int uniformBlockIndexNormalShader = glGetUniformBlockIndex(normalVisualizeShader.ID, "Matrices");
-	unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
+	//unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
 	unsigned int uniformBlockIndexMaterialShader = glGetUniformBlockIndex(materialShader.ID, "Matrices");
 
 	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
@@ -539,7 +539,7 @@ int main()
 	glUniformBlockBinding(skyboxShader.ID, uniformBlockIndexSkyBox, 0);
 	glUniformBlockBinding(textureShader.ID, uniformBlockIndexTextureShader, 0);
 	glUniformBlockBinding(normalVisualizeShader.ID, uniformBlockIndexNormalShader, 0);
-	glUniformBlockBinding(instancedLightingShader.ID, uniformBlockIndexInstanceShader, 0);
+	//glUniformBlockBinding(instancedLightingShader.ID, uniformBlockIndexInstanceShader, 0);
 	glUniformBlockBinding(materialShader.ID, uniformBlockIndexMaterialShader, 0);
 
 	// Creating the actual uniform buffer object and binding it to the binding point
@@ -939,11 +939,11 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 		shader.setBool("isNormalMap", false);
 
 	// Draw Nanosuit
-	/*model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(5.0f, -2.0f, -10.0f));
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(2.0f, 0.0f, -18.0f));
 	model = glm::scale(model, glm::vec3(0.2f));
 	shader.setMat4("model", model);
-	nanosuit.Draw(shader);*/
+	nanosuit.Draw(shader);
 
 
 	//// Redraw nanosuit drawing the normals away from its vertices

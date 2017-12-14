@@ -95,7 +95,7 @@ void main()
 		// transform normal vector to range [-1,1]
 		norm = normalize(normal * 2.0 - 1.0); 
 		// transform the normal vector into tangent space to correct normal mapping 
-		norm = normalize(fs_in.TBN * normal); 
+		norm = normalize(fs_in.TBN * norm); 
 	}
 	else
 		norm = normalize(fs_in.Normal);

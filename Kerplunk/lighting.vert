@@ -34,8 +34,14 @@ void main()
 
 	// Creating the TBN matrix for transforming into tangent space
 	vec3 T = normalize(vec3(model * vec4(aTangent,   0.0)));
-    vec3 B = normalize(vec3(model * vec4(aBitangent, 0.0)));
     vec3 N = normalize(vec3(model * vec4(aNormal,    0.0)));
+
+	// applying the Gram-Schmidt process to re-orthogonalize TBN vectors.
+    // re-orthogonalize T with respect to N
+	T = normalize(T - dot(T, N) * N);
+	// then retrieve perpendicular vector B with the cross product of T and N
+	vec3 B = cross(N, T);
+
 	vs_out.TBN = mat3(T, B, N);
 
     gl_Position = projection * view * model * vec4(aPos, 1.0);
