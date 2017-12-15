@@ -37,6 +37,9 @@
     <Filter Include="Shader Files\Shadow map\Omnidirectional">
       <UniqueIdentifier>{f7187c2a-56fb-4a7a-8d5d-b76ee7022c1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{fbd9f38a-0b4f-4c67-b711-c1d4269939b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -49,7 +52,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ISystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,7 +72,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
