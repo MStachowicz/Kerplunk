@@ -53,9 +53,8 @@ Model planet;
 Model nanosuit;
 Model rock;
 
-Model ironMan;
-Model cyborg;
 Model grass;
+Model Desk;
 
 
 
@@ -464,13 +463,11 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Load models
+	Desk = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Desk/deskWorn_OBJ.obj", true);
+	grass = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Grass pack/Grass_02.obj", true);
 	planet = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
 	nanosuit = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
 	rock = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
-
-	ironMan = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/IronMan/IronMan.obj", true);
-	cyborg = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Cyborg/Cyborg.obj", true);
-	grass = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Grass pack/Grass_01.obj", true);
 
 
 	// Load texture
@@ -507,9 +504,9 @@ int main()
 	lightingShader.use();
 	lightingShader.setInt("material.diffuseMap", 0);
 	lightingShader.setInt("material.specularMap", 1);
-	lightingShader.setInt("shadowMap", 2);
-	lightingShader.setInt("omniShadowMap", 3);
-	lightingShader.setInt("normalMap", 4);
+	lightingShader.setInt("normalMap", 2);
+	lightingShader.setInt("shadowMap", 4);
+	lightingShader.setInt("omniShadowMap", 5);
 
 	materialShader.use();
 	materialShader.setInt("material.diffuseMap", 0);
@@ -756,9 +753,10 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, containerDiffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, containerSpecularMap);
-		glActiveTexture(GL_TEXTURE2);
+
+		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap);
-		glActiveTexture(GL_TEXTURE3);
+		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, omniDirectionalDepthCubemap);
 
 		renderObjects(lightingShader, cubePositions, cubeVAO, floorTexture, true);
@@ -939,7 +937,7 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 		glBindTexture(GL_TEXTURE_2D, brickwallTexture); // binding floor texture to diffuse
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, NULL); // binding blank specular texture map
-		glActiveTexture(GL_TEXTURE4);
+		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, brickwallNormalMap); // binding normal map texture
 	}
 
@@ -961,25 +959,29 @@ void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int
 	nanosuit.Draw(shader);
 
 	// Draw iron man
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -18.0f));
-	model = glm::scale(model, glm::vec3(0.2f));
-	shader.setMat4("model", model);
-	ironMan.Draw(shader);
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -18.0f));
+	//model = glm::scale(model, glm::vec3(0.2f));
+	//shader.setMat4("model", model);
+	//ironMan.Draw(shader);
 
 	// Draw cyborg
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(4.0f, 0.0f, -18.0f));
-	model = glm::scale(model, glm::vec3(0.2f));
+	model = glm::scale(model, glm::vec3(0.08f));
 	shader.setMat4("model", model);
-	cyborg.Draw(shader);
+	Desk.Draw(shader);
 
 	// Draw grass
+	glDisable(GL_CULL_FACE);
+
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(6.0f, 0.0f, -18.0f));
-	model = glm::scale(model, glm::vec3(0.2f));
+	model = glm::translate(model, glm::vec3(1.0f, 0.0f, -18.0f));
+	model = glm::scale(model, glm::vec3(1));
 	shader.setMat4("model", model);
 	grass.Draw(shader);
+
+	glEnable(GL_CULL_FACE);
 
 
 	//// Redraw nanosuit drawing the normals away from its vertices
