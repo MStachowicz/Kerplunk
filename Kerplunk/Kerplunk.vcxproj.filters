@@ -40,6 +40,9 @@
     <Filter Include="Systems">
       <UniqueIdentifier>{fbd9f38a-0b4f-4c67-b711-c1d4269939b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{f6224d64-b076-4702-adce-a53c7cfaee46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -52,6 +55,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ISystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemManager.h">
       <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
@@ -127,7 +136,6 @@
     <None Include="refraction.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
     <None Include="explode.geom">
       <Filter>Shader Files\Lighting</Filter>
     </None>
