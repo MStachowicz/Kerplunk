@@ -60,6 +60,9 @@
     <ClCompile Include="SystemManager.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -82,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="SystemManager.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
