@@ -12,14 +12,11 @@ public:
 		COMPONENT_SCALE = 1 << 3,	 // 0000 1000	  8
 	};
 
-	const ComponentFlags getComponentType()
-	{
-		return componentType;
-	}
+	// Forces components to define their type for building masks.
+	virtual const ComponentFlags ComponentType() = 0;
 
 private:
 	ComponentFlags componentType = COMPONENT_NONE;
-
 
 	~IComponent();
 };
