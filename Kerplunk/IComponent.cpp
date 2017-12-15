@@ -2,9 +2,9 @@
 
 
 
-IComponent::IComponent()
-{
-}
+//IComponent::IComponent()
+//{
+//}
 
 
 IComponent::~IComponent()
