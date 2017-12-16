@@ -11,7 +11,11 @@
 #include "Model.h"
 
 #include "SystemManager.h"
-
+#include "EntityManager.h"
+#include "Entity.h"
+#include "ComponentPosition.h"
+#include "ComponentRotation.h"
+#include "ComponentScale.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -28,6 +32,7 @@ unsigned int loadCubemap(vector<std::string> faces);
 void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures);
 void renderQuad(const Shader &shader, glm::mat4 &model);
+void createEntities(EntityManager &entityManager);
 
 const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
 Camera camera(glm::vec3(0.0f, 1.0f, 3.0f)); // FPS camera object.
@@ -59,6 +64,16 @@ Model rock;
 Model grass;
 Model Desk;
 
+#include "SystemManager.h"
+#include "EntityManager.h"
+#include "Entity.h"
+#include "ComponentPosition.h"
+#include "ComponentRotation.h"
+#include "ComponentScale.h"
+// Component engine
+SystemManager systemManager;
+EntityManager entityManager;
+Entity entity;
 
 
 int main()
@@ -896,6 +911,13 @@ int main()
 	// ------------------------------------------------------------------
 	glfwTerminate();
 	return 0;
+}
+
+void createEntities(EntityManager &entityManager)
+{
+	Entity entity1("object");
+	ComponentPosition position(glm::vec3(3.0f));
+	entity1.AddComponent(position);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
