@@ -78,6 +78,9 @@
     <ClCompile Include="ComponentPosition.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentScale.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -111,6 +114,9 @@
       <Filter>Components\Utility</Filter>
     </ClInclude>
     <ClInclude Include="ComponentPosition.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentScale.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
