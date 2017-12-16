@@ -13,12 +13,13 @@ public:
 		COMPONENT_SCALE = 1 << 3,	 // 0000 1000	  8
 	}; ComponentFlags componentType;
 	
+	IComponent();
+	~IComponent();
 
 	// Forces components to define their type for building masks.
 	virtual ComponentFlags ComponentType() = 0;
 	
 private:
 
-	~IComponent();
 };
 #endif
