@@ -1,5 +1,5 @@
 #include "ISystem.h"
 
-void ISystem::OnAction() {}
+void ISystem::OnAction(Entity &entity) {}
 
 ISystem::~ISystem() {}

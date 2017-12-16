@@ -3,6 +3,7 @@
 #define ISYSTEM_H
 
 #include <string>
+#include "Entity.h"
 
 class ISystem
 {
@@ -11,7 +12,7 @@ public:
 
 	std::string name;
 
-	virtual void OnAction() = 0;
+	virtual void OnAction(Entity &entity) = 0;
 
 	~ISystem();
 };
