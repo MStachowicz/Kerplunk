@@ -7,7 +7,12 @@
 class ComponentPosition : public IComponent
 {
 public:
+	glm::vec3 position;
+
 	ComponentPosition();
+	ComponentPosition(float x, float y, float z);
+	ComponentPosition(glm::vec3 pos);
+
 	~ComponentPosition();
 };
 #endif
