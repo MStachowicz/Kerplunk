@@ -19,7 +19,7 @@ void Entity::AddComponent(IComponent &component)
 
 		// Update the entity mask with the newly added component type
 		unsigned int tempMask = static_cast<int>(mask); // casting mask to int to perform bitwise set operation
-		tempMask |= static_cast<int>(component.ComponentType());
+		tempMask |= static_cast<int>(component.componentType);
 		mask = (IComponent::ComponentFlags)tempMask; // Assign the new value of the mask
 	}
 }

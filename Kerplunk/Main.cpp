@@ -73,7 +73,6 @@ Model Desk;
 // Component engine
 SystemManager systemManager;
 EntityManager entityManager;
-Entity entity;
 
 
 int main()

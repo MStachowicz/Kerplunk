@@ -1,8 +1,6 @@
 #include "IComponent.h"
 
-IComponent::IComponent()
-{
-}
+IComponent::IComponent(ComponentFlags componentType) : componentType(componentType) {}
 
 IComponent::~IComponent()
 {
