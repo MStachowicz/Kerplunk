@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-Entity::Entity(std::string name)
+Entity::Entity(std::string pName)
 {
-	name = name;
+	name = pName;
 }
 
 void Entity::AddComponent(IComponent &component)

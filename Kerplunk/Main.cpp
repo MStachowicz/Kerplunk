@@ -70,7 +70,8 @@ Model Desk;
 #include "ComponentPosition.h"
 #include "ComponentRotation.h"
 #include "ComponentScale.h"
-// Component engine
+
+// Component managers
 SystemManager systemManager;
 EntityManager entityManager;
 
@@ -120,6 +121,9 @@ int main()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
+
+	//systemManager.AddSystem(); add physics system
+	createEntities(entityManager);
 
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
@@ -666,6 +670,10 @@ int main()
 		processInput(window);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+		// component testing
+		systemManager.ActionSystems(entityManager);
+		
+
 		//// FIRST PASS
 		//// bind to framebuffer and draw scene as we normally would to color texture 
 		//glBindFramebuffer(GL_FRAMEBUFFER, FBO);
@@ -912,11 +920,17 @@ int main()
 	return 0;
 }
 
+// code testing the creation of en entity with components added 
 void createEntities(EntityManager &entityManager)
 {
 	Entity entity1("object");
 	ComponentPosition position(glm::vec3(3.0f));
 	entity1.AddComponent(position);
+	ComponentRotation rotation(glm::vec3(1.0f));
+	entity1.AddComponent(rotation);
+	ComponentScale scale(glm::vec3(1.0f));
+	entity1.AddComponent(scale);
+	entityManager.AddEntity(entity1);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
