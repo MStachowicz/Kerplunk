@@ -70,6 +70,7 @@ Model Desk;
 #include "ComponentPosition.h"
 #include "ComponentRotation.h"
 #include "ComponentScale.h"
+#include "ComponentVelocity.h"
 
 // Component managers
 SystemManager systemManager;
@@ -930,6 +931,8 @@ void createEntities(EntityManager &entityManager)
 	entity1.AddComponent(rotation);
 	ComponentScale scale(glm::vec3(1.0f));
 	entity1.AddComponent(scale);
+	ComponentVelocity velocity(glm::vec3(0.5f));
+	entity1.AddComponent(velocity);
 	entityManager.AddEntity(entity1);
 }
 

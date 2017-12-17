@@ -84,6 +84,9 @@
     <ClCompile Include="ComponentRotation.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentVelocity.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -123,6 +126,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="ComponentRotation.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentVelocity.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
