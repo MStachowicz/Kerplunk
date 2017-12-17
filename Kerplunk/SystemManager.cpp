@@ -16,7 +16,7 @@ void SystemManager::ActionSystems(EntityManager & manager)
 	{
 		for (int j = 0; j < manager.entityList.size(); j++) 
 		{
-			systemList[i]->OnAction(*manager.entityList[j]);
+			systemList[i]->OnAction(manager.entityList[j]);
 		}
 	}
 }

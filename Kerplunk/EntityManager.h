@@ -10,10 +10,10 @@ class EntityManager
 public:
 	EntityManager();
 
-	std::vector<Entity*> entityList;
+	std::vector<Entity> entityList;
 
 	// Adds an entity to the entity list of the manager.
-	void AddEntity(Entity &entity);
+	void AddEntity(Entity entity);
 	// Finds an entity in the entity list by its name.
 	void FindEntity(std::string name);
 

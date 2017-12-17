@@ -15,7 +15,7 @@ void Entity::AddComponent(IComponent &component)
 	}
 	else
 	{
-		componentList.push_back(&component);
+		componentList.push_back(component);
 
 		// Update the entity mask with the newly added component type
 		unsigned int tempMask = static_cast<int>(mask); // casting mask to int to perform bitwise set operation

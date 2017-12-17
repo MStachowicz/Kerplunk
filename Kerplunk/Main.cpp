@@ -125,7 +125,6 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
-	//systemManager.AddSystem(); add physics system
 	createEntities(entityManager);
 	systemManager.AddSystem(systemPhysics);
 
