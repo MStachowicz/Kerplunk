@@ -11,6 +11,7 @@
 #include "Model.h"
 
 #include "SystemManager.h"
+#include "SystemPhysics.h"
 #include "EntityManager.h"
 #include "Entity.h"
 #include "ComponentPosition.h"
@@ -75,6 +76,7 @@ Model Desk;
 // Component managers
 SystemManager systemManager;
 EntityManager entityManager;
+SystemPhysics systemPhysics;
 
 
 int main()
@@ -125,6 +127,7 @@ int main()
 
 	//systemManager.AddSystem(); add physics system
 	createEntities(entityManager);
+	systemManager.AddSystem(systemPhysics);
 
 	// Build and compile shader
 	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects

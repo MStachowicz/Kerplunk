@@ -9,11 +9,12 @@ class ISystem
 {
 
 public:
+	ISystem(std::string pName, IComponent::ComponentFlags MASK);
 
 	std::string name;
+	const IComponent::ComponentFlags MASK;
 
 	virtual void OnAction(Entity &entity) = 0;
-
-	~ISystem();
+	virtual ~ISystem();
 };
 #endif

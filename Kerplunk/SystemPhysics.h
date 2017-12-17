@@ -1,15 +1,14 @@
-#ifndef SYSTEMPHYSICS.H
-#define SYSTEMPHYSICS.H
+#ifndef SYSTEMPHYSICS_H
+#define SYSTEMPHYSICS_H
 
 #include "ISystem.h"
+#include "IComponent.h"
 
 class SystemPhysics : public ISystem
 {
 public:
 	SystemPhysics();
-
-	void ISystem::OnAction(Entity &entity);
-
+	void OnAction(Entity & entity);
 	~SystemPhysics();
 };
 #endif

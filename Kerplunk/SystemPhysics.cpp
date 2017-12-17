@@ -1,10 +1,8 @@
 #include "SystemPhysics.h"
 
-SystemPhysics::SystemPhysics() {}
+SystemPhysics::SystemPhysics()  : ISystem("SystemPhysics",(IComponent::ComponentFlags)(IComponent::COMPONENT_POSITION | IComponent::COMPONENT_VELOCITY))
+{}
 
-void ISystem::OnAction(Entity &entity) override
-{
-
-}
+void SystemPhysics::OnAction(Entity &entity) {} //if ((entity.mask & MASK) == MASK) }
 
 SystemPhysics::~SystemPhysics() {}
