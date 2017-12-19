@@ -49,6 +49,9 @@
     <Filter Include="Managers">
       <UniqueIdentifier>{490f128c-20eb-4bf6-9065-c267e191c030}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{a0188c21-8841-4ec0-90f9-dc7c9d83a721}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -254,5 +257,10 @@
     <None Include="omniDepthShader.frag">
       <Filter>Shaders\Shadow map\Omnidirectional</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Cube.txt">
+      <Filter>Geometry</Filter>
+    </Text>
   </ItemGroup>
 </Project>
