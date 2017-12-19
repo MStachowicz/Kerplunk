@@ -13,8 +13,9 @@ public:
 		COMPONENT_SCALE = 1 << 3,	 // 0000 1000	  8
 		COMPONENT_VELOCITY = 1 << 4, // 0001 0000	  16
 	}; ComponentFlags componentType;
-	
+
 	IComponent(ComponentFlags componentType);
+	virtual ComponentFlags GetComponentType();
 	~IComponent();
 };
 #endif
