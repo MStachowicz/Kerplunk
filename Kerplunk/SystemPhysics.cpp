@@ -12,16 +12,21 @@ void SystemPhysics::OnAction(Entity &entity)
 	{
 		std::cout << "System: " << name << " Performing action on entity: " << entity.name << std::endl;
 
-		std::shared_ptr<ComponentPosition> derived2 =
+		std::shared_ptr<ComponentPosition> posComp =
 			std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
 		
-		std::cout << derived2->position.x << std::endl;
+		std::shared_ptr<ComponentVelocity> velComp =
+			std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
+
+		Motion(posComp->position, velComp->Velocity, 0.5f);
+
+		std::cout << posComp->position.x << std::endl;
 	}
 }
 
-void SystemPhysics::Motion(glm::vec3 &pPosition, float deltaTime)
+void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 pVelocity, float deltaTime)
 {
-
+	pPosition += pVelocity * deltaTime;
 }
 
 SystemPhysics::~SystemPhysics() {}

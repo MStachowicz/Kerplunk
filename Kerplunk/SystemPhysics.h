@@ -12,7 +12,7 @@ class SystemPhysics : public ISystem
 public:
 	SystemPhysics();
 	void OnAction(Entity & entity);
-	void Motion(glm::vec3 &pPosition, float deltaTime);
+	void Motion(glm::vec3 &pPosition, glm::vec3 pVelocity,  float deltaTime);
 	~SystemPhysics();
 };
 #endif
