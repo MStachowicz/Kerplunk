@@ -2,7 +2,6 @@
 #define COMPONENTMODEL_H
 
 #include "IComponent.h"
-#include
 
 class ComponentModel : public IComponent
 {

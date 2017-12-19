@@ -85,6 +85,9 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ComponentGeometry.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -134,6 +137,9 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentGeometry.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

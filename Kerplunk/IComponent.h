@@ -12,6 +12,8 @@ public:
 		COMPONENT_ROTATION = 1 << 2, // 0000 0100	  4
 		COMPONENT_SCALE = 1 << 3,	 // 0000 1000	  8
 		COMPONENT_VELOCITY = 1 << 4, // 0001 0000	  16
+		COMPONENT_MODEL = 1 << 5,	 // 0010 0000	  32	
+		COMPONENT_GEOMETRY = 1 << 6, // 0100 0000	  64 
 	}; ComponentFlags componentType;
 
 	IComponent(ComponentFlags componentType);

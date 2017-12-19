@@ -2,7 +2,7 @@
 
 
 
-ComponentModel::ComponentModel()
+ComponentModel::ComponentModel() : IComponent(IComponent::ComponentFlags::COMPONENT_MODEL)
 {
 }
 

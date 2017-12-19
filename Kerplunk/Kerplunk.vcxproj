@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComponentGeometry.cpp" />
     <ClCompile Include="ComponentModel.cpp" />
     <ClCompile Include="ComponentPosition.cpp" />
     <ClCompile Include="ComponentRotation.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComponentGeometry.h" />
     <ClInclude Include="ComponentModel.h" />
     <ClInclude Include="ComponentPosition.h" />
     <ClInclude Include="ComponentRotation.h" />
