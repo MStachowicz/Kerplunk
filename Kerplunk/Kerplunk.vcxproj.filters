@@ -1,42 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Shader Files">
-      <UniqueIdentifier>{3dece70a-8c87-464e-bfd6-d33b269ed086}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Post-processing">
-      <UniqueIdentifier>{eb2cdcf1-6e0d-48db-b74e-1b7c15733e86}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Cubemap">
-      <UniqueIdentifier>{4ae3515f-37e8-42ca-8cd8-aaa845ad8a2b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Lighting">
-      <UniqueIdentifier>{6b31d2a9-90a3-4f1e-bf19-a592947701e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Cubemap\Cubemap reflections">
-      <UniqueIdentifier>{9f1053d0-2ed0-4480-bbae-d862d0893b92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Debug">
-      <UniqueIdentifier>{0de86dda-8576-442e-87ab-cf1c0f2fb5e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Shadow map">
-      <UniqueIdentifier>{1753e955-31e0-4518-9358-52b8bc34ccb6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Shadow map\Omnidirectional">
-      <UniqueIdentifier>{f7187c2a-56fb-4a7a-8d5d-b76ee7022c1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Systems">
       <UniqueIdentifier>{fbd9f38a-0b4f-4c67-b711-c1d4269939b9}</UniqueIdentifier>
     </Filter>
@@ -52,17 +16,35 @@
     <Filter Include="Systems\Utility">
       <UniqueIdentifier>{c6691909-73da-4c4c-a06b-1dfad985c7da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{47a1f688-7ded-44ae-9a56-2be3958436a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3dece70a-8c87-464e-bfd6-d33b269ed086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Post-processing">
+      <UniqueIdentifier>{eb2cdcf1-6e0d-48db-b74e-1b7c15733e86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Cubemap">
+      <UniqueIdentifier>{4ae3515f-37e8-42ca-8cd8-aaa845ad8a2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Cubemap\Cubemap reflections">
+      <UniqueIdentifier>{9f1053d0-2ed0-4480-bbae-d862d0893b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Lighting">
+      <UniqueIdentifier>{6b31d2a9-90a3-4f1e-bf19-a592947701e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Debug">
+      <UniqueIdentifier>{0de86dda-8576-442e-87ab-cf1c0f2fb5e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Shadow map">
+      <UniqueIdentifier>{1753e955-31e0-4518-9358-52b8bc34ccb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Shadow map\Omnidirectional">
+      <UniqueIdentifier>{f7187c2a-56fb-4a7a-8d5d-b76ee7022c1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -93,23 +75,18 @@
     <ClCompile Include="SystemManager.cpp">
       <Filter>Systems\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentModel.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -140,100 +117,118 @@
     <ClInclude Include="SystemManager.h">
       <Filter>Systems\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentModel.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">
-      <Filter>Shader Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="texture.vert">
-      <Filter>Shader Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="frameBuffer.vert">
-      <Filter>Shader Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="frameBuffer.frag">
-      <Filter>Shader Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="inversion.frag">
-      <Filter>Shader Files\Post-processing</Filter>
+      <Filter>Shaders\Post-processing</Filter>
     </None>
     <None Include="greyscale.frag">
-      <Filter>Shader Files\Post-processing</Filter>
+      <Filter>Shaders\Post-processing</Filter>
     </None>
     <None Include="kernel.frag">
-      <Filter>Shader Files\Post-processing</Filter>
+      <Filter>Shaders\Post-processing</Filter>
     </None>
     <None Include="cubemap.vert">
-      <Filter>Shader Files\Cubemap</Filter>
+      <Filter>Shaders\Cubemap</Filter>
     </None>
     <None Include="cubemap.frag">
-      <Filter>Shader Files\Cubemap</Filter>
+      <Filter>Shaders\Cubemap</Filter>
     </None>
     <None Include="lightBox.frag">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="lightBox.vert">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="lighting.frag">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="lighting.vert">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="refraction.frag">
-      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
+      <Filter>Shaders\Cubemap\Cubemap reflections</Filter>
     </None>
     <None Include="reflection.frag">
-      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
+      <Filter>Shaders\Cubemap\Cubemap reflections</Filter>
     </None>
     <None Include="reflection.vert">
-      <Filter>Shader Files\Cubemap\Cubemap reflections</Filter>
+      <Filter>Shaders\Cubemap\Cubemap reflections</Filter>
     </None>
     <None Include="refraction.frag">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="explode.geom">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="normalVisualize.vert">
-      <Filter>Shader Files\Debug</Filter>
+      <Filter>Shaders\Debug</Filter>
     </None>
     <None Include="normalVisualize.frag">
-      <Filter>Shader Files\Debug</Filter>
+      <Filter>Shaders\Debug</Filter>
     </None>
     <None Include="normalVisualize.geom">
-      <Filter>Shader Files\Debug</Filter>
+      <Filter>Shaders\Debug</Filter>
     </None>
     <None Include="lightingInstanced.vert">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="materialLighting.vert">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="materialLighting.frag">
-      <Filter>Shader Files\Lighting</Filter>
+      <Filter>Shaders\Lighting</Filter>
     </None>
     <None Include="depthShader.vert">
-      <Filter>Shader Files\Shadow map</Filter>
+      <Filter>Shaders\Shadow map</Filter>
     </None>
     <None Include="depthShader.frag">
-      <Filter>Shader Files\Shadow map</Filter>
+      <Filter>Shaders\Shadow map</Filter>
     </None>
     <None Include="debugQuad.vert">
-      <Filter>Shader Files\Shadow map</Filter>
+      <Filter>Shaders\Shadow map</Filter>
     </None>
     <None Include="debugQuad.frag">
-      <Filter>Shader Files\Shadow map</Filter>
+      <Filter>Shaders\Shadow map</Filter>
     </None>
     <None Include="omniDepthShader.vert">
-      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
+      <Filter>Shaders\Shadow map\Omnidirectional</Filter>
     </None>
     <None Include="omniDepthShader.geom">
-      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
+      <Filter>Shaders\Shadow map\Omnidirectional</Filter>
     </None>
     <None Include="omniDepthShader.frag">
-      <Filter>Shader Files\Shadow map\Omnidirectional</Filter>
+      <Filter>Shaders\Shadow map\Omnidirectional</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -19,8 +19,6 @@ void SystemPhysics::OnAction(Entity &entity)
 			std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
 
 		Motion(posComp->position, velComp->Velocity, 0.5f);
-
-		std::cout << posComp->position.x << std::endl;
 	}
 }
 
