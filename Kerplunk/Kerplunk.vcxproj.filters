@@ -46,12 +46,12 @@
     <Filter Include="Objects">
       <UniqueIdentifier>{486627ac-8380-47f3-a93a-adbd698d1880}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{490f128c-20eb-4bf6-9065-c267e191c030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityManager.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="IComponent.cpp">
@@ -75,9 +75,6 @@
     <ClCompile Include="ISystem.cpp">
       <Filter>Systems\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="SystemManager.cpp">
-      <Filter>Systems\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="ComponentModel.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -91,12 +88,21 @@
     <ClCompile Include="Geometry.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentGeometry.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityManager.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="IComponent.h">
@@ -120,9 +126,6 @@
     <ClInclude Include="ISystem.h">
       <Filter>Systems\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="SystemManager.h">
-      <Filter>Systems\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="ComponentModel.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -138,11 +141,23 @@
     <ClInclude Include="Mesh.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentGeometry.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

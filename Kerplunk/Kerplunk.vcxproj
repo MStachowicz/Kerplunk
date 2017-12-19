@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComponentGeometry.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="ComponentModel.cpp" />
     <ClCompile Include="ComponentPosition.cpp" />
@@ -145,6 +146,7 @@
     <ClCompile Include="IComponent.cpp" />
     <ClCompile Include="ISystem.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="SystemManager.cpp" />
@@ -152,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComponentGeometry.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="ComponentModel.h" />
     <ClInclude Include="ComponentPosition.h" />
@@ -164,6 +167,7 @@
     <ClInclude Include="ISystem.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="SystemManager.h" />
