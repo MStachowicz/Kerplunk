@@ -1,24 +1,24 @@
-#include "ComponentGeometry.h"
+#include "Geometry.h"
 
 
-ComponentGeometry::ComponentGeometry(std::string filePath) : IComponent(IComponent::ComponentFlags::COMPONENT_GEOMETRY)
+Geometry::Geometry(std::string filePath) 
 {
 }
 
-ComponentGeometry::ComponentGeometry(std::vector<float> pVertices) : IComponent(IComponent::ComponentFlags::COMPONENT_GEOMETRY)
+Geometry::Geometry(std::vector<float> pVertices)
 {
 	vertices = pVertices;
 	numberOfTriangles = vertices.size() / 8; // 3 positions 3 normals 2 texcoords
 	BufferData();
 }
 
-void ComponentGeometry::render()
+void Geometry::render()
 {
 	glBindVertexArray(VAO_Handle);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfTriangles);
 }
 
-void ComponentGeometry::BufferData()
+void Geometry::BufferData()
 {
 	glGenVertexArrays(1, &VAO_Handle);
 	glGenBuffers(1, &VBO_Handle);
@@ -40,4 +40,4 @@ void ComponentGeometry::BufferData()
 	glBindVertexArray(0);
 }
 
-ComponentGeometry::~ComponentGeometry() {}
+Geometry::~Geometry() {}

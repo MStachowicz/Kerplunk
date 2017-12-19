@@ -43,6 +43,9 @@
     <Filter Include="Shaders\Shadow map\Omnidirectional">
       <UniqueIdentifier>{f7187c2a-56fb-4a7a-8d5d-b76ee7022c1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{486627ac-8380-47f3-a93a-adbd698d1880}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -85,8 +88,8 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="ComponentGeometry.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +141,8 @@
     <ClInclude Include="Camera.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentGeometry.h">
-      <Filter>Components</Filter>
+    <ClInclude Include="Geometry.h">
+      <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
