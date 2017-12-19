@@ -1,7 +1,7 @@
 #include "Entity.h"
-
 #include <iostream>
 #include <iterator>
+
 Entity::Entity(std::string pName)
 {
 	name = pName;

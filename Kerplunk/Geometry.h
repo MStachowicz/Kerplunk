@@ -17,9 +17,9 @@ public:
 	unsigned int VBO_Handle;
 
 	// Create a geometry oject loading in vertex data from a file.
-	Geometry(std::string filePath);
-	// Create a geometry object using an array of vertex data.
-	Geometry(std::vector<float> pVertices);
+	Geometry();
+
+	void LoadGeometry(std::string pFilePath);
 
 	void render();
 

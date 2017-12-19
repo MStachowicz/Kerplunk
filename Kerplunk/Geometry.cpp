@@ -1,15 +1,12 @@
 #include "Geometry.h"
 
-
-Geometry::Geometry(std::string filePath) 
+Geometry::Geometry()
 {
 }
 
-Geometry::Geometry(std::vector<float> pVertices)
+void Geometry::LoadGeometry(std::string pFilePath)
 {
-	vertices = pVertices;
-	numberOfTriangles = vertices.size() / 8; // 3 positions 3 normals 2 texcoords
-	BufferData();
+
 }
 
 void Geometry::render()
