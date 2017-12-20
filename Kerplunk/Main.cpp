@@ -940,6 +940,21 @@ void createEntities(EntityManager &entityManager)
 	entity1.AddComponent(geometry);
 
 	entityManager.AddEntity(entity1);
+
+	Entity entity2("object2");
+	ComponentPosition position2(glm::vec3(3.0f));
+	entity2.AddComponent(position2);
+	ComponentRotation rotation2(glm::vec3(1.0f));
+	entity2.AddComponent(rotation);
+	ComponentScale scale2(glm::vec3(1.0f));
+	entity2.AddComponent(scale2);
+	ComponentVelocity velocity2(glm::vec3(0.5f));
+	entity2.AddComponent(velocity2);
+	ComponentGeometry geometry2("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
+	entity2.AddComponent(geometry2);
+
+	entityManager.AddEntity(entity2);
+
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
