@@ -12,10 +12,14 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 	}
 	else // if not found, create and load the geometry then add it to the map
 	{
-		std::shared_ptr<Geometry> geometry; 
-		geometry->LoadGeometry(fileName);
-		geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
+		//Geometry geometry;
+
+		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();;
+		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
+			(fileName, geometry));*/
+		geometryLibrary.emplace(std::pair<std::string, std::shared_ptr<Geometry>>
 			(fileName, geometry));
+		geometry->LoadGeometry(fileName);
 		return geometry;
 	}
 }

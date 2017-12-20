@@ -5,6 +5,10 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <vector>
 //#include <GLFW/glfw3.h>
 
 class Geometry

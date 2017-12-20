@@ -6,7 +6,25 @@ Geometry::Geometry()
 
 void Geometry::LoadGeometry(std::string pFilePath)
 {
+	std::ifstream file(pFilePath);
+	std::string line;
 
+	while (std::getline(file, line))
+	{
+		float i;
+
+		std::stringstream linestream(line);
+		while (linestream >> i)
+		{
+			vertices.push_back(i);
+
+			if (linestream.peek() == ',' || linestream.peek() == ' ')
+				linestream.ignore();
+		}
+	}
+
+	numberOfTriangles = vertices.size() / 8;
+	BufferData();
 }
 
 void Geometry::render()

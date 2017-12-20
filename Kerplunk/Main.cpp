@@ -17,6 +17,7 @@
 #include "ComponentPosition.h"
 #include "ComponentRotation.h"
 #include "ComponentScale.h"
+#include "ComponentGeometry.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -935,6 +936,9 @@ void createEntities(EntityManager &entityManager)
 	entity1.AddComponent(scale);
 	ComponentVelocity velocity(glm::vec3(0.5f));
 	entity1.AddComponent(velocity);
+	ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
+	entity1.AddComponent(geometry);
+
 	entityManager.AddEntity(entity1);
 }
 
