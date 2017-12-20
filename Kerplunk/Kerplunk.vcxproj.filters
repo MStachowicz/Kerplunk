@@ -103,6 +103,9 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="SystemRender.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemRender.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
