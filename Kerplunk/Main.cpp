@@ -777,27 +777,26 @@ int main()
 		lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		lightingShader->setFloat("omniFarPlane", far);
 		// Binding textures on corresponding texture units after activating them
-
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap);
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, omniDirectionalDepthCubemap);
 
-		//		renderObjects(lightingShader, cubePositions, cubeVAO, floorTexture, true);
+		// renderObjects(lightingShader, cubePositions, cubeVAO, floorTexture, true);
 
 		// component testing
 		systemManager.ActionSystems(entityManager);
 
-				// render Depth map of directional shadow to quad for visual debugging
-				// ---------------------------------------------
-				//debugDepthQuad.use();
-				//debugDepthQuad.setFloat("near_plane", near_plane);
-				//debugDepthQuad.setFloat("far_plane", far_plane);
-				//glActiveTexture(GL_TEXTURE0);
-				//glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap); // directional
-				//renderQuad();
+		// render Depth map of directional shadow to quad for visual debugging
+		// ---------------------------------------------
+		//debugDepthQuad.use();
+		//debugDepthQuad.setFloat("near_plane", near_plane);
+		//debugDepthQuad.setFloat("far_plane", far_plane);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap); // directional
+		//renderQuad();
 
-				// Draw light cubes
+		// Draw light cubes
 		lightBoxShader.use();
 
 		for (unsigned int i = 0; i < 4; i++)
@@ -924,30 +923,33 @@ int main()
 // code testing the creation of en entity with components added 
 void createEntities(EntityManager &entityManager)
 {
-	Entity entity1("object");
-	ComponentPosition position(glm::vec3(1.0f));
-	entity1.AddComponent(position);
-	ComponentRotation rotation(glm::vec3(1.0f));
-	entity1.AddComponent(rotation);
-	ComponentScale scale(glm::vec3(1.0f));
-	entity1.AddComponent(scale);
-	ComponentVelocity velocity(glm::vec3(0.0f));
-	//entity1.AddComponent(velocity);
-	ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
-	entity1.AddComponent(geometry);
-	ComponentShader shader(lightingShader);
-	entity1.AddComponent(shader);
-	ComponentTexture texture("container2.png", true);
-	texture.AddSpecularTexture("container2_specular.png");
-	entity1.AddComponent(texture);
+	for (int i = 0; i < 10; i++)
+	{
+		Entity entity1("object");
+		ComponentPosition position(glm::vec3(-5.0f + i, 1.0f, -19.0f));
+		entity1.AddComponent(position);
+		ComponentRotation rotation(glm::vec3(1.0f));
+		entity1.AddComponent(rotation);
+		ComponentScale scale(glm::vec3(1.0f));
+		entity1.AddComponent(scale);
+		ComponentVelocity velocity(glm::vec3(0.0f, 0.0f, 0.0f));
+		entity1.AddComponent(velocity);
+		ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
+		entity1.AddComponent(geometry);
+		ComponentShader shader(lightingShader);
+		entity1.AddComponent(shader);
+		ComponentTexture texture("container2.png", true);
+		texture.AddSpecularTexture("container2_specular.png");
+		entity1.AddComponent(texture);
 
-	entityManager.AddEntity(entity1);
+		entityManager.AddEntity(entity1);
+	}
 
 	Entity entity2("object2");
 	ComponentPosition position2(glm::vec3(3.0f));
 	entity2.AddComponent(position2);
 	ComponentRotation rotation2(glm::vec3(1.0f));
-	entity2.AddComponent(rotation);
+	entity2.AddComponent(rotation2);
 	ComponentScale scale2(glm::vec3(1.0f));
 	entity2.AddComponent(scale2);
 	ComponentVelocity velocity2(glm::vec3(0.5f));

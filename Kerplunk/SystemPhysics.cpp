@@ -7,7 +7,7 @@ void SystemPhysics::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{
-		std::cout << "System: " << name << " Performing action on entity: " << entity.name << std::endl;
+		//std::cout << "System: " << name << " Performing action on entity: " << entity.name << std::endl;
 
 		std::shared_ptr<ComponentPosition> posComp =
 			std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
