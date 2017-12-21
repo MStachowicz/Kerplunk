@@ -12,12 +12,16 @@
 
 #include "SystemManager.h"
 #include "SystemPhysics.h"
+#include "SystemRender.h"
 #include "EntityManager.h"
 #include "Entity.h"
 #include "ComponentPosition.h"
 #include "ComponentRotation.h"
 #include "ComponentScale.h"
+#include "ComponentVelocity.h"
 #include "ComponentGeometry.h"
+#include "ComponentTexture.h"
+#include "ComponentShader.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -68,18 +72,13 @@ Model rock;
 Model grass;
 Model Desk;
 
-#include "SystemManager.h"
-#include "EntityManager.h"
-#include "Entity.h"
-#include "ComponentPosition.h"
-#include "ComponentRotation.h"
-#include "ComponentScale.h"
-#include "ComponentVelocity.h"
-
 // Component managers
 SystemManager systemManager;
 EntityManager entityManager;
 SystemPhysics systemPhysics;
+SystemRender systemRender;
+
+std::shared_ptr<Shader> lightingShader;
 
 
 int main()
@@ -127,12 +126,13 @@ int main()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
+	lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 
 	createEntities(entityManager);
 	systemManager.AddSystem(systemPhysics);
+	systemManager.AddSystem(systemRender);
 
 	// Build and compile shader
-	std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag", nullptr); // Shader to draw textured objects with no lighting applied
 
@@ -319,6 +319,7 @@ int main()
 	glBindVertexArray(cubeVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -490,11 +491,11 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Load models
-	Desk = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Desk/deskWorn_OBJ.obj", true);
-	grass = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Grass pack/Grass_02.obj", true);
-	planet = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
-	nanosuit = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
-	rock = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
+	//Desk = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Desk/deskWorn_OBJ.obj", true);
+	//grass = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/Grass pack/Grass_02.obj", true);
+	//planet = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/planet/planet.obj", true);
+	//nanosuit = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/nanosuit/nanosuit.obj", true);
+	//rock = Model("C:/Users/micha/Documents/Visual Studio 2017/Projects/Kerplunk/resources/objects/rock/rock.obj", true);
 
 
 	// Load texture
@@ -674,11 +675,7 @@ int main()
 
 		// input
 		processInput(window);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-		// component testing
-		systemManager.ActionSystems(entityManager);
-
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);;
 
 		//// FIRST PASS
 		//// bind to framebuffer and draw scene as we normally would to color texture 
@@ -788,6 +785,8 @@ int main()
 
 		//		renderObjects(lightingShader, cubePositions, cubeVAO, floorTexture, true);
 
+		// component testing
+		systemManager.ActionSystems(entityManager);
 
 				// render Depth map of directional shadow to quad for visual debugging
 				// ---------------------------------------------
@@ -926,16 +925,21 @@ int main()
 void createEntities(EntityManager &entityManager)
 {
 	Entity entity1("object");
-	ComponentPosition position(glm::vec3(3.0f));
+	ComponentPosition position(glm::vec3(1.0f));
 	entity1.AddComponent(position);
 	ComponentRotation rotation(glm::vec3(1.0f));
 	entity1.AddComponent(rotation);
 	ComponentScale scale(glm::vec3(1.0f));
 	entity1.AddComponent(scale);
-	ComponentVelocity velocity(glm::vec3(0.5f));
-	entity1.AddComponent(velocity);
+	ComponentVelocity velocity(glm::vec3(0.0f));
+	//entity1.AddComponent(velocity);
 	ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
 	entity1.AddComponent(geometry);
+	ComponentShader shader(lightingShader);
+	entity1.AddComponent(shader);
+	ComponentTexture texture("container2.png", true);
+	texture.AddSpecularTexture("container2_specular.png");
+	entity1.AddComponent(texture);
 
 	entityManager.AddEntity(entity1);
 

@@ -27,6 +27,27 @@ void SystemRender::OnAction(Entity &entity)
 
 		std::shared_ptr<ComponentTexture> texComp =
 			std::dynamic_pointer_cast<ComponentTexture> (entity.FindComponent(256));
+
+
+		shaderComp->shader->use();
+
+		// Setting the model matrix of the entity
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, posComp->position);
+		//model = glm::rotate(model, glm::radians(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.0f));
+		shaderComp->shader->setMat4("model", model);
+
+		// Binding textures
+		shaderComp->shader->setBool("isNormalMap", false);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texComp->diffuseTexture->textureID);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texComp->specularTexture->textureID);
+		
+		// Render the entity
+		geomComp->geometry->render();
 	}
 }
 

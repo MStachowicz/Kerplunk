@@ -31,6 +31,7 @@ void Geometry::render()
 {
 	glBindVertexArray(VAO_Handle);
 	glDrawArrays(GL_TRIANGLES, 0, numberOfTriangles);
+	glBindVertexArray(0);
 }
 
 void Geometry::BufferData()
@@ -40,7 +41,7 @@ void Geometry::BufferData()
 
 	glBindVertexArray(VAO_Handle);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Handle);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size(), &vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
