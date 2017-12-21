@@ -5,6 +5,9 @@
 #include "IComponent.h"
 #include "Shader.h"
 #include "ComponentPosition.h"
+#include "ComponentRotation.h"
+#include "ComponentScale.h"
+#include "ComponentTexture.h"
 #include "ComponentGeometry.h"
 #include "ComponentShader.h"
 #include <memory>
