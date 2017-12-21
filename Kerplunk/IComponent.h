@@ -14,6 +14,7 @@ public:
 		COMPONENT_VELOCITY = 1 << 4, // 0001 0000	  16
 		COMPONENT_MODEL = 1 << 5,	 // 0010 0000	  32	
 		COMPONENT_GEOMETRY = 1 << 6, // 0100 0000	  64 
+		COMPONENT_SHADER = 1 << 7,   // 1000 0000	  128
 	}; ComponentFlags componentType;
 
 	IComponent(ComponentFlags componentType);

@@ -31,7 +31,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
-void setupLighting(Shader &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
+void setupLighting(shared_ptr<Shader> &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures);
 void renderQuad(const Shader &shader, glm::mat4 &model);
 void createEntities(EntityManager &entityManager);
@@ -130,7 +130,7 @@ int main()
 	systemManager.AddSystem(systemPhysics);
 
 	// Build and compile shader
-	Shader lightingShader("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
+	std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag", nullptr); // Shader to draw textured objects with no lighting applied
 
@@ -526,12 +526,12 @@ int main()
 	unsigned int cubemapTexture = loadCubemap(faces2);
 
 	// Shader texture configurations
-	lightingShader.use();
-	lightingShader.setInt("material.diffuseMap", 0);
-	lightingShader.setInt("material.specularMap", 1);
-	lightingShader.setInt("normalMap", 2);
-	lightingShader.setInt("shadowMap", 4);
-	lightingShader.setInt("omniShadowMap", 5);
+	lightingShader->use();
+	lightingShader->setInt("material.diffuseMap", 0);
+	lightingShader->setInt("material.specularMap", 1);
+	lightingShader->setInt("normalMap", 2);
+	lightingShader->setInt("shadowMap", 4);
+	lightingShader->setInt("omniShadowMap", 5);
 
 	materialShader.use();
 	materialShader.setInt("material.diffuseMap", 0);
@@ -563,7 +563,7 @@ int main()
 
 	// Uniform block index
 	// Set the binding point for the uniform block in the shaders
-	unsigned int uniformBlockIndexLighting = glGetUniformBlockIndex(lightingShader.ID, "Matrices");
+	unsigned int uniformBlockIndexLighting = glGetUniformBlockIndex(lightingShader->ID, "Matrices");
 	unsigned int uniformBlockIndexLightBox = glGetUniformBlockIndex(lightBoxShader.ID, "Matrices");
 	unsigned int uniformBlockIndexReflection = glGetUniformBlockIndex(reflectionShader.ID, "Matrices");
 	unsigned int uniformBlockIndexRefraction = glGetUniformBlockIndex(refractionShader.ID, "Matrices");
@@ -573,7 +573,7 @@ int main()
 	//unsigned int uniformBlockIndexInstanceShader = glGetUniformBlockIndex(instancedLightingShader.ID, "Matrices");
 	unsigned int uniformBlockIndexMaterialShader = glGetUniformBlockIndex(materialShader.ID, "Matrices");
 
-	glUniformBlockBinding(lightingShader.ID, uniformBlockIndexLighting, 0);
+	glUniformBlockBinding(lightingShader->ID, uniformBlockIndexLighting, 0);
 	glUniformBlockBinding(lightBoxShader.ID, uniformBlockIndexLightBox, 0);
 	glUniformBlockBinding(reflectionShader.ID, uniformBlockIndexReflection, 0);
 	glUniformBlockBinding(refractionShader.ID, uniformBlockIndexRefraction, 0);
@@ -770,13 +770,13 @@ int main()
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
-		lightingShader.use();
+		lightingShader->use();
 		// Set up all the lighting in the scene
 		setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
 		// add time component to geometry shader in the form of a uniform
-		lightingShader.setFloat("time", glfwGetTime());
-		lightingShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		lightingShader.setFloat("omniFarPlane", far);
+		lightingShader->setFloat("time", glfwGetTime());
+		lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		lightingShader->setFloat("omniFarPlane", far);
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, containerDiffuseMap);
