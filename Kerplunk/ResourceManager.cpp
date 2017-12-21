@@ -1,6 +1,8 @@
 #include "ResourceManager.h"
 
 std::map<std::string, std::shared_ptr<Geometry>> ResourceManager::geometryLibrary;
+std::map<std::string, std::shared_ptr<Texture>> ResourceManager::textureLibrary;
+
 
 std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 {
@@ -22,6 +24,30 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 		geometry->LoadGeometry(fileName);
 		return geometry;
 	}
+}
+
+std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, bool gammeCorrect)
+{
+	auto it = ResourceManager::textureLibrary.find(fileName);
+
+	if (it != ResourceManager::textureLibrary.end()) // element found, returns the pointer to the element
+	{
+		return it->second;
+	}
+	else // if not found, create and load the texture then add it to the map
+	{
+		std::shared_ptr<Texture> texture = std::make_shared<Texture>();;
+		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
+		(fileName, geometry));*/
+		
+		textureLibrary.emplace(std::pair<std::string, std::shared_ptr<Texture>>
+			(fileName, texture));
+		texture->LoadTexture(fileName, gammeCorrect);
+		return texture;
+	}
+
+
+	return std::shared_ptr<Texture>();
 }
 
 

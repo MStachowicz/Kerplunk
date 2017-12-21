@@ -29,7 +29,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-unsigned int loadTexture(char const * path, bool gammaCorrection);
+unsigned int loadTextureMain(char const * path, bool gammaCorrection);
 unsigned int loadCubemap(vector<std::string> faces);
 void setupLighting(shared_ptr<Shader> &shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures);
@@ -496,13 +496,13 @@ int main()
 
 
 	// Load texture
-	unsigned int containerDiffuseMap = loadTexture("container2.png", true);
-	unsigned int containerSpecularMap = loadTexture("container2_specular.png", false);
-	unsigned int floorTexture = loadTexture("woodFloor.png", true);
-	unsigned int transparentTexture = loadTexture("grass.png", true);
-	unsigned int transparentWindowTexture = loadTexture("transparentWindow.png", true);
-	brickwallTexture = loadTexture("brickWall.jpg", true);
-	brickwallNormalMap = loadTexture("brickwall_normal.jpg", false);
+	unsigned int containerDiffuseMap = loadTextureMain("container2.png", true);
+	unsigned int containerSpecularMap = loadTextureMain("container2_specular.png", false);
+	unsigned int floorTexture = loadTextureMain("woodFloor.png", true);
+	unsigned int transparentTexture = loadTextureMain("grass.png", true);
+	unsigned int transparentWindowTexture = loadTextureMain("transparentWindow.png", true);
+	brickwallTexture = loadTextureMain("brickWall.jpg", true);
+	brickwallNormalMap = loadTextureMain("brickwall_normal.jpg", false);
 
 	// Loading cube map texture
 	vector<std::string> faces =
@@ -1325,7 +1325,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // utility function for loading a 2D texture from file
-unsigned int loadTexture(char const * path, bool gammaCorrection)
+unsigned int loadTextureMain(char const * path, bool gammaCorrection)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

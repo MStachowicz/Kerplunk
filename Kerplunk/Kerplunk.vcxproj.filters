@@ -109,7 +109,12 @@
     <ClCompile Include="ComponentShader.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentTexture.cpp" />
+    <ClCompile Include="ComponentTexture.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -175,7 +180,12 @@
     <ClInclude Include="ComponentShader.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentTexture.h" />
+    <ClInclude Include="ComponentTexture.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">

@@ -1,7 +1,4 @@
 #include "SystemPhysics.h"
-#include <iostream>
-#include <vector>
-#include <algorithm>
 
 SystemPhysics::SystemPhysics() : ISystem("SystemPhysics", (IComponent::ComponentFlags)(IComponent::COMPONENT_POSITION | IComponent::COMPONENT_VELOCITY))
 {}

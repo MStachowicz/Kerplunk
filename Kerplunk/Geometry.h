@@ -14,7 +14,7 @@
 class Geometry
 {
 public:
-	// Stores all the vertex data associated with the object. Order = Position, Normal, Texture coord
+	// Stores all the vertex data associated with the object. Order = Position, Normal, texcoord
 	std::vector<float> vertices;
 	unsigned int numberOfTriangles;
 	unsigned int VAO_Handle;
