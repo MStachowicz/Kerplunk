@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClCompile Include="ComponentGeometry.cpp" />
     <ClCompile Include="ComponentShader.cpp" />
+    <ClCompile Include="ComponentTexture.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="ComponentModel.cpp" />
     <ClCompile Include="ComponentPosition.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComponentGeometry.h" />
     <ClInclude Include="ComponentShader.h" />
+    <ClInclude Include="ComponentTexture.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="ComponentModel.h" />
     <ClInclude Include="ComponentPosition.h" />

@@ -109,6 +109,7 @@
     <ClCompile Include="ComponentShader.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -174,6 +175,7 @@
     <ClInclude Include="ComponentShader.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">
