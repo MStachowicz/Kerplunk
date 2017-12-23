@@ -16,6 +16,7 @@ public:
 	// Checks if the geometry has been previously loaded. Loads the geometry if previously loaded and 
 	// creates new geometry and loads it if not.
 	static std::shared_ptr<Geometry> LoadGeometry(std::string fileName);
+	static std::shared_ptr<Geometry> LoadGeometry(Geometry::primitiveTypes primitive);
 	static std::shared_ptr<Texture> LoadTexture(std::string &fileName, bool gammaCorrect);
 	~ResourceManager();
 };

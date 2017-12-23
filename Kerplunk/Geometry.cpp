@@ -1,7 +1,15 @@
 #include "Geometry.h"
 
-Geometry::Geometry()
+Geometry::Geometry() {}
+
+std::string Geometry::ToString(primitiveTypes type)
 {
+	switch (type)
+	{
+	case Geometry::icoSphere: return "icoSphere";
+
+	default: return "ERROR primitive type not implemented in geometry";
+	}
 }
 
 void Geometry::LoadGeometry(std::string pFilePath)
@@ -25,6 +33,25 @@ void Geometry::LoadGeometry(std::string pFilePath)
 
 	numberOfTriangles = vertices.size() / 8;
 	BufferData();
+}
+
+void Geometry::generateIcoSphere()
+{
+
+}
+
+
+void Geometry::LoadGeometry(primitiveTypes type)
+{
+	switch (type)
+	{
+	case Geometry::icoSphere: 
+		Geometry::generateIcoSphere();
+		break;	
+	default: 
+		"ERROR primitive type not implemented in geometry";
+		break;
+	}
 }
 
 void Geometry::render()
@@ -55,5 +82,7 @@ void Geometry::BufferData()
 	//unbind vao
 	glBindVertexArray(0);
 }
+
+
 
 Geometry::~Geometry() {}

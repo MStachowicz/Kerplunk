@@ -20,10 +20,16 @@ public:
 	unsigned int VAO_Handle;
 	unsigned int VBO_Handle;
 
+	enum primitiveTypes {
+		icoSphere,
+	};
+	static std::string ToString(primitiveTypes type);
+
 	// Create a geometry oject loading in vertex data from a file.
 	Geometry();
 
 	void LoadGeometry(std::string pFilePath);
+	void LoadGeometry(primitiveTypes type);
 
 	void render();
 
@@ -31,6 +37,7 @@ public:
 
 private:
 	void BufferData();
+	static void generateIcoSphere();
 
 };
 #endif

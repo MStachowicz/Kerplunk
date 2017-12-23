@@ -15,6 +15,7 @@ public:
 
 	// Create a geometry object loading in vertex data from a file using the resource manager.
 	ComponentGeometry(std::string filePath);
+	ComponentGeometry(Geometry::primitiveTypes primitive);
 
 	~ComponentGeometry();
 };
