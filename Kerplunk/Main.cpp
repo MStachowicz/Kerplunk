@@ -923,10 +923,10 @@ int main()
 // code testing the creation of en entity with components added 
 void createEntities(EntityManager &entityManager)
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		Entity entity1("object");
-		ComponentPosition position(glm::vec3(-5.0f + i, 1.0f, -19.0f));
+		ComponentPosition position(glm::vec3(0.0f + i, 1.0f, -19.0f));
 		entity1.AddComponent(position);
 		ComponentRotation rotation(glm::vec3(1.0f));
 		entity1.AddComponent(rotation);
@@ -934,7 +934,8 @@ void createEntities(EntityManager &entityManager)
 		entity1.AddComponent(scale);
 		ComponentVelocity velocity(glm::vec3(0.0f, 0.0f, 0.0f));
 		entity1.AddComponent(velocity);
-		ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
+		//ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
+		ComponentGeometry geometry(Geometry::icoSphere);
 		entity1.AddComponent(geometry);
 		ComponentShader shader(lightingShader);
 		entity1.AddComponent(shader);
@@ -942,23 +943,27 @@ void createEntities(EntityManager &entityManager)
 		texture.AddSpecularTexture("container2_specular.png");
 		entity1.AddComponent(texture);
 
-		entityManager.AddEntity(entity1);
+		//entityManager.AddEntity(entity1);
 	}
 
 	Entity entity2("object2");
-	ComponentPosition position2(glm::vec3(3.0f));
+	ComponentPosition position2(glm::vec3(0.0f, 1.0f, -19.0f));
 	entity2.AddComponent(position2);
 	ComponentRotation rotation2(glm::vec3(1.0f));
 	entity2.AddComponent(rotation2);
 	ComponentScale scale2(glm::vec3(1.0f));
 	entity2.AddComponent(scale2);
-	ComponentVelocity velocity2(glm::vec3(0.5f));
+	ComponentVelocity velocity2(glm::vec3(0.0f));
 	entity2.AddComponent(velocity2);
 	ComponentGeometry geometry2("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
 	entity2.AddComponent(geometry2);
+	ComponentShader shader(lightingShader);
+	entity2.AddComponent(shader);
+	ComponentTexture texture("container2.png", true);
+	texture.AddSpecularTexture("container2_specular.png");
+	entity2.AddComponent(texture);
 
 	entityManager.AddEntity(entity2);
-
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
@@ -1090,9 +1095,9 @@ void setupLighting(shared_ptr<Shader> shader, glm::vec3 pointLightPositions[], g
 	// Point light motion
 	for (GLuint i = 0; i < 1; i++)
 	{
-		pointLightPositions[i].x += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
+		//pointLightPositions[i].x += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
 		//pointLightPositions[i].z += (0.05 * sin(glfwGetTime() * 0.5)); // light motion
-		pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
+		//pointLightPositions[i].y += (0.015 * sin((glfwGetTime() * 2) + 1)); // light motion
 	}
 
 	// Set the uniforms for all the point lights

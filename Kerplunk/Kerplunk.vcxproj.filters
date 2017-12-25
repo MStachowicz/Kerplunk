@@ -52,6 +52,9 @@
     <Filter Include="Geometry">
       <UniqueIdentifier>{a0188c21-8841-4ec0-90f9-dc7c9d83a721}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Geometry\Primitives">
+      <UniqueIdentifier>{9580fe01-1cc2-4492-9723-81c2bdc5dca6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -114,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="IcoSphere.cpp">
+      <Filter>Geometry\Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="IcoSphere.h">
+      <Filter>Geometry\Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -146,6 +146,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="IComponent.cpp" />
+    <ClCompile Include="IcoSphere.cpp" />
     <ClCompile Include="ISystem.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="IComponent.h" />
+    <ClInclude Include="IcoSphere.h" />
     <ClInclude Include="ISystem.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

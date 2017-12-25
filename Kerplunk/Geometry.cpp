@@ -35,20 +35,32 @@ void Geometry::LoadGeometry(std::string pFilePath)
 	BufferData();
 }
 
+
 void Geometry::generateIcoSphere()
 {
+	IcoSphere sphere;
+	sphere.Create(4);
 
+	// Converting indexed vertex information into flat vector of vertex positions
+	for (int i = 0; i < sphere.indices.size(); i++)
+	{
+		vertices.push_back(sphere.vertices[sphere.indices[i]].x);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].y);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].z);
+	}
+
+	numberOfTriangles = vertices.size() / 3;
+	BufferData();
 }
-
 
 void Geometry::LoadGeometry(primitiveTypes type)
 {
 	switch (type)
 	{
-	case Geometry::icoSphere: 
+	case Geometry::icoSphere:
 		Geometry::generateIcoSphere();
-		break;	
-	default: 
+		break;
+	default:
 		"ERROR primitive type not implemented in geometry";
 		break;
 	}
@@ -69,6 +81,7 @@ void Geometry::BufferData()
 	glBindVertexArray(VAO_Handle);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Handle);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -83,6 +96,35 @@ void Geometry::BufferData()
 	glBindVertexArray(0);
 }
 
+void Geometry::renderElements()
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Handle);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
 
+void Geometry::BufferElementData()
+{
+	glGenBuffers(1, &EBO_Handle);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Handle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &VAO_Handle);
+	glGenBuffers(1, &VBO_Handle);
+	glGenBuffers(1, &EBO_Handle);
+
+	glBindVertexArray(VAO_Handle);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Handle);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Handle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 Geometry::~Geometry() {}

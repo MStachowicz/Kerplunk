@@ -47,13 +47,10 @@ void SystemRender::OnAction(Entity &entity)
 		glBindTexture(GL_TEXTURE_2D, texComp->specularTexture->textureID);
 		
 		// Render the entity
+		glDisable(GL_CULL_FACE);
 		geomComp->geometry->render();
+		glEnable(GL_CULL_FACE);
 	}
-}
-
-void SystemRender::setShaderModel(std::shared_ptr<Shader> shader, glm::vec3 & position, glm::vec3 & rotation, glm::vec3 & scale)
-{
-	shader->use();
 }
 
 SystemRender::~SystemRender() {}
