@@ -41,15 +41,23 @@ void Geometry::generateIcoSphere()
 	IcoSphere sphere;
 	sphere.Create(4);
 
-	// Converting indexed vertex information into flat vector of vertex positions
+	// Converting indexed vertex information into flat vector of vertex positions and normals to set the attribute pointer in shader correctly.
 	for (int i = 0; i < sphere.indices.size(); i++)
 	{
-		vertices.push_back(sphere.vertices[sphere.indices[i]].x);
-		vertices.push_back(sphere.vertices[sphere.indices[i]].y);
-		vertices.push_back(sphere.vertices[sphere.indices[i]].z);
+		// Positions
+		vertices.push_back(sphere.vertices[sphere.indices[i]].position.x);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].position.y);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].position.z);
+		// Normals
+		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.x);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.y);
+		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.z);
+		// texture coords (not implemented)
+		vertices.push_back(0);
+		vertices.push_back(0);
 	}
 
-	numberOfTriangles = vertices.size() / 3;
+	numberOfTriangles = vertices.size() / 8;
 	BufferData();
 }
 

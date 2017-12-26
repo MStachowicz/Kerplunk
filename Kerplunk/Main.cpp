@@ -943,7 +943,7 @@ void createEntities(EntityManager &entityManager)
 		texture.AddSpecularTexture("container2_specular.png");
 		entity1.AddComponent(texture);
 
-		//entityManager.AddEntity(entity1);
+		entityManager.AddEntity(entity1);
 	}
 
 	Entity entity2("object2");
@@ -963,7 +963,7 @@ void createEntities(EntityManager &entityManager)
 	texture.AddSpecularTexture("container2_specular.png");
 	entity2.AddComponent(texture);
 
-	entityManager.AddEntity(entity2);
+	//entityManager.AddEntity(entity2);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
