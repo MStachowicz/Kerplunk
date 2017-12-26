@@ -16,6 +16,7 @@ public:
 		COMPONENT_GEOMETRY = 1 << 6, // 0000 0100 0000	  64 
 		COMPONENT_SHADER = 1 << 7,   // 0000 1000 0000	  128
 		COMPONENT_TEXTURE = 1 << 8,  // 0001 0000 0000    256
+		COMPONENT_MATERIAL = 1 << 9, // 0010 0000 0000    512
 	}; ComponentFlags componentType;
 
 	IComponent(ComponentFlags componentType);

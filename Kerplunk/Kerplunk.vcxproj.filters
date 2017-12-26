@@ -121,6 +121,9 @@
     <ClCompile Include="IcoSphere.cpp">
       <Filter>Geometry\Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentMaterial.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="IcoSphere.h">
       <Filter>Geometry\Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentMaterial.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
