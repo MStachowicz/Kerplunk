@@ -52,6 +52,10 @@ void Geometry::generateIcoSphere()
 		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.x);
 		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.y);
 		vertices.push_back(sphere.vertices[sphere.indices[i]].normal.z);
+		// position used as normal (non uniform scaling only/doesnt render correctly)
+		//vertices.push_back(glm::normalize(sphere.vertices[sphere.indices[i]].position.x));
+		//vertices.push_back(glm::normalize(sphere.vertices[sphere.indices[i]].position.y));
+		//vertices.push_back(glm::normalize(sphere.vertices[sphere.indices[i]].position.z));
 		// texture coords (not implemented)
 		vertices.push_back(0);
 		vertices.push_back(0);
