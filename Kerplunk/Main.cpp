@@ -926,7 +926,7 @@ void createEntities(EntityManager &entityManager)
 {
 	for (int i = 0; i < 1; i++)
 	{
-		Entity entity1("object");
+		Entity entity1("sphere");
 		ComponentPosition position(glm::vec3(0.0f + i, 1.0f, -19.0f));
 		entity1.AddComponent(position);
 		ComponentRotation rotation(glm::vec3(1.0f));
@@ -946,8 +946,8 @@ void createEntities(EntityManager &entityManager)
 		entityManager.AddEntity(entity1);
 	}
 
-	Entity entity2("object2");
-	ComponentPosition position2(glm::vec3(0.0f, 1.0f, -19.0f));
+	Entity entity2("cube");
+	ComponentPosition position2(glm::vec3(1.0f, 1.0f, -19.0f));
 	entity2.AddComponent(position2);
 	ComponentRotation rotation2(glm::vec3(1.0f));
 	entity2.AddComponent(rotation2);

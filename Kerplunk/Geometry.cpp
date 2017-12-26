@@ -39,7 +39,7 @@ void Geometry::LoadGeometry(std::string pFilePath)
 void Geometry::generateIcoSphere()
 {
 	IcoSphere sphere;
-	sphere.Create(4);
+	sphere.Create(0);
 
 	// Converting indexed vertex information into flat vector of vertex positions and normals to set the attribute pointer in shader correctly.
 	for (int i = 0; i < sphere.indices.size(); i++)

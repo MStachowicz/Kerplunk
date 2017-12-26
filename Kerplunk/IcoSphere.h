@@ -69,22 +69,31 @@ public:
 		faces.clear();
 		index = 0;
 
-		auto t = (1.0 + sqrt(5.0)) / 2.0;
+		const double X = 0.525731112119133606;
+		const double Z = 0.850650808352039932;
 
-		AddVertex(glm::vec3(-1, t, 0));
-		AddVertex(glm::vec3(1, t, 0));
-		AddVertex(glm::vec3(-1, -t, 0));
-		AddVertex(glm::vec3(1, -t, 0));
+		auto s = sqrt((5.0 - sqrt(5.0)) / 10.0);
+		auto t = sqrt((5.0 + sqrt(5.0)) / 10.0);
 
-		AddVertex(glm::vec3(0, -1, t));
-		AddVertex(glm::vec3(0, 1, t));
-		AddVertex(glm::vec3(0, -1, -t));
-		AddVertex(glm::vec3(0, 1, -t));
+		//auto s = 1;
+		//auto t = (1.0 + sqrt(5.0)) / 2.0;
 
-		AddVertex(glm::vec3(t, 0, -1));
-		AddVertex(glm::vec3(t, 0, 1));
-		AddVertex(glm::vec3(-t, 0, -1));
-		AddVertex(glm::vec3(-t, 0, 1));
+		AddVertex(glm::vec3(-s, t, 0));
+		AddVertex(glm::vec3(s, t, 0));
+		AddVertex(glm::vec3(-s, -t, 0));
+		AddVertex(glm::vec3(s, -t, 0));
+
+		AddVertex(glm::vec3(0, -s, t));
+		AddVertex(glm::vec3(0, s, t));
+		AddVertex(glm::vec3(0, -s, -t));
+		AddVertex(glm::vec3(0, s, -t));
+
+		AddVertex(glm::vec3(t, 0, -s));
+		AddVertex(glm::vec3(t, 0, s));
+		AddVertex(glm::vec3(-t, 0, -s));
+		AddVertex(glm::vec3(-t, 0, s));
+
+
 
 		faces.push_back(std::make_shared<triangleindices>(0, 11, 5));
 		faces.push_back(std::make_shared<triangleindices>(0, 5, 1));
@@ -158,9 +167,7 @@ private:
 
 	int AddVertex(glm::vec3 position)
 	{
-		double length = sqrt(position.x * position.x + position.y * position.y + position.z * position.z);
-		vertices.push_back(glm::vec3(position.x / length, position.y / length, position.z / length));
-
+		vertices.push_back(glm::normalize(position));
 		return index++;
 	}
 
@@ -176,7 +183,7 @@ private:
 	{
 		SetFaceNormal(faces[facesIndex]);
 		setVertexFace(faces[facesIndex]);
-	}	
+	}
 
 	// sets the non unit vector face normal
 	void SetFaceNormal(std::shared_ptr<triangleindices> face)
