@@ -8,6 +8,7 @@
 #include "ComponentRotation.h"
 #include "ComponentScale.h"
 #include "ComponentTexture.h"
+#include "ComponentMaterial.h"
 #include "ComponentGeometry.h"
 #include "ComponentShader.h"
 #include <memory>
