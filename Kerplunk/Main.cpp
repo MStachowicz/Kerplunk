@@ -21,6 +21,7 @@
 #include "ComponentVelocity.h"
 #include "ComponentGeometry.h"
 #include "ComponentTexture.h"
+#include "ComponentMaterial.h"
 #include "ComponentShader.h"
 
 #include <glm/glm.hpp>
@@ -939,9 +940,8 @@ void createEntities(EntityManager &entityManager)
 		entity1.AddComponent(geometry);
 		ComponentShader shader(lightingShader);
 		entity1.AddComponent(shader);
-		ComponentTexture texture("container2.png", true);
-		texture.AddSpecularTexture("container2_specular.png");
-		entity1.AddComponent(texture);
+		ComponentMaterial material(glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0), 64.0f);
+		entity1.AddComponent(material);
 
 		entityManager.AddEntity(entity1);
 	}
@@ -963,7 +963,7 @@ void createEntities(EntityManager &entityManager)
 	texture.AddSpecularTexture("container2_specular.png");
 	entity2.AddComponent(texture);
 
-	//entityManager.AddEntity(entity2);
+	entityManager.AddEntity(entity2);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)

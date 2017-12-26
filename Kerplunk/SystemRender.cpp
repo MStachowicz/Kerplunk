@@ -47,7 +47,7 @@ void SystemRender::OnAction(Entity &entity)
 			else // material entities
 			{
 				std::shared_ptr<ComponentMaterial> materialComp =
-					std::dynamic_pointer_cast<ComponentMaterial> (entity.FindComponent(256));
+					std::dynamic_pointer_cast<ComponentMaterial> (entity.FindComponent(512));
 
 				// Setting shader material properties
 				shaderComp->shader->setBool("isTextured", false);

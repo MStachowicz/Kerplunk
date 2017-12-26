@@ -269,12 +269,6 @@
     <None Include="lightingInstanced.vert">
       <Filter>Shaders\Lighting</Filter>
     </None>
-    <None Include="materialLighting.vert">
-      <Filter>Shaders\Lighting</Filter>
-    </None>
-    <None Include="materialLighting.frag">
-      <Filter>Shaders\Lighting</Filter>
-    </None>
     <None Include="depthShader.vert">
       <Filter>Shaders\Shadow map</Filter>
     </None>
