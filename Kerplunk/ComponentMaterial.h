@@ -8,10 +8,10 @@
 class ComponentMaterial : public IComponent
 {
 public:
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-	float shininess;
+	glm::vec3 ambient = glm::vec3(0.0f);
+	glm::vec3 diffuse = glm::vec3(0.0f);
+	glm::vec3 specular = glm::vec3(0.0f);
+	float shininess = 0;
 
 	ComponentMaterial();
 	ComponentMaterial(glm::vec3 pAmbientDiffuse);
@@ -20,5 +20,8 @@ public:
 	ComponentMaterial(glm::vec3 pAmbient, glm::vec3 pDiffuse, glm::vec3 pSpecular, float pShininess);
 
 	~ComponentMaterial();
+
+private:
+	const float DEFAULTSHININESS = 64.0f;
 };
 #endif
