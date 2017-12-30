@@ -927,7 +927,7 @@ void createEntities(EntityManager &entityManager)
 	for (int i = 0; i < 1; i++)
 	{
 		Entity entity1("sphere");
-		ComponentPosition position(glm::vec3(0.0f + i, 1.0f, -19.0f));
+		ComponentPosition position(glm::vec3(-1.0f + i, 1.0f, -19.0f));
 		entity1.AddComponent(position);
 		ComponentRotation rotation(glm::vec3(1.0f));
 		entity1.AddComponent(rotation);

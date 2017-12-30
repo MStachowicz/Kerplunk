@@ -69,12 +69,11 @@ public:
 		faces.clear();
 		index = 0;
 
-		const double X = 0.525731112119133606;
-		const double Z = 0.850650808352039932;
+		double s = 0.525731112119133606;
+		double t = 0.850650808352039932;
 
-		auto s = sqrt((5.0 - sqrt(5.0)) / 10.0);
-		auto t = sqrt((5.0 + sqrt(5.0)) / 10.0);
-
+		s = sqrt((5.0 - sqrt(5.0)) / 10.0);
+		t = sqrt((5.0 + sqrt(5.0)) / 10.0);
 		//auto s = 1;
 		//auto t = (1.0 + sqrt(5.0)) / 2.0;
 
