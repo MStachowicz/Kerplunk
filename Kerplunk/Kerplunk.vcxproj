@@ -150,6 +150,7 @@
     <ClCompile Include="IcoSphere.cpp" />
     <ClCompile Include="ISystem.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />

@@ -2,11 +2,15 @@
 #define COMPONENTMODEL_H
 
 #include "IComponent.h"
+#include "Model.h"
+#include "Mesh.h"
 
 class ComponentModel : public IComponent
 {
 public:
-	ComponentModel();
+	Model model;
+
+	ComponentModel(std::string &path, bool gamma);
 	~ComponentModel();
 };
 #endif

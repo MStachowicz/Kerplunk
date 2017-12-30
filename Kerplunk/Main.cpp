@@ -937,7 +937,9 @@ void createEntities(EntityManager &entityManager)
 		entity1.AddComponent(velocity);
 		//ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
 		ComponentGeometry geometry(Geometry::icoSphere);
-		entity1.AddComponent(geometry);
+		std::string filepath = "C:/Users/Michal/Desktop/Sphere.obj";
+		ComponentModel model(filepath, true);
+		entity1.AddComponent(model);
 		ComponentShader shader(lightingShader);
 		entity1.AddComponent(shader);
 		ComponentMaterial material(glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0), 64.0f);

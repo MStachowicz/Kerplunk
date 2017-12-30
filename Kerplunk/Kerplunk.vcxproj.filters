@@ -124,6 +124,9 @@
     <ClCompile Include="ComponentMaterial.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">

@@ -62,6 +62,7 @@ void SystemRender::OnAction(Entity &entity)
 				}
 
 				// DRAW
+				// entity can be drawn using geometry or a model loaded in using assimp
 				if ((entity.mask & IComponent::COMPONENT_GEOMETRY) == IComponent::COMPONENT_GEOMETRY) // geometry entities
 				{
 					std::shared_ptr<ComponentGeometry> geomComp = std::dynamic_pointer_cast<ComponentGeometry> (entity.FindComponent(64));
@@ -74,8 +75,7 @@ void SystemRender::OnAction(Entity &entity)
 				else
 				{
 					std::shared_ptr<ComponentModel> modelComp = std::dynamic_pointer_cast<ComponentModel> (entity.FindComponent(32));
-
-					modelComp->model->Draw();
+					modelComp->model.Draw();
 				}
 			}
 		}

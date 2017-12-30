@@ -4,6 +4,8 @@ std::map<std::string, std::shared_ptr<Geometry>> ResourceManager::geometryLibrar
 std::map<std::string, std::shared_ptr<Texture>> ResourceManager::textureLibrary;
 
 
+
+
 std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 {
 	auto it = ResourceManager::geometryLibrary.find(fileName);
@@ -72,7 +74,11 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, boo
 	return std::shared_ptr<Texture>();
 }
 
-
+ResourceManager::ResourceManager()
+{
+	// sets the path of the file storing resources
+	//directory = path.substr(0, path.find_last_of('/'));
+}
 ResourceManager::~ResourceManager()
 {
 }
