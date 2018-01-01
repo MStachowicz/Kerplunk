@@ -1,6 +1,4 @@
 #include <iostream>
-#include <filesystem>
-#include <direct.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -27,8 +25,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -84,10 +80,6 @@ std::shared_ptr<Shader> lightingShader;
 
 int main()
 {
-	char buf[100];
-	_getcwd(buf, 100);
-	std::cout << "Working Directory: " << buf << std::endl;
-
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
@@ -712,8 +704,8 @@ int main()
 		// 2. render depth of scene to cubemap for omnidirectional shadow mapping
 		// --------------------------------------------------------------
 		float aspect = (float)OMNI_SHADOW_WIDTH / (float)OMNI_SHADOW_HEIGHT;
-		float near = 1.0f, far = 25.0f;
-		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
+		float omniProjectionNear = 1.0f, omniProjectionFar = 25.0f;
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, omniProjectionNear, omniProjectionFar);
 
 		int i = 0;
 		// creating the light space transformation matrices for the 6 faces of cubemap
@@ -741,7 +733,7 @@ int main()
 		for (unsigned int i = 0; i < 6; ++i)
 			omniDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 
-		omniDepthShader.setFloat("far_plane", far);
+		omniDepthShader.setFloat("far_plane", omniProjectionFar);
 		omniDepthShader.setVec3("lightPos", pointLightPositions[0]);
 
 		renderObjects(omniDepthShader, cubePositions, cubeVAO, floorTexture, false);
@@ -776,7 +768,7 @@ int main()
 		// add time component to geometry shader in the form of a uniform
 		lightingShader->setFloat("time", glfwGetTime());
 		lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		lightingShader->setFloat("omniFarPlane", far);
+		lightingShader->setFloat("omniFarPlane", omniProjectionFar);
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap);
@@ -931,13 +923,14 @@ void createEntities(EntityManager &entityManager)
 		entity1.AddComponent(position);
 		ComponentRotation rotation(glm::vec3(1.0f));
 		entity1.AddComponent(rotation);
-		ComponentScale scale(glm::vec3(1.0f));
+		ComponentScale scale(glm::vec3(0.2f));
 		entity1.AddComponent(scale);
 		ComponentVelocity velocity(glm::vec3(0.0f, 0.0f, 0.0f));
 		entity1.AddComponent(velocity);
 		//ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
-		ComponentGeometry geometry(Geometry::icoSphere);
-		std::string filepath = "C:/Users/Michal/Desktop/Sphere.obj";
+		//ComponentGeometry geometr(,);
+		//std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Model primitives/Ico Sphere/4 subdivisions/Ico Sphere.obj";
+		std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Objects/nanosuit/nanosuit.obj";
 		ComponentModel model(filepath, true);
 		entity1.AddComponent(model);
 		ComponentShader shader(lightingShader);

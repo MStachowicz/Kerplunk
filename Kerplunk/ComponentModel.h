@@ -3,12 +3,12 @@
 
 #include "IComponent.h"
 #include "Model.h"
-#include "Mesh.h"
 
 class ComponentModel : public IComponent
 {
 public:
-	Model model;
+	//Model model;
+	std::shared_ptr<Model> model;
 
 	ComponentModel(std::string &path, bool gamma);
 	~ComponentModel();

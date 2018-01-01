@@ -2,9 +2,18 @@
 
 std::map<std::string, std::shared_ptr<Geometry>> ResourceManager::geometryLibrary;
 std::map<std::string, std::shared_ptr<Texture>> ResourceManager::textureLibrary;
+std::map<std::string, std::shared_ptr<Model>> ResourceManager::modelLibrary;
 
+std::string ResourceManager::directory = ResourceManager::SetDirectory();
 
-
+std::string ResourceManager::SetDirectory()
+{
+	char result[MAX_PATH];
+	string path;
+	path = string(result, GetModuleFileName(NULL, result, MAX_PATH));
+	return path;
+	//path = path.
+}
 
 std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 {
@@ -18,7 +27,7 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 	{
 		//Geometry geometry;
 
-		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();;
+		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();
 		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
 			(fileName, geometry));*/
 		geometryLibrary.emplace(std::pair<std::string, std::shared_ptr<Geometry>>
@@ -40,7 +49,7 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(Geometry::primitiveTypes
 	}
 	else // if not found, create and load the geometry then add it to the map
 	{
-		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();;
+		std::shared_ptr<Geometry> geometry = std::make_shared<Geometry>();
 		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
 		(fileName, geometry));*/
 		geometryLibrary.emplace(std::pair<std::string, std::shared_ptr<Geometry>>
@@ -60,7 +69,7 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, boo
 	}
 	else // if not found, create and load the texture then add it to the map
 	{
-		std::shared_ptr<Texture> texture = std::make_shared<Texture>();;
+		std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
 		(fileName, geometry));*/
 		
@@ -69,16 +78,28 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, boo
 		texture->LoadTexture(fileName, gammeCorrect);
 		return texture;
 	}
-
-
-	return std::shared_ptr<Texture>();
 }
 
-ResourceManager::ResourceManager()
+std::shared_ptr<Model> ResourceManager::LoadModel(std::string & fileName, bool gammaCorrect)
 {
-	// sets the path of the file storing resources
-	//directory = path.substr(0, path.find_last_of('/'));
+	auto it = ResourceManager::modelLibrary.find(fileName);
+
+	if (it != ResourceManager::modelLibrary.end()) // element found, returns the pointer to the element
+	{
+		return it->second;
+	}
+	else // if not found, create and load the texture then add it to the map
+	{
+		std::shared_ptr<Model> model = std::make_shared<Model>();
+		/*geometryLibrary.insert(std::pair<std::string, std::shared_ptr<Geometry>>
+		(fileName, geometry));*/
+
+		modelLibrary.emplace(std::pair<std::string, std::shared_ptr<Model>>
+			(fileName, model));
+		model->gammaCorrection = gammaCorrect;
+		model->loadModel(fileName);
+		return model;
+	}
 }
-ResourceManager::~ResourceManager()
-{
-}
+
+ResourceManager::~ResourceManager() {}

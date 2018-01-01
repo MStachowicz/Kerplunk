@@ -75,7 +75,7 @@ void SystemRender::OnAction(Entity &entity)
 				else
 				{
 					std::shared_ptr<ComponentModel> modelComp = std::dynamic_pointer_cast<ComponentModel> (entity.FindComponent(32));
-					modelComp->model.Draw();
+					modelComp->model->Draw();
 				}
 			}
 		}
