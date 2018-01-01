@@ -918,46 +918,40 @@ void createEntities(EntityManager &entityManager)
 {
 	for (int i = 0; i < 1; i++)
 	{
-		Entity entity1("sphere");
-		ComponentPosition position(glm::vec3(-1.0f + i, 1.0f, -19.0f));
-		entity1.AddComponent(position);
-		ComponentRotation rotation(glm::vec3(1.0f));
-		entity1.AddComponent(rotation);
-		ComponentScale scale(glm::vec3(0.2f));
-		entity1.AddComponent(scale);
-		ComponentVelocity velocity(glm::vec3(0.0f, 0.0f, 0.0f));
-		entity1.AddComponent(velocity);
-		//ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
-		//std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Model primitives/Ico Sphere/4 subdivisions/Ico Sphere.obj";
+		Entity entity1("nanosuit");
+		entity1.AddComponent(ComponentPosition(glm::vec3(0.0f + i, 1.0f, -20.0f)));
+		entity1.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+		entity1.AddComponent(ComponentScale(glm::vec3(0.2f)));
+		entity1.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
 		std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Objects/nanosuit/nanosuit.obj";
-		ComponentModel model(filepath, true, true);
-		entity1.AddComponent(model);
-		ComponentShader shader(lightingShader);
-		entity1.AddComponent(shader);
-		ComponentMaterial material(glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(1.0), 64.0f);
-		entity1.AddComponent(material);
-
+		entity1.AddComponent(ComponentModel(filepath, true, true));
+		entity1.AddComponent(ComponentShader(lightingShader));
+		entity1.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 		entityManager.AddEntity(entity1);
 	}
 
 	Entity entity2("cube");
-	ComponentPosition position2(glm::vec3(1.0f, 1.0f, -19.0f));
-	entity2.AddComponent(position2);
-	ComponentRotation rotation2(glm::vec3(1.0f));
-	entity2.AddComponent(rotation2);
-	ComponentScale scale2(glm::vec3(1.0f));
-	entity2.AddComponent(scale2);
-	ComponentVelocity velocity2(glm::vec3(0.0f));
-	entity2.AddComponent(velocity2);
-	ComponentGeometry geometry2("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
-	entity2.AddComponent(geometry2);
-	ComponentShader shader(lightingShader);
-	entity2.AddComponent(shader);
+	entity2.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -20.0f)));
+	entity2.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+	entity2.AddComponent(ComponentScale(glm::vec3(1.0f)));
+	entity2.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
+	entity2.AddComponent(ComponentGeometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt"));
+	entity2.AddComponent(ComponentShader(lightingShader));
 	ComponentTexture texture("container2.png", true);
 	texture.AddSpecularTexture("container2_specular.png");
 	entity2.AddComponent(texture);
-
 	entityManager.AddEntity(entity2);
+
+	Entity entity3("sphere");
+	entity3.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
+	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+	entity3.AddComponent(ComponentScale(glm::vec3(1.0f)));
+	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
+	std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Model primitives/Ico Sphere/4 subdivisions/Ico Sphere.obj";
+	entity3.AddComponent(ComponentModel(filepath, true, false));
+	entity3.AddComponent(ComponentShader(lightingShader));
+	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	entityManager.AddEntity(entity3);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
