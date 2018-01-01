@@ -29,9 +29,9 @@ void SystemRender::OnAction(Entity &entity)
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, posComp->position);
 				//model = glm::rotate(model, glm::radians(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-				model = glm::scale(model, glm::vec3(1.0f));
+				model = glm::scale(model, scaleComp->scale);
+				
 				shaderComp->shader->setMat4("model", model);
-
 				shaderComp->shader->setBool("isNormalMap", false); // normal mapping not implemented for component architecture
 
 				if ((entity.mask & IComponent::COMPONENT_TEXTURE) == IComponent::COMPONENT_TEXTURE) // textures entities
@@ -72,10 +72,14 @@ void SystemRender::OnAction(Entity &entity)
 					geomComp->geometry->render();
 					glEnable(GL_CULL_FACE);
 				}
-				else
+				else // model draw
 				{
 					std::shared_ptr<ComponentModel> modelComp = std::dynamic_pointer_cast<ComponentModel> (entity.FindComponent(32));
-					modelComp->model->Draw();
+
+					if (modelComp->useModelTextures)
+						modelComp->model->Draw(*shaderComp->shader); // Binds the textures associated with the model
+					else
+						modelComp->model->Draw(); // Draws the model using the textures or material components
 				}
 			}
 		}

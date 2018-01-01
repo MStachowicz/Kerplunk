@@ -39,6 +39,7 @@ struct SpotLight {
 struct Material {
     sampler2D specularMap;
     sampler2D diffuseMap;
+    sampler2D normalMap; // Texture storing the normal map
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -57,7 +58,6 @@ uniform Material material;
 uniform sampler2D shadowMap; // Stores the fragment depth information from the perspective of the directional light.
 uniform float omniFarPlane; // The far plane of the perspective of the the omnidirectional light.
 uniform	samplerCube omniShadowMap; // Stores the depth buffer information used to check if a fragment is in shadow. Used by omnidirectional light.
-uniform sampler2D normalMap; // Texture storing the normal map
 uniform bool isNormalMap; // whether the normals used are supplied in the normal map or as an atribute
 uniform bool isTextured; // whether the fragments will be shaded using textures or material properties
 
@@ -89,7 +89,7 @@ void main()
 	if (isNormalMap)
 	{
 		// obtain normal from normal map in range [0,1]
-		vec3 normal = texture(normalMap, fs_in.TexCoord).rgb;
+		vec3 normal = texture(material.normalMap, fs_in.TexCoord).rgb;
 		// transform normal vector to range [-1,1]
 		norm = normalize(normal * 2.0 - 1.0); 
 		// transform the normal vector into tangent space to correct normal mapping 

@@ -928,10 +928,9 @@ void createEntities(EntityManager &entityManager)
 		ComponentVelocity velocity(glm::vec3(0.0f, 0.0f, 0.0f));
 		entity1.AddComponent(velocity);
 		//ComponentGeometry geometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt");
-		//ComponentGeometry geometr(,);
 		//std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Model primitives/Ico Sphere/4 subdivisions/Ico Sphere.obj";
 		std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Objects/nanosuit/nanosuit.obj";
-		ComponentModel model(filepath, true);
+		ComponentModel model(filepath, true, true);
 		entity1.AddComponent(model);
 		ComponentShader shader(lightingShader);
 		entity1.AddComponent(shader);

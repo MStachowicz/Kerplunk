@@ -128,17 +128,22 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	// specular: texture_specularN
 	// normal: texture_normalN
 
+	//"material.ambient"
+	//"material.diffuse"
+	//"material.specular"
+	//"material.shininess"
+
 	// 1. diffuse maps
-	vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+	vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "material.diffuseMap", gammaCorrection);
 	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	// 2. specular maps
-	vector<MeshTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+	vector<MeshTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "material.specularMap", false);
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	// 3. normal maps
-	std::vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+	std::vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "material.normalMap", false);
 	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 	// 4. height maps
-	std::vector<MeshTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+	std::vector<MeshTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height", false);
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 	// return a mesh object created from the extracted mesh data
@@ -147,7 +152,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
 // the required info is returned as a MeshTexture struct.
-vector<MeshTexture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+vector<MeshTexture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName, bool gammaCorrect)
 {
 	vector<MeshTexture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)

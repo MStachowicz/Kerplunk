@@ -27,7 +27,7 @@ public:
 	std::vector<MeshTexture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	std::vector<Mesh> meshes;
 	std::string directory;
-	bool gammaCorrection;
+	bool gammaCorrection; // 
 
 
 	// default constructor
@@ -47,7 +47,7 @@ private:
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 	// checks all material textures of a given type and loads the textures if they're not loaded yet.
 	// the required info is returned as a MeshTexture struct.
-	vector<MeshTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
+	vector<MeshTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName, bool gammaCorrect);
 	unsigned int TextureFromFile(const char *path, const string &directory, bool gamma);
 };
 
