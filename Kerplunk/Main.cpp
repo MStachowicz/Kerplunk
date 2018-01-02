@@ -951,6 +951,16 @@ void createEntities(EntityManager &entityManager)
 	entity3.AddComponent(ComponentShader(lightingShader));
 	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity3);
+
+	Entity entity4("quad");
+	entity4.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
+	entity4.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+	entity4.AddComponent(ComponentScale(glm::vec3(1.0f)));
+	entity4.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
+	entity4.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
+	entity4.AddComponent(ComponentShader(lightingShader));
+	entity4.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	entityManager.AddEntity(entity4);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)

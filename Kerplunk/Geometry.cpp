@@ -6,7 +6,8 @@ std::string Geometry::ToString(primitiveTypes type)
 {
 	switch (type)
 	{
-	case Geometry::icoSphere: return "icoSphere";
+	case primitiveTypes::icoSphere: return "icoSphere";
+	case primitiveTypes::quad: return "quad";
 
 	default: return "ERROR primitive type not implemented in geometry";
 	}
@@ -80,12 +81,6 @@ void Geometry::LoadGeometry(std::string pFilePath)
 		}
 	}
 
-	// Setting the stride of the data
-	for (int i = 0; i < attributes.size(); i++)
-		stride += attributes[i].size;
-
-	// setting number of triangles before binding the collected data to the GPU
-	numberOfTriangles = vertices.size() / stride;
 	BufferData();
 }
 
@@ -115,7 +110,21 @@ void Geometry::generateIcoSphere()
 		vertices.push_back(0);
 	}
 
-	numberOfTriangles = vertices.size() / 8;
+	BufferData();
+}
+
+void Geometry::generateQuad()
+{
+	Quad plane;
+	plane.SetupQuad();
+	vertices = plane.vertices;
+
+	attributes.push_back(Attribute(AttributeTypes::Position, 0));
+	attributes.push_back(Attribute(AttributeTypes::Normal, 3));
+	attributes.push_back(Attribute(AttributeTypes::Texture, 6));
+	attributes.push_back(Attribute(AttributeTypes::Tangent, 8));
+	attributes.push_back(Attribute(AttributeTypes::Bitangent, 11));
+
 	BufferData();
 }
 
@@ -126,6 +135,11 @@ void Geometry::LoadGeometry(primitiveTypes type)
 	case Geometry::icoSphere:
 		Geometry::generateIcoSphere();
 		break;
+
+	case primitiveTypes::quad:
+		Geometry::generateQuad();
+		break;
+
 	default:
 		"ERROR primitive type not implemented in geometry";
 		break;
@@ -141,6 +155,14 @@ void Geometry::render()
 
 void Geometry::BufferData()
 {
+	// Setting the stride of the data
+	for (int i = 0; i < attributes.size(); i++)
+		stride += attributes[i].size;
+
+	// setting number of triangles before binding the collected data to the GPU
+	numberOfTriangles = vertices.size() / stride;
+
+
 	glGenVertexArrays(1, &VAO_Handle);
 	glGenBuffers(1, &VBO_Handle);
 
@@ -164,18 +186,6 @@ void Geometry::BufferData()
 
 	//unbind vao
 	glBindVertexArray(0);
-
-
-	//// position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//// normal attribute
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//// texture attribute
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
 }
 
 void Geometry::renderElements()

@@ -14,6 +14,7 @@
 #include <string>
 
 #include "IcoSphere.h"
+#include "Quad.h"
 
 class Geometry
 {
@@ -27,6 +28,7 @@ public:
 	};
 	enum primitiveTypes {
 		icoSphere,
+		quad,
 	};
 
 	struct Attribute
@@ -101,9 +103,9 @@ private:
 	int stride = 0;
 
 	void BufferData();
-	void BufferData(int numAttributes);
 
 	void BufferElementData();
 	void generateIcoSphere();
+	void generateQuad();
 };
 #endif
