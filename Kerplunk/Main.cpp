@@ -738,7 +738,6 @@ int main()
 		renderObjects(omniDepthShader, cubePositions, cubeVAO, floorTexture, false);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//}
 
 
 		// 3. render scene as normal using the generated depth/shadow map  

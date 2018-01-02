@@ -133,6 +133,9 @@
     <ClCompile Include="Geometry.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentLightEmitter.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -212,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="Geometry.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentLightEmitter.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

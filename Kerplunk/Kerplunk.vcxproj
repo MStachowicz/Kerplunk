@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComponentGeometry.cpp" />
+    <ClCompile Include="ComponentLightEmitter.cpp" />
     <ClCompile Include="ComponentMaterial.cpp" />
     <ClCompile Include="ComponentShader.cpp" />
     <ClCompile Include="ComponentTexture.cpp" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComponentGeometry.h" />
+    <ClInclude Include="ComponentLightEmitter.h" />
     <ClInclude Include="ComponentMaterial.h" />
     <ClInclude Include="ComponentShader.h" />
     <ClInclude Include="ComponentTexture.h" />
