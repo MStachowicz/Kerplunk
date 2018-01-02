@@ -47,7 +47,17 @@ void SystemLighting::OnAction(Entity &entity)
 			}
 			else // light with direction and no cut off must be a directional light
 			{
+				// DIRECTIONAL LIGHT 
+				// ---------------------------------------------------------------------------------------------------------------------
+				std::shared_ptr<ComponentLightDirection> directionComp = std::dynamic_pointer_cast<ComponentLightDirection> (entity.FindComponent(4096));
+				std::shared_ptr<ComponentLightEmitter> emitterComp = std::dynamic_pointer_cast<ComponentLightEmitter> (entity.FindComponent(1024));
+				std::shared_ptr<ComponentShader> shaderComp = std::dynamic_pointer_cast<ComponentShader> (entity.FindComponent(128));
 
+				// Setting the uniforms for the spotlight
+				shaderComp->shader->setVec3("dirLight.direction", directionComp->direction);
+				shaderComp->shader->setVec3("dirLight.ambient", emitterComp->ambient);
+				shaderComp->shader->setVec3("dirLight.diffuse", emitterComp->diffuse);
+				shaderComp->shader->setVec3("dirLight.specular", emitterComp->specular);
 			}
 		}
 		else // light with no direction must be a point light
