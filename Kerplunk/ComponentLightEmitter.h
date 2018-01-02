@@ -7,9 +7,9 @@
 class ComponentLightEmitter : public IComponent
 {
 public:
-	glm::vec3 Ambient;
-	glm::vec3 Diffuse;
-	glm::vec3 Specular;
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
 
 	ComponentLightEmitter(glm::vec3 pAmbient, glm::vec3 pDiffuse, glm::vec3 pSpecular);
 	~ComponentLightEmitter();
