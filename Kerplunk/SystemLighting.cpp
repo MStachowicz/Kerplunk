@@ -62,7 +62,24 @@ void SystemLighting::OnAction(Entity &entity)
 		}
 		else // light with no direction must be a point light
 		{
+			// SPOTLIGHT 
+			// ---------------------------------------------------------------------------------------------------------------------
+			std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
+			std::shared_ptr<ComponentLightEmitter> emitterComp = std::dynamic_pointer_cast<ComponentLightEmitter> (entity.FindComponent(1024));
+			std::shared_ptr<ComponentLightAttenuation> attenuationComp = std::dynamic_pointer_cast<ComponentLightAttenuation> (entity.FindComponent(2048));
+			std::shared_ptr<ComponentShader> shaderComp = std::dynamic_pointer_cast<ComponentShader> (entity.FindComponent(128));
 
+			int i = 0;
+			std::string number = std::to_string(i);
+
+			// Setting the uniforms for the spotlight
+			shaderComp->shader->setVec3("pointLights[" + number + "].position", posComp->position);
+			shaderComp->shader->setVec3("pointLights[" + number + "].ambient", emitterComp->ambient);
+			shaderComp->shader->setVec3("pointLights[" + number + "].diffuse", emitterComp->diffuse);
+			shaderComp->shader->setVec3("pointLights[" + number + "].specular", emitterComp->specular);
+			shaderComp->shader->setFloat("pointLights[" + number + "].constant", attenuationComp->constant);
+			shaderComp->shader->setFloat("pointLights[" + number + "].linear", attenuationComp->linear);
+			shaderComp->shader->setFloat("pointLights[" + number + "].quadratic", attenuationComp->quadratic);
 		}
 	}
 }
