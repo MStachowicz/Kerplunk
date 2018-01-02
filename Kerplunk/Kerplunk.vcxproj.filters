@@ -142,6 +142,9 @@
     <ClCompile Include="ComponentLightDirection.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="SystemLighting.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -230,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="ComponentLightDirection.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemLighting.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

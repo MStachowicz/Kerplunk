@@ -158,6 +158,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="SystemLighting.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="SystemPhysics.cpp" />
     <ClCompile Include="SystemRender.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="SystemLighting.h" />
     <ClInclude Include="SystemManager.h" />
     <ClInclude Include="SystemPhysics.h" />
     <ClInclude Include="SystemRender.h" />
