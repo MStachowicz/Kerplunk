@@ -136,6 +136,7 @@
     <ClCompile Include="ComponentLightEmitter.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentLightAttenuation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -219,6 +220,7 @@
     <ClInclude Include="ComponentLightEmitter.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentLightAttenuation.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">
