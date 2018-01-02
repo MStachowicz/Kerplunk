@@ -148,6 +148,9 @@
     <ClCompile Include="ComponentLightCutOff.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentDirectionShadowEmitter.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -241,6 +244,9 @@
       <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="ComponentLightCutOff.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentDirectionShadowEmitter.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
