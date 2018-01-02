@@ -8,7 +8,6 @@ void SystemLighting::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{
-
 		// If the light has direction must be spotlight or directional light
 		if (((entity.mask & IComponent::COMPONENT_LIGHT_DIRECTION) == IComponent::COMPONENT_LIGHT_DIRECTION))
 		{
@@ -62,7 +61,7 @@ void SystemLighting::OnAction(Entity &entity)
 		}
 		else // light with no direction must be a point light
 		{
-			// SPOTLIGHT 
+			// POINT LIGHT 
 			// ---------------------------------------------------------------------------------------------------------------------
 			std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
 			std::shared_ptr<ComponentLightEmitter> emitterComp = std::dynamic_pointer_cast<ComponentLightEmitter> (entity.FindComponent(1024));
@@ -71,6 +70,8 @@ void SystemLighting::OnAction(Entity &entity)
 
 			int i = 0;
 			std::string number = std::to_string(i);
+			
+			shaderComp->shader->use();
 
 			// Setting the uniforms for the spotlight
 			shaderComp->shader->setVec3("pointLights[" + number + "].position", posComp->position);

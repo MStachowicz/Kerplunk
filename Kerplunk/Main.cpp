@@ -11,6 +11,7 @@
 #include "SystemManager.h"
 #include "SystemPhysics.h"
 #include "SystemRender.h"
+#include "SystemLighting.h"
 #include "EntityManager.h"
 #include "Entity.h"
 #include "ComponentPosition.h"
@@ -73,6 +74,7 @@ SystemManager systemManager;
 EntityManager entityManager;
 SystemPhysics systemPhysics;
 SystemRender systemRender;
+SystemLighting systemLighting;
 
 std::shared_ptr<Shader> lightingShader;
 
@@ -122,6 +124,7 @@ int main()
 
 	createEntities(entityManager);
 	systemManager.AddSystem(systemPhysics);
+	systemManager.AddSystem(systemLighting); // Lighting must be performed before render
 	systemManager.AddSystem(systemRender);
 
 	// Build and compile shader
@@ -762,8 +765,9 @@ int main()
 
 		lightingShader->use();
 		// Set up all the lighting in the scene
-		setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
+		//setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
 		// add time component to geometry shader in the form of a uniform
+		lightingShader->setVec3("viewPos", camera.Position);
 		lightingShader->setFloat("time", glfwGetTime());
 		lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		lightingShader->setFloat("omniFarPlane", omniProjectionFar);
@@ -960,6 +964,28 @@ void createEntities(EntityManager &entityManager)
 	entity4.AddComponent(ComponentShader(lightingShader));
 	entity4.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity4);
+
+	Entity entity5("pointLight0");
+	entity5.AddComponent(ComponentPosition(glm::vec3(0.0f, 3.0f, -19.0f)));
+	entity5.AddComponent(ComponentLightEmitter(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.9f)));
+	entity5.AddComponent(ComponentLightAttenuation(1.0f, 0.9f, 0.32f));
+	entity5.AddComponent(ComponentShader(lightingShader));
+	entityManager.AddEntity(entity5);
+
+	Entity entity6("directionLight");
+	entity6.AddComponent(ComponentLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f)));
+	entity6.AddComponent(ComponentLightEmitter(glm::vec3(0.01f, 0.01f, 0.01f), glm::vec3(0.01f, 0.01f, 0.01f), glm::vec3(0.1f, 0.1f, 0.1f)));
+	entity6.AddComponent(ComponentShader(lightingShader));
+	entityManager.AddEntity(entity6);
+
+	Entity entity7("spotlight");
+	entity7.AddComponent(ComponentPosition(glm::vec3(-15.793399f, -0.271867f, 15.654298f)));
+	entity7.AddComponent(ComponentLightDirection(glm::vec3(0.905481f, -0.424199f, -0.012639f)));
+	entity7.AddComponent(ComponentLightEmitter(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.9f)));
+	entity7.AddComponent(ComponentLightAttenuation(1.0f, 0.09f, 0.032f));
+	entity7.AddComponent(ComponentLightCutOff(12.5f, 15.0f));
+	entity7.AddComponent(ComponentShader(lightingShader));
+	entityManager.AddEntity(entity7);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
