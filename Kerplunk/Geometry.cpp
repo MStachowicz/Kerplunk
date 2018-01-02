@@ -15,8 +15,57 @@ std::string Geometry::ToString(primitiveTypes type)
 void Geometry::LoadGeometry(std::string pFilePath)
 {
 	std::ifstream file(pFilePath);
-	std::string line;
 
+	// Reading in the first line to define attributes included
+	// ------------------------------------------------------------------
+	std::string firstLine;
+	std::getline(file, firstLine);
+
+	std::string buf;
+	std::stringstream ss(firstLine);
+	std::vector<std::string> fileAttributes; // Create vector to hold all the seperate attributes read in
+
+	while (ss >> buf)
+		fileAttributes.push_back(buf);
+
+	int offset; // variable to keep track of the offset for each attribute
+
+	// Add the attributes to the vector of attributes this geometry contains data for.
+	for (unsigned int i = 0; i < fileAttributes.size(); i++)
+	{
+		offset = 0;
+		for (unsigned int i = 0; i < attributes.size(); i++)
+			offset += attributes[i].size;
+
+		if (fileAttributes[i] == "Position")
+		{
+			attributes.push_back(Attribute(AttributeTypes::Position, offset));
+		}
+		else if (fileAttributes[i] == "Normal")
+		{
+			attributes.push_back(Attribute(AttributeTypes::Normal, offset));
+		}
+		else if (fileAttributes[i] == "Texture")
+		{
+			attributes.push_back(Attribute(AttributeTypes::Texture, offset));
+		}
+		else if (fileAttributes[i] == "Tangent")
+		{
+			attributes.push_back(Attribute(AttributeTypes::Tangent, offset));
+		}
+		else if (fileAttributes[i] == "Bitangent")
+		{
+			attributes.push_back(Attribute(AttributeTypes::Bitangent, offset));
+		}
+		else
+		{
+			std::cout << "ERROR::GEOMETRY unknown attribute read in from file: " << pFilePath << std::endl;
+		}
+	}
+
+	// Reading in the vertex data
+	// ------------------------------------------------------------------
+	std::string line;
 	while (std::getline(file, line))
 	{
 		float i;
@@ -31,7 +80,12 @@ void Geometry::LoadGeometry(std::string pFilePath)
 		}
 	}
 
-	numberOfTriangles = vertices.size() / 8;
+	// Setting the stride of the data
+	for (int i = 0; i < attributes.size(); i++)
+		stride += attributes[i].size;
+
+	// setting number of triangles before binding the collected data to the GPU
+	numberOfTriangles = vertices.size() / stride;
 	BufferData();
 }
 
@@ -94,18 +148,34 @@ void Geometry::BufferData()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Handle);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	for (int i = 0; i < attributes.size(); i++)
+	{
+		glVertexAttribPointer(
+			attributes[i].shaderLocation,
+			attributes[i].size,
+			attributes[i].dataType,
+			attributes[i].isNormalized,
+			stride * sizeof(float),
+			(void*)(attributes[i].offset * sizeof(float))
+		);
+
+		glEnableVertexAttribArray(attributes[i].shaderLocation);
+	}
 
 	//unbind vao
 	glBindVertexArray(0);
+
+
+	//// position attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//// normal attribute
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	//// texture attribute
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
+
 }
 
 void Geometry::renderElements()

@@ -55,6 +55,9 @@
     <Filter Include="Geometry\Primitives">
       <UniqueIdentifier>{9580fe01-1cc2-4492-9723-81c2bdc5dca6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Geometry\Data">
+      <UniqueIdentifier>{cffec1ae-4742-4c59-982c-3493f79a9d38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -91,9 +94,6 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Geometry.cpp">
-      <Filter>Objects</Filter>
-    </ClCompile>
     <ClCompile Include="ComponentGeometry.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -126,6 +126,12 @@
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Quad.cpp">
+      <Filter>Geometry\Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,9 +174,6 @@
     <ClInclude Include="Mesh.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Objects</Filter>
     </ClInclude>
@@ -203,6 +206,12 @@
     </ClInclude>
     <ClInclude Include="ComponentMaterial.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Quad.h">
+      <Filter>Geometry\Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -296,7 +305,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Cube.txt">
-      <Filter>Geometry</Filter>
+      <Filter>Geometry\Data</Filter>
     </Text>
   </ItemGroup>
 </Project>

@@ -9,8 +9,6 @@
 class IcoSphere
 {
 public:
-
-
 	struct triangleindices
 	{
 		int v1, v2, v3;
