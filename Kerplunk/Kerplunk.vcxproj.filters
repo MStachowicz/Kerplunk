@@ -145,6 +145,7 @@
     <ClCompile Include="SystemLighting.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentLightCutOff.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -237,6 +238,7 @@
     <ClInclude Include="SystemLighting.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="ComponentLightCutOff.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">
