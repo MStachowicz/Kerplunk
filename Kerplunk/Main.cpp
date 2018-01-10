@@ -933,7 +933,7 @@ void createEntities(EntityManager &entityManager)
 	}
 
 	Entity entity2("cube");
-	entity2.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -20.0f)));
+	entity2.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
 	entity2.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity2.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity2.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
@@ -943,20 +943,20 @@ void createEntities(EntityManager &entityManager)
 	texture.AddSpecularTexture("textures/container/specular.png");
 	entity2.AddComponent(texture);
 	entityManager.AddEntity(entity2);
-
+	
 	Entity entity3("sphere");
-	entity3.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
+	entity3.AddComponent(ComponentPosition(glm::vec3(4.0f, 1.0f, -20.0f)));
 	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity3.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-	std::string filepath = "models/primitives/icosphere/4 subdivisions/Ico Sphere.obj";
+	std::string filepath = "models/primitives/icosphere/icosphere4.obj";
 	entity3.AddComponent(ComponentModel(filepath, true, false));
 	entity3.AddComponent(ComponentShader(lightingShader));
 	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity3);
 
 	Entity entity4("quad");
-	entity4.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
+	entity4.AddComponent(ComponentPosition(glm::vec3(6.0f, 1.0f, -20.0f)));
 	entity4.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
