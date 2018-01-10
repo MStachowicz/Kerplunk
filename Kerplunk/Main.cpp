@@ -925,7 +925,7 @@ void createEntities(EntityManager &entityManager)
 		entity1.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 		entity1.AddComponent(ComponentScale(glm::vec3(0.2f)));
 		entity1.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-		std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Objects/nanosuit/nanosuit.obj";
+		std::string filepath = "models/nanosuit/nanosuit.obj";
 		entity1.AddComponent(ComponentModel(filepath, true, true));
 		entity1.AddComponent(ComponentShader(lightingShader));
 		entity1.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
@@ -937,10 +937,10 @@ void createEntities(EntityManager &entityManager)
 	entity2.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity2.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity2.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-	entity2.AddComponent(ComponentGeometry("C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Cube.txt"));
+	entity2.AddComponent(ComponentGeometry("data/cube.txt"));
 	entity2.AddComponent(ComponentShader(lightingShader));
-	ComponentTexture texture("container2.png", true);
-	texture.AddSpecularTexture("container2_specular.png");
+	ComponentTexture texture("textures/container/diffuse.png", true);
+	texture.AddSpecularTexture("textures/container/specular.png");
 	entity2.AddComponent(texture);
 	entityManager.AddEntity(entity2);
 
@@ -949,7 +949,7 @@ void createEntities(EntityManager &entityManager)
 	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity3.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-	std::string filepath = "C:/Users/Michal/Source/Repos/Kerplunk/Kerplunk/Resources/Model primitives/Ico Sphere/4 subdivisions/Ico Sphere.obj";
+	std::string filepath = "models/primitives/icosphere/4 subdivisions/Ico Sphere.obj";
 	entity3.AddComponent(ComponentModel(filepath, true, false));
 	entity3.AddComponent(ComponentShader(lightingShader));
 	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));

@@ -69,6 +69,8 @@ std::string ResourceManager::SetDirectory()
 
 std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 {
+	fileName.insert(0, ResourceManager::directory);
+
 	auto it = ResourceManager::geometryLibrary.find(fileName);
 
 	if (it != ResourceManager::geometryLibrary.end()) // element found, returns the pointer to the element
@@ -91,8 +93,10 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(std::string fileName)
 
 std::shared_ptr<Geometry> ResourceManager::LoadGeometry(Geometry::primitiveTypes primitive)
 {
-	// stores the name of the primitive in a sring to place into the geometry library
+	// stores the name of the primitive in a string to place into the geometry library
 	std::string primitiveFilename = Geometry::ToString(primitive);
+
+
 	auto it = ResourceManager::geometryLibrary.find(primitiveFilename);
 
 	if (it != ResourceManager::geometryLibrary.end()) // element found, returns the pointer to the element
@@ -113,6 +117,8 @@ std::shared_ptr<Geometry> ResourceManager::LoadGeometry(Geometry::primitiveTypes
 
 std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, bool gammeCorrect)
 {
+	fileName.insert(0, ResourceManager::directory);
+
 	auto it = ResourceManager::textureLibrary.find(fileName);
 
 	if (it != ResourceManager::textureLibrary.end()) // element found, returns the pointer to the element
@@ -134,6 +140,8 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(std::string &fileName, boo
 
 std::shared_ptr<Model> ResourceManager::LoadModel(std::string & fileName, bool gammaCorrect)
 {
+	fileName.insert(0, ResourceManager::directory);
+
 	auto it = ResourceManager::modelLibrary.find(fileName);
 
 	if (it != ResourceManager::modelLibrary.end()) // element found, returns the pointer to the element
