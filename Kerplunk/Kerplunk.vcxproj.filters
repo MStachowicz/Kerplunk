@@ -151,7 +151,12 @@
     <ClCompile Include="ComponentDirectionShadowEmitter.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentCollision.cpp" />
+    <ClCompile Include="ComponentCollision.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCollision.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -250,7 +255,12 @@
     <ClInclude Include="ComponentDirectionShadowEmitter.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentCollision.h" />
+    <ClInclude Include="ComponentCollision.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCollision.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.frag">

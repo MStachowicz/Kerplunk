@@ -3,8 +3,12 @@
 
 #include "IComponent.h"
 
+
+
 class ComponentCollision : public IComponent
 {
+
+public:
 	enum collisionPrimitiveType
 	{
 		Sphere,
@@ -12,7 +16,6 @@ class ComponentCollision : public IComponent
 		Point
 	};
 
-public:
 	collisionPrimitiveType type;
 
 	ComponentCollision(collisionPrimitiveType pType);
