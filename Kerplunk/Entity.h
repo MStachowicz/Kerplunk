@@ -17,6 +17,7 @@ public:
 	std::string name; // Name of the entity. Used for debugging purposes.
 	std::vector <std::shared_ptr<IComponent>> componentList; // All the components this entity contains
 	IComponent::ComponentFlags mask; // The bitwise mask used to match appropriate system actions to this entity.
+	static unsigned int entityKey;
 
 
 	Entity(std::string name);
@@ -28,6 +29,12 @@ public:
 	{
 		componentList.push_back(std::make_shared<CompType>(pComponent));
 		updateMask(pComponent);
+	}
+
+	// Compares two entities by their adresses to determine if they are the same entity.
+	bool operator==(const Entity& rhs) const {
+		return
+			this == &rhs;
 	}
 
 private:
