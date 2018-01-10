@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComponentCollision.cpp" />
     <ClCompile Include="ComponentGeometry.cpp" />
     <ClCompile Include="ComponentLightAttenuation.cpp" />
     <ClCompile Include="ComponentLightCutOff.cpp" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComponentCollision.h" />
     <ClInclude Include="ComponentGeometry.h" />
     <ClInclude Include="ComponentLightAttenuation.h" />
     <ClInclude Include="ComponentLightCutOff.h" />
