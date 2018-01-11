@@ -2,8 +2,8 @@
 #define COMPONENTCOLLISION_H
 
 #include "IComponent.h"
-
-
+#include "vector"
+#include <math.h>
 
 class ComponentCollision : public IComponent
 {

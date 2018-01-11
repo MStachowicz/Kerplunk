@@ -1,18 +1,15 @@
-#ifndef SYSTEMLIGHTING_H
-#define SYSTEMLIGHTING_H
+#ifndef SYSTEMCOLLISION_H
+#define SYSTEMCOLLISION_H
 
 #include <iostream>
+#include <glm\glm.hpp>
 #include "ISystem.h"
-#include "ComponentLightAttenuation.h"
-#include "ComponentLightDirection.h"
-#include "ComponentLightCutOff.h"
-#include "ComponentLightEmitter.h"
-#include "ComponentShader.h"
 #include "ComponentCollision.h"
 #include "EntityManager.h"
+#include "ComponentVelocity.h"
+#include "ComponentScale.h"
+#include "EntityManager.h"
 
-class ComponentRotation;
-class ComponentScale;
 class EntityManager;
 
 class SystemCollision : public ISystem

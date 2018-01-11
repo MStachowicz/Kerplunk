@@ -12,6 +12,7 @@
 #include "SystemPhysics.h"
 #include "SystemRender.h"
 #include "SystemLighting.h"
+#include "SystemCollision.h"
 #include "EntityManager.h"
 #include "Entity.h"
 #include "ComponentPosition.h"
@@ -22,6 +23,7 @@
 #include "ComponentTexture.h"
 #include "ComponentMaterial.h"
 #include "ComponentShader.h"
+#include "ComponentCollision.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -72,9 +74,11 @@ Model Desk;
 // Component managers
 SystemManager systemManager;
 EntityManager entityManager;
+
 SystemPhysics systemPhysics;
 SystemRender systemRender;
 SystemLighting systemLighting;
+SystemCollision systemCollision(entityManager);
 
 std::shared_ptr<Shader> lightingShader;
 
@@ -126,6 +130,8 @@ int main()
 	systemManager.AddSystem(systemPhysics);
 	systemManager.AddSystem(systemLighting); // Lighting must be performed before render
 	systemManager.AddSystem(systemRender);
+	systemManager.AddSystem(systemCollision);
+
 
 	// Build and compile shader
 	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
@@ -945,18 +951,29 @@ void createEntities(EntityManager &entityManager)
 	entityManager.AddEntity(entity2);
 	
 	Entity entity3("sphere");
-	entity3.AddComponent(ComponentPosition(glm::vec3(4.0f, 1.0f, -20.0f)));
+	entity3.AddComponent(ComponentPosition(glm::vec3(-2.0f, 1.0f, -10.0f)));
 	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
-	entity3.AddComponent(ComponentScale(glm::vec3(1.0f)));
-	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-	std::string filepath = "models/primitives/icosphere/icosphere4.obj";
-	entity3.AddComponent(ComponentModel(filepath, true, false));
+	entity3.AddComponent(ComponentScale(glm::vec3(0.5f)));
+	entity3.AddComponent(ComponentVelocity(glm::vec3(0.01f, 0.0f, 0.0f)));
+	entity3.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
+	entity3.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
 	entity3.AddComponent(ComponentShader(lightingShader));
 	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity3);
 
+	Entity entity8("sphere2");
+	entity8.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -10.0f)));
+	entity8.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+	entity8.AddComponent(ComponentScale(glm::vec3(0.5f)));
+	entity8.AddComponent(ComponentVelocity(glm::vec3(-0.01f, 0.0f, 0.0f)));
+	entity8.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
+	entity8.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
+	entity8.AddComponent(ComponentShader(lightingShader));
+	entity8.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	entityManager.AddEntity(entity8);
+
 	Entity entity4("quad");
-	entity4.AddComponent(ComponentPosition(glm::vec3(6.0f, 1.0f, -20.0f)));
+	entity4.AddComponent(ComponentPosition(glm::vec3(8.0f, 1.0f, -20.0f)));
 	entity4.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
