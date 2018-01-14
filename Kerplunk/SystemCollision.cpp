@@ -30,9 +30,11 @@ void SystemCollision::OnAction(Entity &entity)
 					switch (collisionComp->type)
 					{
 					case ComponentCollision::collisionPrimitiveType::Sphere:
+						
 						switch (collisionComp2->type)
 						{
 						case ComponentCollision::collisionPrimitiveType::Sphere:
+						{
 							// SPHERE V SPHERE CHECK
 							// --------------------------------------------------------------------------------------------------
 							// The vector from the sphere to the sphere being checked against.
@@ -52,6 +54,12 @@ void SystemCollision::OnAction(Entity &entity)
 							}
 							break;
 						}
+						case ComponentCollision::collisionPrimitiveType::Plane:
+						{						
+							CollisionSpherePlane(entity, entityManager.entityList[i]);				
+							break;
+						}
+						}
 						break;
 					}
 				}
@@ -63,6 +71,41 @@ void SystemCollision::OnAction(Entity &entity)
 
 	}
 }
+
+// Finds the magnitude of the vector between the sphere and the closest point on a plane comparing it to the sphere radius.
+bool SystemCollision::CollisionSpherePlane(Entity& pSphereEntity, Entity& pPlaneEntity)
+{
+	std::shared_ptr<ComponentPosition> spherePos = std::dynamic_pointer_cast<ComponentPosition> (pSphereEntity.FindComponent(2));
+	std::shared_ptr<ComponentScale> sphereScale = std::dynamic_pointer_cast<ComponentScale> (pSphereEntity.FindComponent(8));
+	std::shared_ptr<ComponentCollision> collisionComp = std::dynamic_pointer_cast<ComponentCollision> (pSphereEntity.FindComponent(32768));
+
+	glm::vec3 sphereToClosestPoint = ClosestPtPlane(pPlaneEntity, spherePos->position) - spherePos->position;
+	// The signed distance from the sphere center to the closest point on the plane
+	float distance = glm::length(sphereToClosestPoint);
+
+	// If a collision is detected log it to the collision component of the sphere.
+	if (abs(distance) <= 1 * sphereScale->scale.x)
+	{
+		collisionComp->AddCollision(pPlaneEntity, sphereToClosestPoint);
+		return true;
+	}
+	else
+		return false;
+}
+
+// Returns the closest point on a plane to a point.
+glm::vec3 SystemCollision::ClosestPtPlane(Entity& pPlane, glm::vec3& pPoint)
+{
+	std::shared_ptr<ComponentPosition> planePos = std::dynamic_pointer_cast<ComponentPosition> (pPlane.FindComponent(2));	
+
+	// pg 165 collision detection
+	glm::vec3 planeNormal = glm::vec3(0, 0, 1);
+	// calculates how many units of plane normal length equal the point
+	float t = glm::dot(planeNormal, (pPoint - planePos->position));
+
+	return glm::vec3(pPoint - (t * planeNormal));
+}
+
 
 SystemCollision::~SystemCollision()
 {

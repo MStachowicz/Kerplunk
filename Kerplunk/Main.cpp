@@ -951,17 +951,17 @@ void createEntities(EntityManager &entityManager)
 	entityManager.AddEntity(entity2);
 	
 	Entity entity3("sphere");
-	entity3.AddComponent(ComponentPosition(glm::vec3(-2.0f, 1.0f, -10.0f)));
+	entity3.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -5.0f)));
 	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity3.AddComponent(ComponentScale(glm::vec3(0.5f)));
-	entity3.AddComponent(ComponentVelocity(glm::vec3(0.01f, 0.0f, 0.0f)));
+	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, -0.005f)));
 	entity3.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
 	entity3.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
 	entity3.AddComponent(ComponentShader(lightingShader));
 	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity3);
 
-	Entity entity8("sphere2");
+	/*Entity entity8("sphere2");
 	entity8.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -10.0f)));
 	entity8.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity8.AddComponent(ComponentScale(glm::vec3(0.5f)));
@@ -970,13 +970,14 @@ void createEntities(EntityManager &entityManager)
 	entity8.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
 	entity8.AddComponent(ComponentShader(lightingShader));
 	entity8.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
-	entityManager.AddEntity(entity8);
+	entityManager.AddEntity(entity8);*/
 
 	Entity entity4("quad");
-	entity4.AddComponent(ComponentPosition(glm::vec3(8.0f, 1.0f, -20.0f)));
+	entity4.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -10.0f)));
 	entity4.AddComponent(ComponentRotation(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentScale(glm::vec3(1.0f)));
 	entity4.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
+	entity4.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
 	entity4.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
 	entity4.AddComponent(ComponentShader(lightingShader));
 	entity4.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));

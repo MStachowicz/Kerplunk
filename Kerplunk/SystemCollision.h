@@ -4,11 +4,10 @@
 #include <iostream>
 #include <glm\glm.hpp>
 #include "ISystem.h"
-#include "ComponentCollision.h"
 #include "EntityManager.h"
+#include "ComponentCollision.h"
 #include "ComponentVelocity.h"
 #include "ComponentScale.h"
-#include "EntityManager.h"
 
 class EntityManager;
 
@@ -20,5 +19,7 @@ public:
 	~SystemCollision();
 private:
 	EntityManager& entityManager;
+	bool CollisionSpherePlane(Entity & pSphereEntity, Entity &pCubeEntity);
+	glm::vec3 ClosestPtPlane(Entity& pPlane, glm::vec3& pPoint);
 };
 #endif
