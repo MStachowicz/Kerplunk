@@ -5,6 +5,7 @@
 #include "IComponent.h"
 #include "ComponentPosition.h"
 #include "ComponentVelocity.h"
+#include "ComponentCollision.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>

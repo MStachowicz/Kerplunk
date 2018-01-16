@@ -17,6 +17,18 @@ void SystemPhysics::OnAction(Entity &entity)
 
 		Motion(posComp->position, velComp->Velocity, 0.5f);
 	}
+
+	// Check every entity with collision component for collisions in previous run.
+	if (((entity.mask & IComponent::COMPONENT_COLLISION) == IComponent::COMPONENT_COLLISION))
+	{
+		std::shared_ptr<ComponentCollision> collisionComp = std::dynamic_pointer_cast<ComponentCollision> (entity.FindComponent(32768));
+
+		// Perform the collision response and remove the collision from the vector of collisions.
+		for (unsigned int i = 0; i < collisionComp->collisions.size(); i++)
+		{
+			collisionComp->collisions.erase(collisionComp->collisions.begin() +  i);
+		}
+	}
 }
 
 void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 pVelocity, float deltaTime)
