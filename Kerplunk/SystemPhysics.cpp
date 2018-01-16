@@ -23,10 +23,11 @@ void SystemPhysics::OnAction(Entity &entity)
 	{
 		std::shared_ptr<ComponentCollision> collisionComp = std::dynamic_pointer_cast<ComponentCollision> (entity.FindComponent(32768));
 
-		// Perform the collision response and remove the collision from the vector of collisions.
-		for (unsigned int i = 0; i < collisionComp->collisions.size(); i++)
+		// Perform the collision response and remove the collision from the vector of collisions from the end down.
+		for (unsigned int i = collisionComp->collisions.size(); i > 0; i--)
 		{
-			collisionComp->collisions.erase(collisionComp->collisions.begin() +  i);
+			//collisionComp->collisions.erase(collisionComp->collisions.begin() + i);
+			collisionComp->collisions.pop_back();
 		}
 	}
 }
