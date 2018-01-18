@@ -93,7 +93,7 @@ bool SystemCollision::CollisionSpherePlane(Entity& pSphereEntity, Entity& pPlane
 	// If a collision is detected log it to the collision component of the sphere.
 	if (abs(distance) <= 1 * sphereScale->scale.x)
 	{
-		collisionComp->AddCollision(pPlaneEntity, sphereToClosestPoint);
+		collisionComp->AddCollision(pPlaneEntity, sphereToClosestPoint + spherePos->position);
 		return true;
 	}
 	else
