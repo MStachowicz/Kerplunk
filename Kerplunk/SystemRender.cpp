@@ -4,6 +4,13 @@ SystemRender::SystemRender() : ISystem("SystemRender", (IComponent::ComponentFla
 	IComponent::COMPONENT_SHADER))
 {}
 
+void SystemRender::OnLoad(Entity & entity) 
+{
+	if ((entity.mask & MASK) == MASK)
+	{
+	}
+}
+
 void SystemRender::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
@@ -85,5 +92,6 @@ void SystemRender::OnAction(Entity &entity)
 		}
 	}
 }
+
 
 SystemRender::~SystemRender() {}

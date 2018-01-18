@@ -4,6 +4,13 @@ SystemLighting::SystemLighting() : ISystem("SystemLighting", (IComponent::Compon
 {
 }
 
+void SystemLighting::OnLoad(Entity & entity) 
+{
+	if ((entity.mask & MASK) == MASK)
+	{
+	}
+}
+
 void SystemLighting::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
@@ -84,6 +91,7 @@ void SystemLighting::OnAction(Entity &entity)
 		}
 	}
 }
+
 
 SystemLighting::~SystemLighting()
 {

@@ -8,6 +8,7 @@ class ComponentPosition : public IComponent
 {
 public:
 	glm::vec3 position;
+	glm::vec3 lastPosition;
 
 	ComponentPosition();
 	ComponentPosition(float x, float y, float z);

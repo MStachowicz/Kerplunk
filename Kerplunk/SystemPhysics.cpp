@@ -3,6 +3,20 @@
 SystemPhysics::SystemPhysics() : ISystem("SystemPhysics", (IComponent::ComponentFlags)(IComponent::COMPONENT_POSITION | IComponent::COMPONENT_VELOCITY))
 {}
 
+// Applies the velocity to all the entities 
+void SystemPhysics::OnLoad(Entity & entity) 
+{
+	if ((entity.mask & MASK) == MASK)
+	{
+		std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
+		std::shared_ptr<ComponentVelocity> velComp = std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
+
+		// If the positions are the same (no velocity, apply the velocity component)
+		if (posComp->lastPosition == posComp->position)
+			posComp->lastPosition -= velComp->Velocity;
+	}
+}
+
 void SystemPhysics::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
@@ -11,11 +25,11 @@ void SystemPhysics::OnAction(Entity &entity)
 
 		std::shared_ptr<ComponentPosition> posComp =
 			std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
-		
+
 		std::shared_ptr<ComponentVelocity> velComp =
 			std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
 
-		Motion(posComp->position, velComp->Velocity, 0.5f);
+		Motion(posComp->position, posComp->lastPosition, 0.5f);
 	}
 
 	// Check every entity with collision component for collisions in previous run.
@@ -24,17 +38,42 @@ void SystemPhysics::OnAction(Entity &entity)
 		std::shared_ptr<ComponentCollision> collisionComp = std::dynamic_pointer_cast<ComponentCollision> (entity.FindComponent(32768));
 
 		// Perform the collision response and remove the collision from the vector of collisions from the end down.
-		for (unsigned int i = collisionComp->collisions.size(); i > 0; i--)
+		for (unsigned int i = collisionComp->collisions.size(); i-- > 0;)
 		{
-			//collisionComp->collisions.erase(collisionComp->collisions.begin() + i);
+			std::shared_ptr<ComponentCollision> CollidedCollisionComp = std::dynamic_pointer_cast<ComponentCollision>(collisionComp->collisions[i].entityCollidedWith.FindComponent(32768));
+
+			switch (collisionComp->type)
+			{
+			case ComponentCollision::collisionPrimitiveType::Sphere:
+
+				switch (CollidedCollisionComp->type)
+				{
+				case ComponentCollision::collisionPrimitiveType::Plane: // Sphere on plane collision response
+					break;
+				}
+
+				break;
+			}
+
+			//collisionComp->collisions.erase(collisionComp->collisions.begin() + i); // this method requires writing the gang of three in the collisionData struct
 			collisionComp->collisions.pop_back();
 		}
 	}
 }
 
-void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 pVelocity, float deltaTime)
+
+// Performs the physics calculations to apply motion through the verlet integration method.
+void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 &pLastPosition, float deltaTime)
 {
-	pPosition += pVelocity * deltaTime;
+	// Calculating the velocity
+	glm::vec3 velocity = glm::vec3(pPosition - pLastPosition);
+	// Setting the previous position as the current position.
+	pLastPosition = pPosition;
+	// Apply the velocity
+	pPosition += velocity;
+
+
+	//pPosition += pVelocity * deltaTime;
 }
 
 SystemPhysics::~SystemPhysics() {}

@@ -4,6 +4,13 @@ SystemCollision::SystemCollision(EntityManager& pManager) : ISystem("SystemColli
 {
 }
 
+void SystemCollision::OnLoad(Entity &entity) 
+{
+	if ((entity.mask & MASK) == MASK)
+	{
+	}
+}
+
 void SystemCollision::OnAction(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)

@@ -21,5 +21,16 @@ void SystemManager::ActionSystems(EntityManager & manager)
 	}
 }
 
+void SystemManager::LoadSystems(EntityManager &manager)
+{
+	for (int i = 0; i < systemList.size(); i++)
+	{
+		for (int j = 0; j < manager.entityList.size(); j++)
+		{
+			systemList[i]->OnLoad(manager.entityList[j]);
+		}
+	}
+}
+
 
 SystemManager::~SystemManager() {}

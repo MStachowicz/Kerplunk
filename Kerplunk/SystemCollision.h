@@ -15,7 +15,8 @@ class SystemCollision : public ISystem
 {
 public:
 	SystemCollision(EntityManager& pManager);
-	void OnAction(Entity & entity);
+	void OnAction(Entity &entity);
+	void OnLoad(Entity &entity);
 	~SystemCollision();
 private:
 	EntityManager& entityManager;

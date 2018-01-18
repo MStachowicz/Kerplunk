@@ -16,7 +16,8 @@ class SystemPhysics : public ISystem
 public:
 	SystemPhysics();
 	void OnAction(Entity & entity);
-	void Motion(glm::vec3 &pPosition, glm::vec3 pVelocity,  float deltaTime);
+	void OnLoad(Entity &entity);
+	void Motion(glm::vec3 &pPosition, glm::vec3 &pLastPosition, float deltaTime);
 	~SystemPhysics();
 };
 #endif

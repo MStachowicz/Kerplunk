@@ -15,6 +15,7 @@ public:
 	const IComponent::ComponentFlags MASK;
 
 	virtual void OnAction(Entity &entity) = 0;
+	virtual void OnLoad(Entity &entity) = 0;
 	virtual ~ISystem();
 };
 #endif

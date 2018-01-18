@@ -22,6 +22,7 @@ class SystemRender : public ISystem
 public:
 	SystemRender();
 	void OnAction(Entity &entity);
+	void OnLoad(Entity &entity);
 	~SystemRender();
 };
 #endif

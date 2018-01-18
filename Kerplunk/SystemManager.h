@@ -16,6 +16,8 @@ public:
 	void AddSystem(ISystem &system);
 	// Calls every system action on every entity. Performs the actions if the mask of entity and system match.
 	void ActionSystems(EntityManager &manager);
+	// Calls every system OnLoad function to prepare the entities for the update/render cycle as well as the systems.
+	void LoadSystems(EntityManager &manager);
 
 	~SystemManager();
 };

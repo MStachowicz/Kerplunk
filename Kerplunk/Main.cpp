@@ -126,11 +126,11 @@ int main()
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 	lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 
-	createEntities(entityManager);
 	systemManager.AddSystem(systemPhysics);
 	systemManager.AddSystem(systemLighting); // Lighting must be performed before render
 	systemManager.AddSystem(systemRender);
 	systemManager.AddSystem(systemCollision);
+	createEntities(entityManager);
 
 
 	// Build and compile shader
@@ -665,7 +665,6 @@ int main()
 		glBindVertexArray(0);
 	}
 
-
 	//  ------------------------------------------------ RENDER LOOP ------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
@@ -1004,6 +1003,8 @@ void createEntities(EntityManager &entityManager)
 	entity7.AddComponent(ComponentLightCutOff(12.5f, 15.0f));
 	entity7.AddComponent(ComponentShader(lightingShader));
 	entityManager.AddEntity(entity7);
+
+	systemManager.LoadSystems(entityManager);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
