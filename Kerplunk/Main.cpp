@@ -127,9 +127,9 @@ int main()
 	lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 
 	systemManager.AddSystem(systemPhysics);
+	systemManager.AddSystem(systemCollision);
 	systemManager.AddSystem(systemLighting); // Lighting must be performed before render
 	systemManager.AddSystem(systemRender);
-	systemManager.AddSystem(systemCollision);
 	createEntities(entityManager);
 
 
@@ -927,7 +927,7 @@ void createEntities(EntityManager &entityManager)
 	{
 		Entity entity1("nanosuit");
 		entity1.AddComponent(ComponentPosition(glm::vec3(0.0f + i, 1.0f, -20.0f)));
-		entity1.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+		entity1.AddComponent(ComponentRotation(glm::vec3(90.0f, 0.0f, 0.0f)));
 		entity1.AddComponent(ComponentScale(glm::vec3(0.2f)));
 		entity1.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
 		std::string filepath = "models/nanosuit/nanosuit.obj";

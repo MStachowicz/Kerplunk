@@ -157,6 +157,9 @@
     <ClCompile Include="SystemCollision.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentRigidBody.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h">
@@ -260,6 +263,9 @@
     </ClInclude>
     <ClInclude Include="SystemCollision.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentRigidBody.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,5 +19,8 @@ public:
 	void OnLoad(Entity &entity);
 	void Motion(glm::vec3 &pPosition, glm::vec3 &pLastPosition, float deltaTime);
 	~SystemPhysics();
+
+private:
+	void spherePlaneResponse(Entity &pSphere, Entity &pPlane, ComponentCollision::CollisionData &pCollisionData);
 };
 #endif

@@ -4,7 +4,7 @@ SystemPhysics::SystemPhysics() : ISystem("SystemPhysics", (IComponent::Component
 {}
 
 // Applies the velocity to all the entities 
-void SystemPhysics::OnLoad(Entity & entity) 
+void SystemPhysics::OnLoad(Entity & entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{
@@ -49,6 +49,7 @@ void SystemPhysics::OnAction(Entity &entity)
 				switch (CollidedCollisionComp->type)
 				{
 				case ComponentCollision::collisionPrimitiveType::Plane: // Sphere on plane collision response
+					spherePlaneResponse(entity, collisionComp->collisions[i].entityCollidedWith, collisionComp->collisions[i]);
 					break;
 				}
 
@@ -77,3 +78,12 @@ void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 &pLastPosition, float
 }
 
 SystemPhysics::~SystemPhysics() {}
+
+void SystemPhysics::spherePlaneResponse(Entity &pSphere, Entity &pPlane, ComponentCollision::CollisionData &pCollisionData)
+{
+	std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (pSphere.FindComponent(2));
+	std::shared_ptr<ComponentVelocity> velComp = std::dynamic_pointer_cast<ComponentVelocity> (pSphere.FindComponent(16));
+
+	posComp->lastPosition = posComp->lastPosition;// pCollisionData.collisionPoint;
+
+}

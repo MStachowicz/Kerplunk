@@ -141,6 +141,7 @@
     <ClCompile Include="ComponentLightDirection.cpp" />
     <ClCompile Include="ComponentLightEmitter.cpp" />
     <ClCompile Include="ComponentMaterial.cpp" />
+    <ClCompile Include="ComponentRigidBody.cpp" />
     <ClCompile Include="ComponentShader.cpp" />
     <ClCompile Include="ComponentDirectionShadowEmitter.cpp" />
     <ClCompile Include="ComponentTexture.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="ComponentLightDirection.h" />
     <ClInclude Include="ComponentLightEmitter.h" />
     <ClInclude Include="ComponentMaterial.h" />
+    <ClInclude Include="ComponentRigidBody.h" />
     <ClInclude Include="ComponentShader.h" />
     <ClInclude Include="ComponentDirectionShadowEmitter.h" />
     <ClInclude Include="ComponentTexture.h" />
