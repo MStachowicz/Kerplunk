@@ -1,6 +1,6 @@
 #include "SystemPhysics.h"
 
-SystemPhysics::SystemPhysics() : ISystem("SystemPhysics", (IComponent::ComponentFlags)(IComponent::COMPONENT_POSITION | IComponent::COMPONENT_VELOCITY))
+SystemPhysics::SystemPhysics() : ISystem("SystemPhysics", (IComponent::ComponentFlags)(IComponent::COMPONENT_RIGID_BODY))
 {}
 
 // Applies the velocity to all the entities 
@@ -8,28 +8,40 @@ void SystemPhysics::OnLoad(Entity & entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{
-		std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
-		std::shared_ptr<ComponentVelocity> velComp = std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
-
-		// If the positions are the same (no velocity, apply the velocity component)
-		if (posComp->lastPosition == posComp->position)
-			posComp->lastPosition -= velComp->Velocity;
 	}
+}
+
+// Performs the Euler integration to find the position of the body after a timestep forward.
+void SystemPhysics::RigidBodyMotion(glm::vec3 &pPosition, glm::vec3 &pVelocity, float deltaTime)
+{
+	pPosition = pPosition + (deltaTime * pVelocity);
 }
 
 void SystemPhysics::OnAction(Entity &entity)
 {
+	//std::cout << "System: " << name << " Performing action on entity: " << entity.name << std::endl;
+
 	if ((entity.mask & MASK) == MASK)
 	{
-		//std::cout << "System: " << name << " Performing action on entity: " << entity.name << std::endl;
+		std::shared_ptr<ComponentRigidBody> RigidBodyComponent =
+			std::dynamic_pointer_cast<ComponentRigidBody> (entity.FindComponent(65536));
 
-		std::shared_ptr<ComponentPosition> posComp =
-			std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
+		RigidBodyMotion(RigidBodyComponent->position, RigidBodyComponent->velocity, timeStep);
 
-		std::shared_ptr<ComponentVelocity> velComp =
-			std::dynamic_pointer_cast<ComponentVelocity> (entity.FindComponent(16));
+		// Applying gravity
+		RigidBodyComponent->forcesApplied.push_back(ComponentRigidBody::Force(RigidBodyComponent->position, glm::vec3(0.0f, -9.81f, 0.0f)));
 
-		Motion(posComp->position, posComp->lastPosition, 0.5f);
+		// Resolve all the linear forces applied to the body since the last physics tick
+		glm::vec3 resultantForce = glm::vec3(0.0f);
+
+		for (unsigned int i = RigidBodyComponent->forcesApplied.size(); i-- > 0;)
+		{
+			resultantForce += RigidBodyComponent->forcesApplied[i].force;
+			RigidBodyComponent->forcesApplied.pop_back();
+		}
+
+		// Setting the new velocity integrated from the current velocity and acceleration
+		RigidBodyComponent->velocity = RigidBodyComponent->velocity + (timeStep * (resultantForce / RigidBodyComponent->mass));
 	}
 
 	// Check every entity with collision component for collisions in previous run.
@@ -60,21 +72,6 @@ void SystemPhysics::OnAction(Entity &entity)
 			collisionComp->collisions.pop_back();
 		}
 	}
-}
-
-
-// Performs the physics calculations to apply motion through the verlet integration method.
-void SystemPhysics::Motion(glm::vec3 &pPosition, glm::vec3 &pLastPosition, float deltaTime)
-{
-	// Calculating the velocity
-	glm::vec3 velocity = glm::vec3(pPosition - pLastPosition);
-	// Setting the previous position as the current position.
-	pLastPosition = pPosition;
-	// Apply the velocity
-	pPosition += velocity;
-
-
-	//pPosition += pVelocity * deltaTime;
 }
 
 SystemPhysics::~SystemPhysics() {}

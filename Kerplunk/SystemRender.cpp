@@ -1,6 +1,6 @@
 #include "SystemRender.h"
 
-SystemRender::SystemRender() : ISystem("SystemRender", (IComponent::ComponentFlags)(IComponent::COMPONENT_POSITION | IComponent::COMPONENT_ROTATION | IComponent::COMPONENT_SCALE |
+SystemRender::SystemRender() : ISystem("SystemRender", (IComponent::ComponentFlags)(IComponent::COMPONENT_RIGID_BODY | IComponent::COMPONENT_SCALE |
 	IComponent::COMPONENT_SHADER))
 {}
 
@@ -25,20 +25,21 @@ void SystemRender::OnAction(Entity &entity)
 			if (((entity.mask & IComponent::COMPONENT_TEXTURE) == IComponent::COMPONENT_TEXTURE) ||
 				((entity.mask & IComponent::COMPONENT_MATERIAL) == IComponent::COMPONENT_MATERIAL))
 			{
-				std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
-				std::shared_ptr<ComponentRotation> rotComp = std::dynamic_pointer_cast<ComponentRotation> (entity.FindComponent(4));
+				//std::shared_ptr<ComponentPosition> posComp = std::dynamic_pointer_cast<ComponentPosition> (entity.FindComponent(2));
+				//std::shared_ptr<ComponentRotation> rotComp = std::dynamic_pointer_cast<ComponentRotation> (entity.FindComponent(4));
 				std::shared_ptr<ComponentScale> scaleComp = std::dynamic_pointer_cast<ComponentScale> (entity.FindComponent(8));
+				std::shared_ptr<ComponentRigidBody> RigidBodyComponent = std::dynamic_pointer_cast<ComponentRigidBody> (entity.FindComponent(65536));
 				std::shared_ptr<ComponentShader> shaderComp = std::dynamic_pointer_cast<ComponentShader> (entity.FindComponent(128));
 
 				shaderComp->shader->use();
 
 				// Setting the model matrix of the entity
 				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, posComp->position);
+				model = glm::translate(model, RigidBodyComponent->position);
 
-				model = glm::rotate(model, glm::radians(rotComp->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotComp->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(rotComp->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				//model = glm::rotate(model, glm::radians(rotComp->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				//model = glm::rotate(model, glm::radians(rotComp->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				//model = glm::rotate(model, glm::radians(rotComp->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				model = glm::scale(model, scaleComp->scale);
 				

@@ -12,6 +12,7 @@
 #include "ComponentModel.h"
 #include "ComponentGeometry.h"
 #include "ComponentShader.h"
+#include "ComponentRigidBody.h"
 #include <memory>
 #include <glm\glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

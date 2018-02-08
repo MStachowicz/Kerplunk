@@ -24,6 +24,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentShader.h"
 #include "ComponentCollision.h"
+#include "ComponentRigidBody.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -44,6 +45,7 @@ Camera camera(glm::vec3(0.0f, 1.0f, 3.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
 bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
+bool firstPhysicsTick = true; // Whether the physics system is being used for first frame, resets the deltatime to 0 preventing large timestep.
 
 // TRANSFORMATION MATRICES FOR COORDINATE SYSTEMS
 glm::mat4 model; // Model matrix, transforms the vertex coordinates to world coordinates.
@@ -673,6 +675,8 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		if (firstPhysicsTick ? firstPhysicsTick = false : systemPhysics.timeStep = 1)
+
 		// input
 		processInput(window);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);;
@@ -926,10 +930,8 @@ void createEntities(EntityManager &entityManager)
 	for (int i = 0; i < 1; i++)
 	{
 		Entity entity1("nanosuit");
-		entity1.AddComponent(ComponentPosition(glm::vec3(0.0f + i, 1.0f, -20.0f)));
-		entity1.AddComponent(ComponentRotation(glm::vec3(90.0f, 0.0f, 0.0f)));
+		//entity1.AddComponent(ComponentRigidBody(glm::vec3(0.0f + i, 1.0f, -20.0f)));
 		entity1.AddComponent(ComponentScale(glm::vec3(0.2f)));
-		entity1.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
 		std::string filepath = "models/nanosuit/nanosuit.obj";
 		entity1.AddComponent(ComponentModel(filepath, true, true));
 		entity1.AddComponent(ComponentShader(lightingShader));
@@ -948,12 +950,10 @@ void createEntities(EntityManager &entityManager)
 	texture.AddSpecularTexture("textures/container/specular.png");
 	entity2.AddComponent(texture);
 	entityManager.AddEntity(entity2);
-	
+
 	Entity entity3("sphere");
-	entity3.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -5.0f)));
-	entity3.AddComponent(ComponentRotation(glm::vec3(1.0f)));
+	entity3.AddComponent(ComponentRigidBody(glm::vec3(0.0f, 0.0f, 0.0f)));
 	entity3.AddComponent(ComponentScale(glm::vec3(0.5f)));
-	entity3.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, -0.005f)));
 	entity3.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
 	entity3.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
 	entity3.AddComponent(ComponentShader(lightingShader));
