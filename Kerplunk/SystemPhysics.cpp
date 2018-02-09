@@ -26,22 +26,29 @@ void SystemPhysics::OnAction(Entity &entity)
 		std::shared_ptr<ComponentRigidBody> RigidBodyComponent =
 			std::dynamic_pointer_cast<ComponentRigidBody> (entity.FindComponent(65536));
 
-		RigidBodyMotion(RigidBodyComponent->position, RigidBodyComponent->velocity, timeStep);
-
-		// Applying gravity
-		RigidBodyComponent->forcesApplied.push_back(ComponentRigidBody::Force(RigidBodyComponent->position, glm::vec3(0.0f, -9.81f, 0.0f)));
-
-		// Resolve all the linear forces applied to the body since the last physics tick
-		glm::vec3 resultantForce = glm::vec3(0.0f);
-
-		for (unsigned int i = RigidBodyComponent->forcesApplied.size(); i-- > 0;)
+		if (timeStep != 0)
 		{
-			resultantForce += RigidBodyComponent->forcesApplied[i].force;
-			RigidBodyComponent->forcesApplied.pop_back();
+
+			// LINEAR DYNAMICS
+			//------------------------------------------------------------------------------------------------------
+			RigidBodyMotion(RigidBodyComponent->position, RigidBodyComponent->velocity, timeStep);
+
+			// Applying gravity
+			RigidBodyComponent->forcesApplied.push_back(ComponentRigidBody::Force(RigidBodyComponent->position, glm::vec3(0.0f, -9.81f, 0.0f)));
+
+			// Resolve all the linear forces applied to the body since the last physics tick
+			glm::vec3 resultantForce = glm::vec3(0.0f);
+
+			for (unsigned int i = RigidBodyComponent->forcesApplied.size(); i-- > 0;)
+			{
+				resultantForce += RigidBodyComponent->forcesApplied[i].force;
+				RigidBodyComponent->forcesApplied.pop_back();
+			}
+
+			// Setting the new velocity integrated from the current velocity and acceleration through all the forces applied to the body since the last tick
+			RigidBodyComponent->velocity = RigidBodyComponent->velocity + (timeStep * (resultantForce / RigidBodyComponent->mass));
 		}
 
-		// Setting the new velocity integrated from the current velocity and acceleration
-		RigidBodyComponent->velocity = RigidBodyComponent->velocity + (timeStep * (resultantForce / RigidBodyComponent->mass));
 	}
 
 	// Check every entity with collision component for collisions in previous run.

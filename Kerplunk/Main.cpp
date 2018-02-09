@@ -675,7 +675,7 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		if (firstPhysicsTick ? firstPhysicsTick = false : systemPhysics.timeStep = 1)
+		if (firstPhysicsTick ? firstPhysicsTick = false : systemPhysics.timeStep = deltaTime)
 
 		// input
 		processInput(window);
@@ -758,8 +758,10 @@ int main()
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		float viewDistanceFar = 2000.0f, viewDistanceNear = 0.1f;
 		// Projection + view set
-		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), 0.1f, 100.0f);
+		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), viewDistanceNear, viewDistanceFar);
 		view = camera.GetViewMatrix();
 
 		// Set matrices in the uniform buffer object (sets the projection and view matrices)
@@ -952,7 +954,13 @@ void createEntities(EntityManager &entityManager)
 	entityManager.AddEntity(entity2);
 
 	Entity entity3("sphere");
-	entity3.AddComponent(ComponentRigidBody(glm::vec3(0.0f, 0.0f, 0.0f)));
+
+	ComponentRigidBody body = ComponentRigidBody(glm::vec3(0.0f, 1.0f, -5.0f));
+	body.forcesApplied.push_back(ComponentRigidBody::Force(body.position, glm::vec3(0.0f, 3000, -3000.0f)));
+
+
+	entity3.AddComponent(body);
+	
 	entity3.AddComponent(ComponentScale(glm::vec3(0.5f)));
 	entity3.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
 	entity3.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
