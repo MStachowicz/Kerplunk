@@ -13,7 +13,7 @@ class SystemLighting : public ISystem
 {
 public:
 	SystemLighting();
-	void OnAction(Entity & entity);
+	void Tick(Entity & entity);
 	void OnLoad(Entity &entity);
 	~SystemLighting();
 };

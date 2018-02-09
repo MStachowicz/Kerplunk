@@ -17,14 +17,23 @@
 class SystemPhysics : public ISystem
 {
 public:
-	// The current timeStep being applied to physics calculations
-	float timeStep = 0;
-
+	// The total time the simulation has been running
+	float SimulationTime = 0;
+	// Time since the last physics tick
+	float tickDeltaTime;
+	// Time of the last physics tick
+	float tickLastTime;
+	// Whether the gravity is being applied to all the rigid bodies
+	bool applyGravity = true;
+	// Whether the simulation is paused.
+	bool pauseSimulation = false;
 
 	SystemPhysics();
-	void OnAction(Entity & entity);
+	void Tick(Entity & entity);
 	void OnLoad(Entity &entity);
-	void RigidBodyMotion(glm::vec3 &pPosition, glm::vec3 &pVelocity, float deltaTime);
+	void UpdateBodyPosition(glm::vec3 &pPosition, glm::vec3 &pVelocity, float tickDeltaTime);
+	void UpdateBodyVelocity(glm::vec3 &pVelocity, glm::vec3 &resultantForce, const float &pMass, const float &tickDeltaTime);
+	void UpdateTiming(float &tickDeltaTime);
 	~SystemPhysics();
 
 private:

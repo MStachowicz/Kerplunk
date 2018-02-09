@@ -11,7 +11,7 @@ void SystemLighting::OnLoad(Entity & entity)
 	}
 }
 
-void SystemLighting::OnAction(Entity &entity)
+void SystemLighting::Tick(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{

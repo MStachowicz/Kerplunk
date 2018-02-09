@@ -45,7 +45,6 @@ Camera camera(glm::vec3(0.0f, 1.0f, 3.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
 bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
-bool firstPhysicsTick = true; // Whether the physics system is being used for first frame, resets the deltatime to 0 preventing large timestep.
 
 // TRANSFORMATION MATRICES FOR COORDINATE SYSTEMS
 glm::mat4 model; // Model matrix, transforms the vertex coordinates to world coordinates.
@@ -675,7 +674,7 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		if (firstPhysicsTick ? firstPhysicsTick = false : systemPhysics.timeStep = deltaTime)
+		systemPhysics.UpdateTiming(deltaTime);
 
 		// input
 		processInput(window);
@@ -955,8 +954,8 @@ void createEntities(EntityManager &entityManager)
 
 	Entity entity3("sphere");
 
-	ComponentRigidBody body = ComponentRigidBody(glm::vec3(0.0f, 1.0f, -5.0f));
-	body.forcesApplied.push_back(ComponentRigidBody::Force(body.position, glm::vec3(0.0f, 3000, -3000.0f)));
+	ComponentRigidBody body = ComponentRigidBody(glm::vec3(0.0f, 0.0f, 0.0f));
+	//body.forcesApplied.push_back(ComponentRigidBody::Force(body.position, glm::vec3(0.0f, 3000, -3000.0f)));
 
 
 	entity3.AddComponent(body);

@@ -22,7 +22,7 @@ class SystemRender : public ISystem
 {
 public:
 	SystemRender();
-	void OnAction(Entity &entity);
+	void Tick(Entity &entity);
 	void OnLoad(Entity &entity);
 	~SystemRender();
 };

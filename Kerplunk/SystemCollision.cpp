@@ -11,7 +11,7 @@ void SystemCollision::OnLoad(Entity &entity)
 	}
 }
 
-void SystemCollision::OnAction(Entity &entity)
+void SystemCollision::Tick(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{

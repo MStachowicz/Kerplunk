@@ -11,7 +11,7 @@ void SystemRender::OnLoad(Entity & entity)
 	}
 }
 
-void SystemRender::OnAction(Entity &entity)
+void SystemRender::Tick(Entity &entity)
 {
 	if ((entity.mask & MASK) == MASK)
 	{

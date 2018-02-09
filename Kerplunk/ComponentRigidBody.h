@@ -25,12 +25,15 @@ public:
 	glm::vec3 velocity;
 	// A list of all the forces applied to the body since the last physics tick
 	std::vector<Force> forcesApplied;
+	// Current resultant force being applied to the object
+	glm::vec3 resultantForce;
 	// Mass of the body
 	float mass;
 
 
 	ComponentRigidBody();
 	ComponentRigidBody(float x, float y, float z);
+	void ApplyForces();
 	ComponentRigidBody(glm::vec3 pos);
 
 	~ComponentRigidBody();
