@@ -3,8 +3,6 @@
 
 #include "ISystem.h"
 #include "IComponent.h"
-#include "ComponentPosition.h"
-#include "ComponentVelocity.h"
 #include "ComponentCollision.h"
 #include "ComponentRigidBody.h"
 #include <iostream>
@@ -17,6 +15,10 @@
 class SystemPhysics : public ISystem
 {
 public:
+	SystemPhysics();
+	~SystemPhysics();
+
+
 	// The total time the simulation has been running
 	float SimulationTime = 0;
 	// Time since the last physics tick
@@ -24,19 +26,25 @@ public:
 	// Time of the last physics tick
 	float tickLastTime;
 	// Whether the gravity is being applied to all the rigid bodies
-	bool applyGravity = true;
+	bool applyGravity;
 	// Whether the simulation is paused.
 	bool pauseSimulation = false;
+	// Physics timestep scaled by this value.
+	float timeScaler;
 
-	SystemPhysics();
-	void Tick(Entity & entity);
-	void OnLoad(Entity &entity);
+
+	void OnLoad(const std::shared_ptr<Entity> &entity);
+	void OnTickStart();
+	void OnTickStart(const std::shared_ptr<Entity> &entity);
+	void Tick(const std::shared_ptr<Entity> &entity);
+
 	void UpdateBodyPosition(glm::vec3 &pPosition, glm::vec3 &pVelocity, float tickDeltaTime);
 	void UpdateBodyVelocity(glm::vec3 &pVelocity, glm::vec3 &resultantForce, const float &pMass, const float &tickDeltaTime);
 	void UpdateTiming(float &tickDeltaTime);
-	~SystemPhysics();
+	void ApplyGravity(glm::vec3 & pVelocity, const float &tickDeltaTime);
 
 private:
-	void spherePlaneResponse(Entity &pSphere, Entity &pPlane, ComponentCollision::CollisionData &pCollisionData);
+	// Defaults
+	const float TIMESCALER = 1.0f;
 };
 #endif

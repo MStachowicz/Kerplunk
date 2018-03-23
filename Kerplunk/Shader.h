@@ -19,6 +19,7 @@ class Shader
 public:
 	// Reads and builds the shader
 	//Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader();
 	Shader(const char * vertexPath, const char * fragmentPath, const char* geometryPath);
 	
 	// Checks shader for comppilation or linking errors.

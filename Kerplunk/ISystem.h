@@ -14,8 +14,13 @@ public:
 	std::string name;
 	const IComponent::ComponentFlags MASK;
 
-	virtual void Tick(Entity &entity) = 0;
-	virtual void OnLoad(Entity &entity) = 0;
+	virtual void OnLoad(const std::shared_ptr<Entity> &entity) = 0;
+	
+	// These methods are called in the following order every frame.
+
+	virtual void OnTickStart(const std::shared_ptr<Entity> &entity) = 0;
+	virtual void OnTickStart() = 0;
+	virtual void Tick(const std::shared_ptr<Entity> &entity) = 0;
 	virtual ~ISystem();
 };
 #endif

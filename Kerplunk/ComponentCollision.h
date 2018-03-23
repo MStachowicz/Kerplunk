@@ -9,8 +9,6 @@
 #include "ISystem.h"
 #include "IComponent.h"
 #include "ComponentCollision.h"
-#include "ComponentVelocity.h"
-#include "ComponentScale.h"
 
 class Entity;
 

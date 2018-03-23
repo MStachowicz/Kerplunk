@@ -1,4 +1,8 @@
 #include <iostream>
+#include <limits>
+#include <random>
+#include <chrono>
+#include <map> 
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -13,18 +17,22 @@
 #include "SystemRender.h"
 #include "SystemLighting.h"
 #include "SystemCollision.h"
+#include "SystemShadows.h"
+
 #include "EntityManager.h"
 #include "Entity.h"
-#include "ComponentPosition.h"
-#include "ComponentRotation.h"
-#include "ComponentScale.h"
-#include "ComponentVelocity.h"
+
 #include "ComponentGeometry.h"
 #include "ComponentTexture.h"
 #include "ComponentMaterial.h"
-#include "ComponentShader.h"
+#include "ComponentShadowCast.h"
+#include "ComponentRenderable.h"
 #include "ComponentCollision.h"
 #include "ComponentRigidBody.h"
+#include "ComponentDirectionalLight.h"
+#include "ComponentSpotlight.h"
+#include "ComponentPointLight.h"
+
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -39,9 +47,10 @@ unsigned int loadCubemap(vector<std::string> faces);
 void setupLighting(shared_ptr<Shader> shader, glm::vec3 pointLightPositions[], glm::vec3 pointLightColours[], glm::vec3 pointLightSpecular[]);
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures);
 void createEntities(EntityManager &entityManager);
+float GenerateRandomNum(const float &min, const float &max);
 
-const GLint SCR_WIDTH = 1600, SCR_HEIGHT = 1200; // Screen dimensions.
-Camera camera(glm::vec3(0.0f, 1.0f, 3.0f)); // FPS camera object.
+const GLint SCR_WIDTH = 1920, SCR_HEIGHT = 1080; // Screen dimensions.
+std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0.0f, 1.0f, 0.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
 bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
@@ -57,6 +66,7 @@ float lastFrame = 0.0f; // Time of last frame
 
 // KEY FLAGS set to true when key is pressed, reset to false when the key is released
 bool capsFlag = false;
+bool pFlag = false;
 bool testFlag = false;
 bool isNormalMapActive = true; // Switches the lighting to use the blinn-phong lighting model.
 
@@ -78,7 +88,6 @@ EntityManager entityManager;
 
 SystemPhysics systemPhysics;
 SystemRender systemRender;
-SystemLighting systemLighting;
 SystemCollision systemCollision(entityManager);
 
 std::shared_ptr<Shader> lightingShader;
@@ -127,15 +136,20 @@ int main()
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 	lightingShader = std::make_shared<Shader>("../Kerplunk/lighting.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom"); // Shader to calculate lighting on objects
 
+
+
+	SystemShadows systemShadows(entityManager);
+	SystemLighting systemLighting(camera);
+
 	systemManager.AddSystem(systemPhysics);
 	systemManager.AddSystem(systemCollision);
+	systemManager.AddSystem(systemShadows); // Shadow setting must be performed before render
 	systemManager.AddSystem(systemLighting); // Lighting must be performed before render
 	systemManager.AddSystem(systemRender);
 	createEntities(entityManager);
 
 
 	// Build and compile shader
-	Shader lightBoxShader("../Kerplunk/lightBox.vert", "../Kerplunk/lightBox.frag", nullptr); // Shader to draw an always white object representing light source
 	Shader textureShader("../Kerplunk/texture.vert", "../Kerplunk/texture.frag", nullptr); // Shader to draw textured objects with no lighting applied
 
 	Shader screenShader("../Kerplunk/frameBuffer.vert", "../Kerplunk/frameBuffer.frag", nullptr); // Shader to draw a quad overlaying the screen used by the frame buffer object
@@ -151,7 +165,6 @@ int main()
 	//Shader instancedLightingShader("../Kerplunk/lightingInstanced.vert", "../Kerplunk/lighting.frag", "../Kerplunk/explode.geom");
 
 	Shader materialShader("../Kerplunk/materialLighting.vert", "../Kerplunk/materialLighting.frag", nullptr); // Shader to draw objects with material properties and texture applied.
-	Shader simpleDepthShader("../Kerplunk/depthShader.vert", "../Kerplunk/depthShader.frag", nullptr); // Shader used for shadow mapping, used to write to the depth buffer performing no lighting. 
 	Shader debugDepthQuad("../Kerplunk/debugQuad.vert", "../Kerplunk/debugQuad.frag", nullptr);
 	Shader omniDepthShader("../Kerplunk/omniDepthShader.vert", "../Kerplunk/omniDepthShader.frag", "../Kerplunk/omniDepthShader.geom"); // shader used to fill the depth component of the framebuffer cubemap for omnidirectional shadow mapping
 
@@ -332,16 +345,6 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	// Light box VAO
-	unsigned int lightVAO;
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-	// we only need to bind to the VBO, the container's VBO's data already contains the correct data.
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	// set the vertex attributes (only position data for lamp)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 
 
 	// transparent VAO
@@ -430,6 +433,7 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// DIRECTIONAL SHADOW MAPPING
+	// **************************************************************************************************
 	// Generating a framebuffer to store the shadow depth map
 	unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
@@ -569,7 +573,6 @@ int main()
 	// Uniform block index
 	// Set the binding point for the uniform block in the shaders
 	unsigned int uniformBlockIndexLighting = glGetUniformBlockIndex(lightingShader->ID, "Matrices");
-	unsigned int uniformBlockIndexLightBox = glGetUniformBlockIndex(lightBoxShader.ID, "Matrices");
 	unsigned int uniformBlockIndexReflection = glGetUniformBlockIndex(reflectionShader.ID, "Matrices");
 	unsigned int uniformBlockIndexRefraction = glGetUniformBlockIndex(refractionShader.ID, "Matrices");
 	unsigned int uniformBlockIndexSkyBox = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
@@ -579,7 +582,6 @@ int main()
 	unsigned int uniformBlockIndexMaterialShader = glGetUniformBlockIndex(materialShader.ID, "Matrices");
 
 	glUniformBlockBinding(lightingShader->ID, uniformBlockIndexLighting, 0);
-	glUniformBlockBinding(lightBoxShader.ID, uniformBlockIndexLightBox, 0);
 	glUniformBlockBinding(reflectionShader.ID, uniformBlockIndexReflection, 0);
 	glUniformBlockBinding(refractionShader.ID, uniformBlockIndexRefraction, 0);
 	glUniformBlockBinding(skyboxShader.ID, uniformBlockIndexSkyBox, 0);
@@ -686,31 +688,6 @@ int main()
 		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for default FBO to draw screen quad)		
 
 
-		// 1. render depth of scene to depth map for directional shadow mapping
-		// --------------------------------------------------------------
-		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 50.0f, projSize = 15.0f;
-
-		lightProjection = glm::ortho(-projSize, projSize, -projSize, projSize, near_plane, far_plane);
-		lightView = glm::lookAt(
-			glm::vec3(-2.0f, 30.0f, -1.0f), // light position
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0, 1.0, 0.0));
-		lightSpaceMatrix = lightProjection * lightView;
-
-		// 1.1 render scene to depth map
-		// --------------------------------------------------------------
-		simpleDepthShader.use();
-		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glCullFace(GL_FRONT); // reverse cull order to reduce peter panning on shadows
-		renderObjects(simpleDepthShader, cubePositions, cubeVAO, floorTexture, false);
-		glCullFace(GL_BACK);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		// 2. render depth of scene to cubemap for omnidirectional shadow mapping
 		// --------------------------------------------------------------
 		float aspect = (float)OMNI_SHADOW_WIDTH / (float)OMNI_SHADOW_HEIGHT;
@@ -751,17 +728,18 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-		// 3. render scene as normal using the generated depth/shadow map  
+		// 3. render scene as normal using the generated depth/shadow maps 
 		// --------------------------------------------------------------
 		// reset viewport
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		// REGULAR DRAW
+		// ********************************************************************************************************************************************
 		float viewDistanceFar = 2000.0f, viewDistanceNear = 0.1f;
 		// Projection + view set
-		proj = glm::perspective(glm::radians(camera.Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), viewDistanceNear, viewDistanceFar);
-		view = camera.GetViewMatrix();
+		proj = glm::perspective(glm::radians(camera->Zoom), ((float)(SCR_WIDTH / SCR_HEIGHT)), viewDistanceNear, viewDistanceFar);
+		view = camera->GetViewMatrix();
 
 		// Set matrices in the uniform buffer object (sets the projection and view matrices)
 		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
@@ -777,10 +755,12 @@ int main()
 		// Set up all the lighting in the scene
 		//setupLighting(lightingShader, pointLightPositions, pointLightColours, pointLightSpecular);
 		// add time component to geometry shader in the form of a uniform
-		lightingShader->setVec3("viewPos", camera.Position);
+		lightingShader->setVec3("viewPos", camera->Position);
 		lightingShader->setFloat("time", glfwGetTime());
-		lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		// shadow related var
 		lightingShader->setFloat("omniFarPlane", omniProjectionFar);
+
 		// Binding textures on corresponding texture units after activating them
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap);
@@ -793,7 +773,7 @@ int main()
 		systemManager.ActionSystems(entityManager);
 
 		// render Depth map of directional shadow to quad for visual debugging
-		// ---------------------------------------------
+		//****************************************************************************************************************************
 		//debugDepthQuad.use();
 		//debugDepthQuad.setFloat("near_plane", near_plane);
 		//debugDepthQuad.setFloat("far_plane", far_plane);
@@ -801,45 +781,34 @@ int main()
 		//glBindTexture(GL_TEXTURE_2D, directionalShadowDepthMap); // directional
 		//renderQuad();
 
-		// Draw light cubes
-		lightBoxShader.use();
 
-		for (unsigned int i = 0; i < 4; i++)
-		{
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, pointLightPositions[i]);
-			model = glm::scale(model, glm::vec3(0.2f));
-			lightBoxShader.setMat4("model", model);
-
-			glBindVertexArray(lightVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-
+		// 4. REFRACTION AND REFLECTION
+		//**********************************************************************************************************
 		// Draw reflective cube
-		reflectionShader.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(8.0f, 0.5f, 0.0f));
-		reflectionShader.setMat4("model", model);
-		reflectionShader.setVec3("cameraPos", camera.Position);
+		//reflectionShader.use();
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(8.0f, 0.5f, 0.0f));
+		//reflectionShader.setMat4("model", model);
+		//reflectionShader.setVec3("cameraPos", camera->Position);
 
-		glBindVertexArray(mirrorCubeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
+		//glBindVertexArray(mirrorCubeVAO);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glBindVertexArray(0);
 
-		// draw refraction cube	
-		refractionShader.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-8.0f, 0.5f, 0.0f));
-		refractionShader.setMat4("model", model);
-		refractionShader.setVec3("cameraPos", camera.Position);
+		//// draw refraction cube	
+		//refractionShader.use();
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(-8.0f, 0.5f, 0.0f));
+		//refractionShader.setMat4("model", model);
+		//refractionShader.setVec3("cameraPos", camera->Position);
 
-		glBindVertexArray(mirrorCubeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
+		//glBindVertexArray(mirrorCubeVAO);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glBindVertexArray(0);
 
 
 		// Draw cube map
@@ -847,7 +816,7 @@ int main()
 
 		skyboxShader.use();
 
-		glm::mat4 cubeView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translations from the view matrix
+		glm::mat4 cubeView = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translations from the view matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, UBOmatrices);
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(cubeView));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -928,90 +897,174 @@ int main()
 // code testing the creation of en entity with components added 
 void createEntities(EntityManager &entityManager)
 {
-	for (int i = 0; i < 1; i++)
-	{
-		Entity entity1("nanosuit");
-		//entity1.AddComponent(ComponentRigidBody(glm::vec3(0.0f + i, 1.0f, -20.0f)));
-		entity1.AddComponent(ComponentScale(glm::vec3(0.2f)));
-		std::string filepath = "models/nanosuit/nanosuit.obj";
-		entity1.AddComponent(ComponentModel(filepath, true, true));
-		entity1.AddComponent(ComponentShader(lightingShader));
-		entity1.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
-		entityManager.AddEntity(entity1);
-	}
+	// LIGHTS
+	Entity DirLight("DirLight");
+	DirLight.AddComponent(ComponentDirectionalLight());
+	DirLight.AddComponent(ComponentShadowCast());
+	entityManager.AddEntity(DirLight);
 
-	Entity entity2("cube");
-	entity2.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -20.0f)));
-	entity2.AddComponent(ComponentRotation(glm::vec3(1.0f)));
-	entity2.AddComponent(ComponentScale(glm::vec3(1.0f)));
-	entity2.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
-	entity2.AddComponent(ComponentGeometry("data/cube.txt"));
-	entity2.AddComponent(ComponentShader(lightingShader));
-	ComponentTexture texture("textures/container/diffuse.png", true);
-	texture.AddSpecularTexture("textures/container/specular.png");
-	entity2.AddComponent(texture);
-	entityManager.AddEntity(entity2);
+	/*Entity PointLight("PointLight");
+	PointLight.AddComponent(ComponentPointLight());
+	entityManager.AddEntity(PointLight);
 
-	Entity entity3("sphere");
-
-	ComponentRigidBody body = ComponentRigidBody(glm::vec3(0.0f, 0.0f, 0.0f));
-	//body.forcesApplied.push_back(ComponentRigidBody::Force(body.position, glm::vec3(0.0f, 3000, -3000.0f)));
+	Entity SpotLight("SpotLight");
+	SpotLight.AddComponent(ComponentSpotlight());
+	entityManager.AddEntity(SpotLight);
+*/
 
 
+	std::map <string, glm::vec3> colours;
+
+	colours.insert(std::pair<string, glm::vec3>("Violet", glm::vec3(148, 0, 211)));
+	colours.insert(std::pair<string, glm::vec3>("Indigo", glm::vec3(75, 0, 130)));
+	colours.insert(std::pair<string, glm::vec3>("Blue", glm::vec3(0, 0, 255)));
+	colours.insert(std::pair<string, glm::vec3>("Green", glm::vec3(0, 255, 0)));
+	colours.insert(std::pair<string, glm::vec3>("Yellow", glm::vec3(255, 255, 0)));
+	colours.insert(std::pair<string, glm::vec3>("Orange", glm::vec3(255, 127, 0)));
+	colours.insert(std::pair<string, glm::vec3>("Red", glm::vec3(255, 0, 0)));
+
+
+	//for (int i = 0; i < 1; i++)
+	//{
+	//	Entity entity1("nanosuit");
+	//	//entity1.AddComponent(ComponentRigidBody(glm::vec3(0.0f + i, 1.0f, -20.0f)));
+	//	std::string filepath = "models/nanosuit/nanosuit.obj";
+	//	entity1.AddComponent(ComponentModel(filepath, true, true));
+	//	entity1.AddComponent(ComponentRenderable());
+	//	entity1.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	//	entityManager.AddEntity(entity1);
+	//}
+
+	//Entity entity2("cube");
+	////entity2.AddComponent(ComponentRigidBody(glm::vec3(0.0f, 0.0f, -10.0f)));
+	//entity2.AddComponent(ComponentGeometry("data/cube.txt"));
+	//entity2.AddComponent(ComponentRenderable());
+	//ComponentTexture texture("textures/container/diffuse.png", true);
+	//texture.AddSpecularTexture("textures/container/specular.png");
+	//entity2.AddComponent(texture);
+	//entityManager.AddEntity(entity2);
+
+	Entity entity3("sphere1");
+
+	ComponentRigidBody body = ComponentRigidBody(glm::vec3(-5.0f,20.0f, 0.0f));
+	body.ignorePhysics = true;
+	//body.forcesApplied.push_back(ComponentRigidBody::Force(body.position, glm::vec3(60.0f, 0.0f, -200.0f)));
+	body.scale = 5.0f;
 	entity3.AddComponent(body);
-	
-	entity3.AddComponent(ComponentScale(glm::vec3(0.5f)));
 	entity3.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
 	entity3.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
-	entity3.AddComponent(ComponentShader(lightingShader));
-	entity3.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	entity3.AddComponent(ComponentRenderable());
+	entity3.AddComponent(ComponentMaterial(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0), 64.0f));
 	entityManager.AddEntity(entity3);
 
-	/*Entity entity8("sphere2");
-	entity8.AddComponent(ComponentPosition(glm::vec3(2.0f, 1.0f, -10.0f)));
-	entity8.AddComponent(ComponentRotation(glm::vec3(1.0f)));
-	entity8.AddComponent(ComponentScale(glm::vec3(0.5f)));
-	entity8.AddComponent(ComponentVelocity(glm::vec3(-0.01f, 0.0f, 0.0f)));
-	entity8.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
-	entity8.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
-	entity8.AddComponent(ComponentShader(lightingShader));
-	entity8.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
-	entityManager.AddEntity(entity8);*/
+	/*Entity entity11("sphere2");
+	entity11.AddComponent(ComponentRigidBody(glm::vec3(0.0f, 10.0f, 0.0f)));
+	entity11.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
+	entity11.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
+	entity11.AddComponent(ComponentShader(lightingShader));
+	entity11.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f,0.0f), glm::vec3(1.0), 64.0f));
+	entityManager.AddEntity(entity11);*/
 
-	Entity entity4("quad");
-	entity4.AddComponent(ComponentPosition(glm::vec3(0.0f, 1.0f, -10.0f)));
-	entity4.AddComponent(ComponentRotation(glm::vec3(1.0f)));
-	entity4.AddComponent(ComponentScale(glm::vec3(1.0f)));
-	entity4.AddComponent(ComponentVelocity(glm::vec3(0.0f, 0.0f, 0.0f)));
+
+	for (int i = 0; i < 25; i++)
+	{
+		Entity entity("sphereFor " + i);
+		entity.AddComponent(ComponentRigidBody(glm::vec3(GenerateRandomNum(-8, 8), GenerateRandomNum(3, 10), GenerateRandomNum(-8, 8))));
+		entity.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Sphere));
+		entity.AddComponent(ComponentModel(string("models/primitives/icosphere/icosphere4.obj"), true, false));
+		entity.AddComponent(ComponentRenderable());
+		glm::vec3 colour(GenerateRandomNum(0, 1), GenerateRandomNum(0, 1), GenerateRandomNum(0, 1));
+		entity.AddComponent(ComponentMaterial(colour, colour, glm::vec3(1.0), 64.0f));
+		entityManager.AddEntity(entity);
+	}
+
+	Entity entity4("quadBottom");
+	ComponentRigidBody body2 = ComponentRigidBody(glm::vec3(0.0f, 0.0f, 0.0f));
+	body2.rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
+	body2.scale = 10;
+	body2.ignorePhysics = true;
+	body2.mass = std::numeric_limits<float>::infinity();
+	entity4.AddComponent(ComponentRigidBody(body2));
 	entity4.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
 	entity4.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
-	entity4.AddComponent(ComponentShader(lightingShader));
-	entity4.AddComponent(ComponentMaterial(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0), 64.0f));
+	entity4.AddComponent(ComponentRenderable());
+	glm::vec3 or = glm::normalize(colours["Orange"]);
+	entity4.AddComponent(ComponentMaterial(or , or , glm::vec3(1), 64.0f));
 	entityManager.AddEntity(entity4);
 
-	Entity entity5("pointLight0");
-	entity5.AddComponent(ComponentPosition(glm::vec3(0.0f, 3.0f, -19.0f)));
-	entity5.AddComponent(ComponentLightEmitter(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.9f)));
-	entity5.AddComponent(ComponentLightAttenuation(1.0f, 0.9f, 0.32f));
-	entity5.AddComponent(ComponentShader(lightingShader));
+	Entity entity5("quadRight");
+	ComponentRigidBody body3 = ComponentRigidBody(glm::vec3(10.0f, 10.0f, 0.0f));
+	body3.rotation = glm::vec3(0.0f, -90.0f, 0.0f);
+	body3.scale = 10;
+	body3.ignorePhysics = true;
+	body3.mass = std::numeric_limits<float>::infinity();
+	entity5.AddComponent(ComponentRigidBody(body3));
+	entity5.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
+	entity5.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
+	entity5.AddComponent(ComponentRenderable());
+	or = glm::normalize(colours["Violet"]);
+	entity5.AddComponent(ComponentMaterial(or , or , glm::vec3(1), 64.0f));
 	entityManager.AddEntity(entity5);
 
-	Entity entity6("directionLight");
-	entity6.AddComponent(ComponentLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f)));
-	entity6.AddComponent(ComponentLightEmitter(glm::vec3(0.01f, 0.01f, 0.01f), glm::vec3(0.01f, 0.01f, 0.01f), glm::vec3(0.1f, 0.1f, 0.1f)));
-	entity6.AddComponent(ComponentShader(lightingShader));
+	Entity entity6("quadLeft");
+	ComponentRigidBody body4 = ComponentRigidBody(glm::vec3(-10.0f, 10.0f, 0.0f));
+	body4.rotation = glm::vec3(0.0f, 90.0f, 0.0f);
+	body4.scale = 10;
+	body4.ignorePhysics = true;
+	body4.mass = std::numeric_limits<float>::infinity();
+	entity6.AddComponent(ComponentRigidBody(body4));
+	entity6.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
+	entity6.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
+	entity6.AddComponent(ComponentRenderable());
+	or = glm::normalize(colours["Blue"]);
+	entity6.AddComponent(ComponentMaterial(or , or , glm::vec3(1), 64.0f));
 	entityManager.AddEntity(entity6);
 
-	Entity entity7("spotlight");
-	entity7.AddComponent(ComponentPosition(glm::vec3(-15.793399f, -0.271867f, 15.654298f)));
-	entity7.AddComponent(ComponentLightDirection(glm::vec3(0.905481f, -0.424199f, -0.012639f)));
-	entity7.AddComponent(ComponentLightEmitter(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.9f)));
-	entity7.AddComponent(ComponentLightAttenuation(1.0f, 0.09f, 0.032f));
-	entity7.AddComponent(ComponentLightCutOff(12.5f, 15.0f));
-	entity7.AddComponent(ComponentShader(lightingShader));
+	Entity entity7("quadFront");
+	ComponentRigidBody body5 = ComponentRigidBody(glm::vec3(0.0f, 10.0f, -10.0f));
+	body5.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	body5.scale = 10;
+	body5.ignorePhysics = true;
+	body5.mass = std::numeric_limits<float>::infinity();
+	entity7.AddComponent(ComponentRigidBody(body5));
+	entity7.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
+	entity7.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
+	entity7.AddComponent(ComponentRenderable());
+	or = glm::normalize(colours["Green"]);
+	entity7.AddComponent(ComponentMaterial(or , or , glm::vec3(1), 64.0f));
 	entityManager.AddEntity(entity7);
 
+	Entity entity8("quadBack");
+	ComponentRigidBody body6 = ComponentRigidBody(glm::vec3(0.0f, 10.0f, 10.0f));
+	body6.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+	body6.scale = 10;
+	body6.ignorePhysics = true;
+	body6.mass = std::numeric_limits<float>::infinity();
+	entity8.AddComponent(ComponentRigidBody(body6));
+	entity8.AddComponent(ComponentCollision(ComponentCollision::collisionPrimitiveType::Plane));
+	entity8.AddComponent(ComponentGeometry(Geometry::primitiveTypes::quad));
+	entity8.AddComponent(ComponentRenderable());
+	or = glm::normalize(colours["Yellow"]);
+	entity8.AddComponent(ComponentMaterial(or , or , glm::vec3(1), 64.0f));
+	entityManager.AddEntity(entity8);
+
 	systemManager.LoadSystems(entityManager);
+}
+
+float GenerateRandomNum(const float & min, const float & max)
+{
+	std::mt19937_64 rng;
+
+	// initialize the random number generator with time-dependent seed
+	uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	std::seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+	rng.seed(ss);
+
+	// initialize a uniform distribution between 0 and 1
+	std::uniform_real_distribution<double> unif(min, max);
+
+	// generate random number
+	return unif(rng);
 }
 
 void renderObjects(const Shader &shader, glm::vec3 cubePositions[], unsigned int cubeVAO, unsigned int floorTexture, bool bindTextures)
@@ -1138,7 +1191,7 @@ void setupLighting(shared_ptr<Shader> shader, glm::vec3 pointLightPositions[], g
 {
 	// Set up all the lighting in the scene
 	shader->use();
-	shader->setVec3("viewPos", camera.Position);
+	shader->setVec3("viewPos", camera->Position);
 
 	// Point light motion
 	for (GLuint i = 0; i < 1; i++)
@@ -1225,6 +1278,25 @@ void processInput(GLFWwindow *window)
 		capsFlag = false;
 	}
 
+	// Pause Simulation
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+	{
+		if (!pFlag)
+		{
+			if (systemPhysics.pauseSimulation)
+				systemPhysics.pauseSimulation = false;
+			else
+				systemPhysics.pauseSimulation = true;
+		}
+
+		// Set flag to indicate the key is being pressed.
+		pFlag = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE)
+	{
+		pFlag = false;
+	}
+
 	// Toggle blinn shading
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
@@ -1247,13 +1319,17 @@ void processInput(GLFWwindow *window)
 
 	// CAMERA MOVEMENT
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
+		camera->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
+		camera->ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
+		camera->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+		camera->ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		camera->ProcessKeyboard(UP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		camera->ProcessKeyboard(DOWN, deltaTime);
 }
 
 
@@ -1281,12 +1357,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	camera->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera.ProcessMouseScroll(yoffset);
+	camera->ProcessMouseScroll(yoffset);
 }
 
 // utility function for loading a 2D texture from file

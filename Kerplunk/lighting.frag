@@ -108,10 +108,10 @@ void main()
    // for(int i = 0; i < NR_POINT_LIGHTS; i++)
        // result += CalcPointLight(pointLights[i], norm,  fs_in.FragPos, viewDir); 
 		
-	result += CalcPointLight(pointLights[0], norm,  fs_in.FragPos, viewDir);
+	//result += CalcPointLight(pointLights[0], norm,  fs_in.FragPos, viewDir);
 
     // phase 3: Spot light
-    result += CalcSpotLight(spotlight, norm,  fs_in.FragPos, viewDir);          
+    //result += CalcSpotLight(spotlight, norm,  fs_in.FragPos, viewDir);          
 
 	result = pow(result, vec3(1.0/2.2)); // gamma correction
     

@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "IComponent.h"
-#include "ComponentPosition.h"
 
 class Entity
 {
@@ -20,7 +19,7 @@ public:
 
 	Entity(std::string name);
 	~Entity();
-	std::shared_ptr<IComponent> FindComponent(int pComponentValue);
+	std::shared_ptr<IComponent> FindComponent(int pComponentValue) const; 
 
 	template <typename CompType> 
 	void AddComponent(CompType& pComponent) // Adds a single component to the entity and updates the mask.
@@ -29,15 +28,26 @@ public:
 		updateMask(pComponent);
 	}
 
+	//// Compares two entities by their adresses to determine if they are the same entity.
+	//bool operator==(const Entity& rhs) const {
+	//	return
+	//		this == &rhs;
+	//}
+	//// Compares two entities by their adresses to determine if they are not the same entity.
+	//bool operator!=(const Entity& rhs) const {
+	//	return
+	//		this != &rhs;
+	//}
+
+
 	// Compares two entities by their adresses to determine if they are the same entity.
-	bool operator==(const Entity& rhs) const {
+	bool operator==(const std::shared_ptr<Entity>& rhs) const {
 		return
-			this == &rhs;
+			false;
 	}
-	// Compares two entities by their adresses to determine if they are not the same entity.
-	bool operator!=(const Entity& rhs) const {
+	bool operator!=(const std::shared_ptr<Entity>& rhs) const {
 		return
-			this != &rhs;
+			false;
 	}
 
 private:

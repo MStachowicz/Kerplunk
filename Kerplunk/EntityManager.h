@@ -10,7 +10,7 @@ class EntityManager
 public:
 	EntityManager();
 
-	std::vector<Entity> entityList;
+	std::vector<std::shared_ptr<Entity>> entityList;
 
 	// Adds an entity to the entity list of the manager.
 	void AddEntity(Entity entity);

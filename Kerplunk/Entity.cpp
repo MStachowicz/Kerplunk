@@ -7,7 +7,7 @@ Entity::Entity(std::string pName)
 	name = pName;
 }
 
-std::shared_ptr<IComponent> Entity::FindComponent(int pComponentValue)
+std::shared_ptr<IComponent> Entity::FindComponent(int pComponentValue) const
 {
 	// lambda expression
 	auto findComponentType = [pComponentValue](auto component)

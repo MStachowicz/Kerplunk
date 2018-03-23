@@ -135,22 +135,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComponentCollision.cpp" />
+    <ClCompile Include="ComponentDirectionalLight.cpp" />
     <ClCompile Include="ComponentGeometry.cpp" />
-    <ClCompile Include="ComponentLightAttenuation.cpp" />
-    <ClCompile Include="ComponentLightCutOff.cpp" />
-    <ClCompile Include="ComponentLightDirection.cpp" />
-    <ClCompile Include="ComponentLightEmitter.cpp" />
     <ClCompile Include="ComponentMaterial.cpp" />
+    <ClCompile Include="ComponentPointLight.cpp" />
+    <ClCompile Include="ComponentRenderable.cpp" />
     <ClCompile Include="ComponentRigidBody.cpp" />
-    <ClCompile Include="ComponentShader.cpp" />
-    <ClCompile Include="ComponentDirectionShadowEmitter.cpp" />
+    <ClCompile Include="ComponentShadowCast.cpp" />
+    <ClCompile Include="ComponentSpotlight.cpp" />
     <ClCompile Include="ComponentTexture.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="ComponentModel.cpp" />
-    <ClCompile Include="ComponentPosition.cpp" />
-    <ClCompile Include="ComponentRotation.cpp" />
-    <ClCompile Include="ComponentScale.cpp" />
-    <ClCompile Include="ComponentVelocity.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="IComponent.cpp" />
@@ -167,27 +162,23 @@
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="SystemPhysics.cpp" />
     <ClCompile Include="SystemRender.cpp" />
+    <ClCompile Include="SystemShadows.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComponentCollision.h" />
+    <ClInclude Include="ComponentDirectionalLight.h" />
     <ClInclude Include="ComponentGeometry.h" />
-    <ClInclude Include="ComponentLightAttenuation.h" />
-    <ClInclude Include="ComponentLightCutOff.h" />
-    <ClInclude Include="ComponentLightDirection.h" />
-    <ClInclude Include="ComponentLightEmitter.h" />
     <ClInclude Include="ComponentMaterial.h" />
+    <ClInclude Include="ComponentPointLight.h" />
+    <ClInclude Include="ComponentRenderable.h" />
     <ClInclude Include="ComponentRigidBody.h" />
-    <ClInclude Include="ComponentShader.h" />
-    <ClInclude Include="ComponentDirectionShadowEmitter.h" />
+    <ClInclude Include="ComponentShadowCast.h" />
+    <ClInclude Include="ComponentSpotlight.h" />
     <ClInclude Include="ComponentTexture.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="ComponentModel.h" />
-    <ClInclude Include="ComponentPosition.h" />
-    <ClInclude Include="ComponentRotation.h" />
-    <ClInclude Include="ComponentScale.h" />
-    <ClInclude Include="ComponentVelocity.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="IComponent.h" />
@@ -204,6 +195,7 @@
     <ClInclude Include="SystemManager.h" />
     <ClInclude Include="SystemPhysics.h" />
     <ClInclude Include="SystemRender.h" />
+    <ClInclude Include="SystemShadows.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
