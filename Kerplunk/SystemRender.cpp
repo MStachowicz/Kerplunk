@@ -17,8 +17,8 @@ void SystemRender::OnTickStart(const std::shared_ptr<Entity>& entity)
 void SystemRender::OnTickStart()
 {
 	// reset viewport
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void SystemRender::Tick(const std::shared_ptr<Entity> &entity)
 {

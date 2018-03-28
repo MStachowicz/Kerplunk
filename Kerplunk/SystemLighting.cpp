@@ -74,6 +74,10 @@ void SystemLighting::OnTickStart()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->GetViewMatrix()));
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	// Clear the viewport and buffers after shadow system operations preparing for rendering
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void SystemLighting::Tick(const std::shared_ptr<Entity> &entity)
 {
@@ -83,13 +87,23 @@ void SystemLighting::Tick(const std::shared_ptr<Entity> &entity)
 		{
 			std::shared_ptr<ComponentDirectionalLight> directionLightComp = std::dynamic_pointer_cast<ComponentDirectionalLight> (entity->FindComponent(4));
 
+			float radius = 30, angle = glfwGetTime() / 15;
+			float x = radius * glm::cos(angle);
+			float y = radius * glm::sin(angle);
+
+			glm::vec3 sunPosition(x, y, 0.0f);
+			glm::vec3 sunDirection = glm::normalize(glm::vec3(0.0f) - sunPosition);
+
+			directionLightComp->position = sunPosition;
+			directionLightComp->direction = sunDirection;
+
 			lightingShader->setVec3("dirLight.direction", directionLightComp->direction);
 			lightingShader->setVec3("dirLight.ambient", directionLightComp->ambient);
 			lightingShader->setVec3("dirLight.diffuse", directionLightComp->diffuse);
 			lightingShader->setVec3("dirLight.specular", directionLightComp->specular);
 
 			if (drawLightSources)
-				RenderLightBox(glm::vec3(0.0f, 30.0f, 0.0f));
+				RenderLightBox(glm::vec3(sunPosition));
 		}
 		else if ((entity->mask & IComponent::COMPONENT_SPOTLIGHT) == IComponent::COMPONENT_SPOTLIGHT)
 		{
@@ -149,10 +163,10 @@ void SystemLighting::SetupShader()
 	lightingShader->setInt("omniShadowMap", 5);
 
 	unsigned int uniformBlockIndexLighting = glGetUniformBlockIndex(lightingShader->ID, "Matrices");
-	glUniformBlockBinding(lightingShader->ID, uniformBlockIndexLighting, 0);
-
 	unsigned int uniformBlockIndexLightBox = glGetUniformBlockIndex(lightBoxShader.ID, "Matrices");
-	glUniformBlockBinding(lightingShader->ID, uniformBlockIndexLightBox, 0);
+
+	glUniformBlockBinding(lightingShader->ID, uniformBlockIndexLighting, 0);
+	glUniformBlockBinding(lightBoxShader.ID, uniformBlockIndexLightBox, 0);
 
 	// Creating the actual uniform buffer object and binding it to the binding point
 	glGenBuffers(1, &ShaderUBO);

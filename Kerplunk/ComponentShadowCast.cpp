@@ -35,7 +35,7 @@ void ComponentShadowCast::setLightSpaceMatrix(const glm::vec3 &pPosition)
 	if (auto shader = depthShader.lock()) {
 
 		glm::mat4 lightProjection, lightView;
-		float near_plane = 1.0f, far_plane = 50.0f, projSize = 15.0f;
+		float near_plane = 1.0f, far_plane = 50.0f, projSize = 50.0f; // todo: make these variable members
 
 		lightProjection = glm::ortho(-projSize, projSize, -projSize, projSize, near_plane, far_plane);
 		lightView = glm::lookAt(

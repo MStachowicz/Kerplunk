@@ -60,7 +60,7 @@ void SystemShadows::FillDepthBuffer(const std::shared_ptr<Entity> &entity)
 		// hard coded to work with directional light as consider moving all shadow functionality to new system avoiding low cohesion
 		std::shared_ptr<ComponentDirectionalLight> directionLightComp = std::dynamic_pointer_cast<ComponentDirectionalLight> (entity->FindComponent(4));
 
-		shadowCastComp->setLightSpaceMatrix(glm::vec3(-2.0f, 30.0f, -1.0f));
+		shadowCastComp->setLightSpaceMatrix(directionLightComp->position);
 
 		glViewport(0, 0, shadowCastComp->SHADOW_WIDTH, shadowCastComp->SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, shadowCastComp->depthMapFBO);

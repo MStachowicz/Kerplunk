@@ -50,7 +50,7 @@ void createEntities(EntityManager &entityManager);
 float GenerateRandomNum(const float &min, const float &max);
 
 const GLint SCR_WIDTH = 1920, SCR_HEIGHT = 1080; // Screen dimensions.
-std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0.0f, 1.0f, 0.0f)); // FPS camera object.
+std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0.0f, 5.0f, 50.0f)); // FPS camera object.
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2; // Previous mouse position on screen. 
 bool isWireFrameModeActive = false; // Boolean keeping track of whether wireframe mode is enabled.
 bool firstMouse = true; // Whether the mouse callback event is being performed for the first time.
